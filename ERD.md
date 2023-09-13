@@ -34,7 +34,7 @@ bbs_articles {
 }
 bbs_article_snapshots {
     String id PK
-    String bbs_article_id
+    String bbs_article_id FK
     String format
     String title
     String body
@@ -42,27 +42,27 @@ bbs_article_snapshots {
 }
 bbs_article_snapshot_files {
     String id PK
-    String bbs_article_snapshot_id
-    String attachment_file_id
+    String bbs_article_snapshot_id FK
+    String attachment_file_id FK
     Int sequence
 }
 bbs_article_comments {
     String id PK
-    String bbs_article_id
-    String parent_id "nullable"
+    String bbs_article_id FK
+    String parent_id FK "nullable"
     DateTime created_at
 }
 bbs_article_comment_snapshots {
     String id PK
-    String bbs_article_comment_id
+    String bbs_article_comment_id FK
     String format
     String body
     DateTime created_at
 }
 bbs_article_comment_snapshot_files {
     String id PK
-    String bbs_article_comment_snapshot_id
-    String attachment_file_id
+    String bbs_article_comment_snapshot_id FK
+    String attachment_file_id FK
     Int sequence
 }
 attachment_files {
@@ -145,8 +145,8 @@ pair relationship 테이블이다. 그리고 첨부파일의 순서를 보장하
 
 그리고 이 댓글 또한, 앞서 [bbs_articles](#bbs_articles) 및 [bbs_article_snapshots](#bbs_article_snapshots) 
 간의 관계가 그러하였듯, 증거주의를 위하여 댓글의 본문을 하위 
-[bbs_article_comment_snapshots](#bbs_article_comment_snapshots) 에 저장하고, 댓글을 수정할 때마다 새로운 
-스냅샷 레코드를 발행하고 있다.
+[스냅샷](#bbs_article_comment_snapshots)에 저장하고, 댓글을 수정할 때마다 
+새로운 스냅샷 레코드를 발행하고 있다.
 
 또한, [bbs_article_comments.parent_id](#bbs_article_comments) 속성을 통하여, 대댓글의 관계를 
 표현하고 있다.

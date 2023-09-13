@@ -60,8 +60,9 @@ export namespace DescriptionWriter {
             if (last === -1) break;
 
             const part: string = content.slice(first + 7, last).trim();
-            const space: number = part.indexOf(" ", first + 7);
+            const space: number = part.indexOf(" ");
             rejoined.push(content.slice(i, first));
+
             if (space === -1)
                 rejoined.push(`[${part}](#${part.split(".")[0]})`);
             else
