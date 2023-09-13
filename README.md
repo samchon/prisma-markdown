@@ -12,6 +12,10 @@ Prisma markdown documents generator.
   - Descriptions written by `///` comments
   - Separations by `@tag` comments
 
+If you want to see how markdown document being generated, read below examples:
+
+  - Generated markdown: [samchon/prisma-markdown/ERD.md](https://github.com/samchon/prisma-markdown/blob/master/ERD.md)
+  - Prisma schema file: [samchon/prisma-markdown/schema.prisma](https://github.com/samchon/prisma-markdown/blob/master/schema.prisma)
 
 
 
@@ -36,15 +40,6 @@ At last, run below command, than [ERD.md](https://github.com/samchon/prisma-mark
 ```bash
 npx prisma generate
 ```
-
-
-
-
-## Demonstration
-You can see how markdown document being generated: 
-
-- Prisma schema file: [schema.prisma](https://github.com/samchon/prisma-markdown/blob/master/schema.prisma)
-- Generated markdown: [ERD.md](https://github.com/samchon/prisma-markdown/blob/master/ERD.md)
 
 
 
