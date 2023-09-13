@@ -15,7 +15,7 @@ generator markdown {
 ///
 /// 본 DB 의 모든 곳에서 사용되는 첨부파일 엔티티.
 ///
-/// @group articles
+/// @tag Articles
 /// @author Samchon
 model attachment_files {
     //----
@@ -65,9 +65,9 @@ model attachment_files {
 /// 
 /// 이른바 '밑장빼기' 방지용.
 ///
-/// @group articles
-/// @group inquiries
-/// @group issues
+/// @tag Articles
+/// @tag inquiries
+/// @tag issues
 /// @author Samchon
 model bbs_articles {
     /// @format uuid
@@ -101,9 +101,9 @@ model bbs_articles {
 /// {@link bbs_articles} 에서도 설명한 바 있듯이, 밑장빼기 방지를 위하여 컨텐츠를
 /// 게시물 레코드에서 분리하였다.
 ///
-/// @group articles
-/// @group inquiries
-/// @group issues
+/// @tag Articles
+/// @tag inquiries
+/// @tag issues
 /// @author Samchon
 model bbs_article_snapshots {
     //----
@@ -153,7 +153,7 @@ model bbs_article_snapshots {
 /// {@link bbs_article_snapshot_files.sequence} 속성을 추가로 가지는데, 앞으로 계속
 /// 보게 될 패턴이니, 미리 미리 익숙해지자.
 ///
-/// @group articles
+/// @tag Articles
 /// @author Samchon
 model bbs_article_snapshot_files {
     //----
@@ -199,9 +199,9 @@ model bbs_article_snapshot_files {
 /// 또한, {@link bbs_article_comments.parent_id} 속성을 통하여, 대댓글의 관계를 
 /// 표현하고 있다.
 ///
-/// @group articles
-/// @group inquiries
-/// @group issues
+/// @tag Articles
+/// @tag inquiries
+/// @tag issues
 /// @author Samchon
 model bbs_article_comments {
     //----
@@ -257,7 +257,7 @@ model bbs_article_comments {
 /// 
 /// 위 {@link bbs_article_comments) 에서 설명하였듯, 밑장빼기 방지용.
 ///
-/// @group articles
+/// @tag Articles
 /// @author Samchon
 model bbs_article_comment_snapshots {
     //----
@@ -299,9 +299,9 @@ model bbs_article_comment_snapshots {
 /// {@link bbs_article_comment_snapshots} {@link attachment_files} 의 
 /// M: N 관계 해소용.
 /// 
-/// @group articles
-/// @group inquiries
-/// @group issues
+/// @tag Articles
+/// @tag inquiries
+/// @tag issues
 /// @author Samchon
 model bbs_article_comment_snapshot_files {
     //----
