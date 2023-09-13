@@ -24,7 +24,7 @@ generator markdown {
 }
 ```
 
-At last, run below command, than [ERD.md](https://github.com/samchon/prisma-markdown/ERD.md) file would be generated.
+At last, run below command, than [ERD.md](https://github.com/samchon/prisma-markdown/blob/master/ERD.md) file would be generated.
 
 ```bash
 npx prisma generate
@@ -36,5 +36,5 @@ npx prisma generate
 ## Demonstration
 You can see how markdown document being generated: 
 
-- Prisma schema file: [schema.prisma](https://github.com/samchon/prisma-markdown/schema.prisma)
-- Generated markdown: [ERD.md](https://github.com/samchon/prisma-markdown/ERD.md)
+- Prisma schema file: [schema.prisma](https://github.com/samchon/prisma-markdown/blob/master/schema.prisma)
+- Generated markdown: [ERD.md](https://github.com/samchon/prisma-markdown/blob/master/ERD.md)
