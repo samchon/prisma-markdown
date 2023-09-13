@@ -1,0 +1,336 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("POSTGRESQL_URL")
+}
+
+generator markdown {
+    provider = "node ./lib/executable/markdown"
+    output   = "./ERD.md"
+}
+
+//-----------------------------------------------------------
+// ARTICLES
+//-----------------------------------------------------------
+/// 첨부 파일.
+///
+/// 본 DB 의 모든 곳에서 사용되는 첨부파일 엔티티.
+///
+/// @group articles
+/// @author Samchon
+model attachment_files {
+    //----
+    // COLUMNS
+    //----
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// 파일명, 확장자 제외.
+    ///
+    /// @minLength 1
+    /// @maxLength 255
+    name String? @db.VarChar
+
+    /// 확장자.
+    ///
+    /// @minLength 1
+    /// @maxLength 8
+    extension String? @db.VarChar
+
+    /// 파일의 URL 경로.
+    ///
+    /// @format url
+    url String @db.VarChar
+
+    //----
+    // RELATIONS
+    //----
+    bbs_article_snapshot_files          bbs_article_snapshot_files[]
+    bbs_article_comment_snapshots_files bbs_article_comment_snapshot_files[]
+}
+
+/// 게시물 엔티티.
+/// 
+/// `bbs_articles` 은 현행 쇼핑몰 시스템에 존재하는 모든 종류의 게시물에 대한 
+/// 슈퍼타입 엔티티로써, 문자 그대로 게시판의 개별 게시물을 형상화하였다.
+/// 
+/// 그리고 게시물에 필연적으로 존재해야하는 제목이나 본문같은 요소들이 본 
+/// `bbs_articles` 에 존재하지 않고, 그보다 하위 엔티티엔 
+/// {@link bbs_article_snapshots} 에 1: N 의 관계로써 존재하는데, 이는 게시물을
+///  수정할 때마다 새로운 스냅샷 레코드를 발행하기 때문이다.
+/// 
+/// 이렇게 게시물을 수정할 때마다 새로운 스냅샷 레코드를 발행하는 이유는, 바로 증거를 
+/// 보존하기 위함이다. 전자상거래의 특성상, 참여자들 간에는 늘 분쟁의 위협이 도사린다. 
+/// 그리고 게시물이나 그 댓글을 통해서도 다툼이 일어날 수 있는데, 이 때 기존 게시물을 
+/// 수정하여 정황을 조작하는 일 등을 막기 위하여, 게시물이 이러한 구조로 설계된 것. 
+/// 
+/// 이른바 '밑장빼기' 방지용.
+///
+/// @group articles
+/// @group inquiries
+/// @group issues
+/// @author Samchon
+model bbs_articles {
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// 게시물 생성 일시.
+    created_at DateTime @db.Timestamptz
+
+    /// 게시물 삭제 일시.
+    deleted_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    /// 스냅샷 리스트.
+    ///
+    /// 게시물 작성시 최초 1 회 생성되며, 게시물을 수정할 때마다 누적됨.
+    ///
+    /// @minItems 1
+    snapshots bbs_article_snapshots[]
+
+    /// 댓글 리스트.
+    comments bbs_article_comments[]
+
+    @@index([created_at])
+}
+
+/// 게시물 스냅샷
+///
+/// `bbs_article_snapshots` 은 게시물의 컨텐츠를 담은 스냅샷 엔티티로써, 
+/// {@link bbs_articles} 에서도 설명한 바 있듯이, 밑장빼기 방지를 위하여 컨텐츠를
+/// 게시물 레코드에서 분리하였다.
+///
+/// @group articles
+/// @group inquiries
+/// @group issues
+/// @author Samchon
+model bbs_article_snapshots {
+    //----
+    // COLUMNS
+    //----
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// 귀속 게시물의 {@link bbs_articles.id}
+    ///
+    /// @format uuid
+    bbs_article_id String @db.Uuid
+
+    /// 본문의 형식.
+    ///
+    /// 확장자의 비슷한 의미: html, md, txt 등
+    format String @db.VarChar
+
+    /// 게시물의 제목
+    title String @db.VarChar
+
+    /// 게시물 본문 컨텐츠
+    body String
+
+    /// 레코드 생성 일시 (게시물의 최초 생성일시 또는 편집일시)
+    created_at DateTime @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    /// 귀속 게시물 정보.
+    article bbs_articles @relation(fields: [bbs_article_id], references: [id], onDelete: Cascade)
+
+    /// 첨부파일 리스트
+    files bbs_article_snapshot_files[]
+
+    @@index([bbs_article_id, created_at])
+}
+
+/// 게시물 스냅샷의 첨부 파일.
+///
+/// `bbs_article_snapshot_files` 는 게시물 스냅샷의 첨부 파일을 형상화한 엔티티이다.
+///
+/// `bbs_article_snapshot_files` 는 {@link bbs_article_snapshots} 와 
+/// {@link attachment_files} 간의 M: N 관계를 해소하기 위한, 전형적인 
+/// pair relationship 테이블이다. 그리고 첨부파일의 순서를 보장하기 위하여 
+/// {@link bbs_article_snapshot_files.sequence} 속성을 추가로 가지는데, 앞으로 계속
+/// 보게 될 패턴이니, 미리 미리 익숙해지자.
+///
+/// @group articles
+/// @author Samchon
+model bbs_article_snapshot_files {
+    //----
+    // COLUMNS
+    //----
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// 귀속 게시물 스냅샷의 {@link bbs_article_snapshots.id}
+    ///
+    /// @format uuid
+    bbs_article_snapshot_id String @db.Uuid
+
+    /// 귀속 첨부 파일의 {@link attachment_files.id}
+    ///
+    /// @format uuid
+    attachment_file_id String @db.Uuid
+
+    /// 게시물 스냅샷 내 첨부파일의 배열상 배치 순서.
+    ///
+    /// @format int
+    sequence Int @db.Integer
+
+    //----
+    // RELATIONS
+    //----
+    snapshot bbs_article_snapshots @relation(fields: [bbs_article_snapshot_id], references: [id], onDelete: Cascade)
+    file     attachment_files      @relation(fields: [attachment_file_id], references: [id], onDelete: Cascade)
+
+    @@index([bbs_article_snapshot_id])
+    @@index([attachment_file_id])
+}
+
+/// 게시물에 작성한 댓글.
+/// 
+/// `bbs_article_comments` 는 게시물에 작성한 댓글을 형상화한 엔티티이다.
+/// 
+/// 그리고 이 댓글 또한, 앞서 {@link bbs_articles} 및 {@link bbs_article_snapshots} 
+/// 간의 관계가 그러하였듯, 증거주의를 위하여 댓글의 본문을 하위 
+/// {@link bbs_article_comment_snapshots} 에 저장하고, 댓글을 수정할 때마다 새로운 
+/// 스냅샷 레코드를 발행하고 있다.
+/// 
+/// 또한, {@link bbs_article_comments.parent_id} 속성을 통하여, 대댓글의 관계를 
+/// 표현하고 있다.
+///
+/// @group articles
+/// @group inquiries
+/// @group issues
+/// @author Samchon
+model bbs_article_comments {
+    //----
+    // COLUMNS
+    //----
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// 귀속 게시물의 {@link bbs_articles.id}
+    /// 
+    /// @format uuid
+    bbs_article_id String @db.Uuid
+
+    /// 부모 댓글의 ID.
+    ///
+    /// 대댓글을 작성할 때 사용한다.
+    ///
+    /// @format uuid
+    parent_id String? @db.Uuid
+
+    /// 댓글 생성 일시.
+    created_at DateTime @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    /// 귀속 게시물.
+    article bbs_articles @relation(fields: [bbs_article_id], references: [id], onDelete: Cascade)
+
+    /// 부모 댓글.
+    ///
+    /// 대댓글인 경우에 한함.
+    parent bbs_article_comments? @relation("bbs_article_comments_reply", fields: [parent_id], references: [id], onDelete: Cascade)
+
+    /// 자식 댓글 리스트.
+    ///
+    /// 본 댓글에 달린 대댓글 리스트.
+    children bbs_article_comments[] @relation("bbs_article_comments_reply")
+
+    /// 스냅샷 리스트.
+    /// 
+    /// 댓글 작성시 최초 1 회 생성되며, 댓글을 수정할 때마다 누적됨.
+    ///
+    /// @minItems 1
+    snapshots bbs_article_comment_snapshots[]
+
+    @@index([bbs_article_id, parent_id, created_at])
+}
+
+/// 댓글 스냅샷.
+/// 
+/// `bbs_article_comment_snapshots` 는 댓글의 본 컨텐츠를 담은 스냅샷 엔티티이다. 
+/// 
+/// 위 {@link bbs_article_comments) 에서 설명하였듯, 밑장빼기 방지용.
+///
+/// @group articles
+/// @author Samchon
+model bbs_article_comment_snapshots {
+    //----
+    // COLUMNS
+    //----
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// 귀속 게시물 댓글의 {@link bbs_article_comments.id}
+    ///
+    /// @format uuid
+    bbs_article_comment_id String @db.Uuid
+
+    /// 본문의 형식.
+    ///
+    /// 확장자의 비슷한 의미: html, md, txt 등
+    format String @db.VarChar
+
+    /// 댓글 본문.
+    body String
+
+    /// 레코드 생성 일시 (댓글의 최초 생성일시 또는 편집일시)
+    created_at DateTime @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    /// 귀속 댓글 정보
+    comment bbs_article_comments @relation(fields: [bbs_article_comment_id], references: [id], onDelete: Cascade)
+
+    /// 첨부파일 리스트.
+    files bbs_article_comment_snapshot_files[]
+
+    @@index([bbs_article_comment_id, created_at])
+}
+
+/// 댓글 스냅샷의 첨부 파일.
+/// 
+/// {@link bbs_article_comment_snapshots} {@link attachment_files} 의 
+/// M: N 관계 해소용.
+/// 
+/// @group articles
+/// @group inquiries
+/// @group issues
+/// @author Samchon
+model bbs_article_comment_snapshot_files {
+    //----
+    // COLUMNS
+    //----
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// 귀속 댓글 스냅샷의 {@link bbs_article_comment_snapshots.id}
+    ///
+    /// @format uuid
+    bbs_article_comment_snapshot_id String @db.Uuid
+
+    /// 귀속 첨부파일의 {@link attachment_files.id}
+    ///
+    /// @format uuid
+    attachment_file_id String @db.Uuid
+
+    /// 배치 순서.
+    ///
+    /// 댓글 스냅샷에 첨부된 파일들의 배열 상 배치 순서.
+    sequence Int @db.Integer
+
+    //----
+    // RELATIONS
+    //----
+    snapshot bbs_article_comment_snapshots @relation(fields: [bbs_article_comment_snapshot_id], references: [id], onDelete: Cascade)
+    file     attachment_files              @relation(fields: [attachment_file_id], references: [id], onDelete: Cascade)
+
+    @@index([bbs_article_comment_snapshot_id])
+    @@index([attachment_file_id])
+}
