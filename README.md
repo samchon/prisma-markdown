@@ -4,7 +4,6 @@
 [![npm version](https://img.shields.io/npm/v/prisma-markdown.svg)](https://www.npmjs.com/package/prisma-markdown)
 [![Downloads](https://img.shields.io/npm/dm/prisma-markdown.svg)](https://www.npmjs.com/package/prisma-markdown)
 [![Build Status](https://github.com/samchon/prisma-markdown/workflows/build/badge.svg)](https://github.com/samchon/prisma-markdown/actions?query=workflow%3Abuild)
-[![Example](https://img.shields.io/badge/guide-example-forestgreen)](https://github.com/samchon/prisma-markdown/blob/master/ERD.md)
 
 Prisma markdown documents generator.
 
