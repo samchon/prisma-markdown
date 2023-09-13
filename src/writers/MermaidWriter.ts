@@ -63,7 +63,7 @@ export namespace MermaidWriter {
             if (target === undefined) return "";
 
             const arrow: string = [
-                scalar.isUnique ? "|" : "}",
+                scalar.isId || scalar.isUnique ? "|" : "}",
                 scalar.isRequired ? "|" : "o",
                 "--",
                 props.model === target ? "o" : "|",
