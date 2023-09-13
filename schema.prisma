@@ -15,7 +15,8 @@ generator markdown {
 ///
 /// 본 DB 의 모든 곳에서 사용되는 첨부파일 엔티티.
 ///
-/// @tag Articles
+/// @tag Filesystem
+/// @erdTag Articles
 /// @author Samchon
 model attachment_files {
     //----
@@ -66,8 +67,6 @@ model attachment_files {
 /// 이른바 '밑장빼기' 방지용.
 ///
 /// @tag Articles
-/// @tag inquiries
-/// @tag issues
 /// @author Samchon
 model bbs_articles {
     /// @format uuid
@@ -102,8 +101,6 @@ model bbs_articles {
 /// 게시물 레코드에서 분리하였다.
 ///
 /// @tag Articles
-/// @tag inquiries
-/// @tag issues
 /// @author Samchon
 model bbs_article_snapshots {
     //----
@@ -200,8 +197,6 @@ model bbs_article_snapshot_files {
 /// 표현하고 있다.
 ///
 /// @tag Articles
-/// @tag inquiries
-/// @tag issues
 /// @author Samchon
 model bbs_article_comments {
     //----
@@ -300,8 +295,6 @@ model bbs_article_comment_snapshots {
 /// M: N 관계 해소용.
 /// 
 /// @tag Articles
-/// @tag inquiries
-/// @tag issues
 /// @author Samchon
 model bbs_article_comment_snapshot_files {
     //----

@@ -44,18 +44,18 @@ npx prisma generate
 
 
 
-## `@tag`
+## `@tag` and `@erdTag`
 If your database has over hundreds of models, none of automatic ERD generators can express them perfect. In that case, `prisma-migration` recommends you to separate hundreds of models to multiple paginated diagrams by using `/// @tags <name>` comments.
 
 When you write `/// @tags <name>` comment on models, they would be separated to proper sections of markdown document. For reference, you can assign multiple `@tag`s to a model, and if you do not assign any `@tag` to a model, it would be assigned to `default` tag.
 
+Also, if you use `@erdTag` instead of `@tag`, target model would be expressed only at ERD. It would not be appeared to the markdown content section.
+
 ```prisma
-/// You can assign multiple tags to a model.
-///
 /// @tag Actors
-/// @tag Articles
-/// @tag Orders
-/// @tag Deposits
+/// @erdTag Articles
+/// @erdTag Orders
+/// @erdTag Deposits
 model shopping_customers {}
 
 /// @tag Articles

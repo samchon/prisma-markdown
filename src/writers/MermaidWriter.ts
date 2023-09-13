@@ -1,8 +1,10 @@
 import { DMMF } from "@prisma/generator-helper";
+import { ITagSection } from "../structure/ITagSection";
 
 export namespace MermaidWriter {
-    export const write = (group: DMMF.Model[]) =>
-        [
+    export const write = (section: ITagSection) => {
+        const group = [...section.models, ...section.erdOnly];
+        return [
             "```mermaid",
             "erDiagram",
             ...group.map(writeTable),
@@ -16,6 +18,7 @@ export namespace MermaidWriter {
                 .filter((str) => !!str.length),
             "```",
         ].join("\n");
+    };
 
     const writeTable = (model: DMMF.Model): string =>
         [
