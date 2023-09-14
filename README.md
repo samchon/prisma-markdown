@@ -59,17 +59,27 @@ Also, if you use `@erd <name>` instead of `@namespace <name>`, target model woul
   - `@hidden`: Neither ERD nor markdown content
 
 ```prisma
+/// Both description and ERD on Actors chatper.
+///
+/// Also, only ERD on Articles and Orders chapters.
+///
 /// @namespace Actors
 /// @erd Articles
 /// @erd Orders
 model shopping_customers {}
 
+/// Only description on Actors chapter.
+///
 /// @describe Actors
 model shopping_customer_login_histories {}
 
+/// Only ERD on Articles chapter.
+///
 /// @erd Articles
 model shopping_sale_reviews {}
 
+/// Never be shown.
+///
 /// @hidden
 model shopping_sale_hits {}
 ```
