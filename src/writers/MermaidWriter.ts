@@ -1,24 +1,21 @@
 import { DMMF } from "@prisma/generator-helper";
-import { ITagSection } from "../structure/ITagSection";
 
 export namespace MermaidWriter {
-    export const write = (section: ITagSection) => {
-        const group = [...section.models, ...section.erdOnly];
-        return [
+    export const write = (chapter: DMMF.Model[]) =>
+        [
             "```mermaid",
             "erDiagram",
-            ...group.map(writeTable),
-            ...group
+            ...chapter.map(writeTable),
+            ...chapter
                 .map((model) =>
                     model.fields
                         .filter((f) => f.kind === "object")
-                        .map(writeRelationship({ group, model })),
+                        .map(writeRelationship({ group: chapter, model })),
                 )
                 .flat()
                 .filter((str) => !!str.length),
             "```",
         ].join("\n");
-    };
 
     const writeTable = (model: DMMF.Model): string =>
         [

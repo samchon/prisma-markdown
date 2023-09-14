@@ -18,7 +18,7 @@ generator markdown {
 /// For reference, it is possible to omit one of file name or extension like 
 /// `.gitignore` or `README` case, but not possible to omit both of them,
 ///
-/// @tag Articles
+/// @namespace Articles
 /// @author Samchon
 model attachment_files {
     //----
@@ -76,7 +76,7 @@ model attachment_files {
 ///
 /// In other words, to keep evidence, and prevent fraud.
 ///
-/// @tag Articles
+/// @namespace Articles
 /// @author Samchon
 model bbs_articles {
     /// @format uuid
@@ -115,7 +115,7 @@ model bbs_articles {
 /// article are separated from the article record to keep evidence and prevent 
 /// fraud.
 ///
-/// @tag Articles
+/// @namespace Articles
 /// @author Samchon
 model bbs_article_snapshots {
     //----
@@ -168,7 +168,7 @@ model bbs_article_snapshots {
 /// files, it has an additional `sequence` attribute, which we will continue to
 /// see in this documents.
 ///
-/// @tag Articles
+/// @namespace Articles
 /// @author Samchon
 model bbs_article_snapshot_files {
     //----
@@ -219,7 +219,7 @@ model bbs_article_snapshot_files {
 /// Also, `bbs_article_comments} is expressing the relationship of the 
 /// hierarchical reply structure through the `parent_id` attribute.
 ///
-/// @tag Articles
+/// @namespace Articles
 /// @author Samchon
 model bbs_article_comments {
     //----
@@ -284,7 +284,7 @@ model bbs_article_comments {
 /// As mentioned in {@link bbs_article_comments}, designed to keep evidence 
 /// and prevent fraud.
 ///
-/// @tag Articles
+/// @namespace Articles
 /// @author Samchon
 model bbs_article_comment_snapshots {
     //----
@@ -329,7 +329,7 @@ model bbs_article_comment_snapshots {
 /// relationship between {@link bbs_article_comment_snapshots} and 
 /// {@link attachment_files} tables.
 /// 
-/// @tag Articles
+/// @namespace Articles
 /// @author Samchon
 model bbs_article_comment_snapshot_files {
     //----
@@ -380,8 +380,8 @@ model bbs_article_comment_snapshot_files {
 /// By the way, if your shopping mall system requires only one channel, then 
 /// just use only one. This concept is designed to be expandable in the future.
 ///
-/// @tag Systematic
-/// @erdTag Sales
+/// @namespace Systematic
+/// @erd Sales
 /// @author Samchon
 model shopping_channels {
     //----
@@ -454,8 +454,8 @@ model shopping_channels {
 /// Furthermore, `shopping_channel_categories` is designed to merge between 
 /// themselves, so there is no burden to edit the category at any time.
 ///
-/// @tag Systematic
-/// @erdTag Sales
+/// @namespace Systematic
+/// @erd Sales
 /// @author Samchon
 model shopping_channel_categories {
     //----
@@ -516,8 +516,8 @@ model shopping_channel_categories {
 /// By the way, if your shopping mall system requires only one section, then 
 /// just use only one. This concept is designed to be expandable in the future.
 ///
-/// @tag Systematic
-/// @erdTag Sales
+/// @namespace Systematic
+/// @erd Sales
 /// @author Samchon
 model shopping_sections {
     //----
@@ -583,8 +583,8 @@ model shopping_sections {
 /// at once. Therefore, identification and tracking of customers can be done 
 /// very systematically.
 ///
-/// @tag Actors
-/// @erdTag Coins
+/// @namespace Actors
+/// @erd Coins
 /// @author Samchon
 model shopping_customers {
     //----
@@ -681,7 +681,7 @@ model shopping_customers {
 /// In addition, additional information received from external services can 
 /// be recorded in the `data` field in JSON format.
 ///
-/// @tag Actors
+/// @namespace Actors
 /// @author Samchon
 model shopping_external_users {
     //----
@@ -741,8 +741,8 @@ model shopping_external_users {
 /// Of course, real name and mobile phone authentication information are 
 /// encrypted and stored.
 ///
-/// @tag Actors
-/// @erdTag Coins
+/// @namespace Actors
+/// @erd Coins
 /// @author Samchon
 model shopping_citizens {
     //----
@@ -804,7 +804,7 @@ model shopping_citizens {
 /// Of course, this is according to system theory, and it is unclear what 
 /// the planning will be like.
 ///
-/// @tag Actors
+/// @namespace Actors
 /// @author Samchon
 model shopping_members {
     //----
@@ -865,7 +865,7 @@ model shopping_members {
 /// {@link shopping_members member}. If you don't have to plan such multiple
 /// email addresses, just use only one.
 ///
-/// @tag Actors
+/// @namespace Actors
 /// @author Samchon
 model shopping_member_emails {
     //----
@@ -908,8 +908,8 @@ model shopping_member_emails {
 /// it means a person who registers {@link shopping_sales sales} to operate
 /// selling activities.
 ///
-/// @tag Actors
-/// @erdTag Sales
+/// @namespace Actors
+/// @erd Sales
 /// @author Samchon
 model shopping_sellers {
     //----
@@ -945,7 +945,7 @@ model shopping_sellers {
 /// Administrator account.
 ///
 /// @todo Not detailed yet.
-/// @tag Actors
+/// @namespace Actors
 /// @author Samchon
 model shopping_administrators {
     //----
@@ -977,8 +977,8 @@ model shopping_administrators {
 
 /// The address information.
 ///
-/// @tag Actors
-/// @erdTag Orders
+/// @namespace Actors
+/// @erd Orders
 /// @author Samchon
 model shopping_addresses {
     //----
@@ -1026,8 +1026,8 @@ model shopping_addresses {
 /// A/B testing, which involves changing components or prices and measuring 
 /// the performance in each case.
 ///
-/// @tag Sales
-/// @erdTag Systematic
+/// @namespace Sales
+/// @erd Systematic
 /// @author Samchon
 model shopping_sales {
     //----
@@ -1097,10 +1097,10 @@ model shopping_sales {
 /// belonged {@link shopping_sales sale}. The snapshot record is created
 /// whenever the seller newly creates or updates the sale.
 ///
-/// @tag Sales
-/// @erdTag Systematic
-/// @erdTag Inquiries
-/// @erdTag Carts
+/// @namespace Sales
+/// @erd Systematic
+/// @erd Inquiries
+/// @erd Carts
 /// @author Samchon
 model shopping_sale_snapshots {
     //----
@@ -1136,7 +1136,7 @@ model shopping_sale_snapshots {
 /// of {@link shopping_sale_snapshots sale snapshot}. Also, it contains
 /// revert policy of the sale.
 ///
-/// @tag Sales
+/// @namespace Sales
 /// @author Samchon
 model shopping_sale_snapshot_contents {
     //----
@@ -1185,8 +1185,8 @@ model shopping_sale_snapshot_contents {
 /// {@link shopping_sale_snapshots snapshot} is sold, and is designed to 
 /// resolve the M:N relationship between two tables.
 /// 
-/// @tag Sales
-/// @erdTag Systematic
+/// @namespace Sales
+/// @erd Systematic
 /// @author Samchon
 model shopping_sale_snapshot_channels {
     //----
@@ -1230,8 +1230,8 @@ model shopping_sale_snapshot_channels {
 /// respectively. Of course, if the target category being referred to is a 
 /// major category, all minor categories belonging to it can also be used.
 ///
-/// @tag Sales
-/// @erdTag Systematic
+/// @namespace Sales
+/// @erd Systematic
 /// @author Samchon
 model shopping_sale_snapshot_channel_categories {
     //----
@@ -1293,8 +1293,8 @@ model shopping_sale_snapshot_channel_categories {
 /// only after selecting all the 
 /// {@link shopping_sale_snapshot_unit_options options} (CPU / RAM / SSD), etc.
 ///
-/// @tag Sales
-/// @erdTag Carts
+/// @namespace Sales
+/// @erd Carts
 /// @author Samchon
 model shopping_sale_snapshot_units {
     //----
@@ -1366,8 +1366,8 @@ model shopping_sale_snapshot_units {
 /// this case does not affect the 
 /// {@link shopping_sale_snapshot_unit_stocks final stock}.
 ///
-/// @tag Sales
-/// @erdTag Carts
+/// @namespace Sales
+/// @erd Carts
 /// @author Samchon
 model shopping_sale_snapshot_unit_options {
     //----
@@ -1436,8 +1436,8 @@ model shopping_sale_snapshot_unit_options {
 /// By the way, if belonged {@link shopping_sale_snapshot_unit_options option} 
 /// is not "select" type, this entity never being used.
 ///
-/// @tag Sales
-/// @erdTag Carts
+/// @namespace Sales
+/// @erd Carts
 /// @author Samchon
 model shopping_sale_snapshot_unit_option_candidates {
     //----
@@ -1497,8 +1497,8 @@ model shopping_sale_snapshot_unit_option_candidates {
 /// Of course, without a single variable "select" type option, the final 
 /// stocks count in the unit is only 1.
 ///
-/// @tag Sales
-/// @erdTag Carts
+/// @namespace Sales
+/// @erd Carts
 /// @author Samchon
 model shopping_sale_snapshot_unit_stocks {
     //----
@@ -1564,7 +1564,7 @@ model shopping_sale_snapshot_unit_stocks {
 /// have any {@link shopping_sale_snapshot_unit_options options}, this entity 
 /// can also be ignored.
 ///
-/// @tag Sales
+/// @namespace Sales
 /// @author Samchon
 model shopping_sale_snapshot_unit_stock_choices {
     //----
@@ -1607,7 +1607,7 @@ model shopping_sale_snapshot_unit_stock_choices {
 /// {@link shopping_customers customer} temporarily stores products before
 /// {@link shopping_orders purchase}.
 /// 
-/// @tag Carts
+/// @namespace Carts
 /// @author Samchon
 model shopping_carts {
     //----
@@ -1654,7 +1654,7 @@ model shopping_carts {
 /// multiplied by {@link shopping_cart_item_stocks.quantity}, the quantity 
 /// for each component.
 /// 
-/// @tag Carts
+/// @namespace Carts
 /// @author Samchon
 model shopping_cart_items {
     //----
@@ -1732,7 +1732,7 @@ model shopping_cart_items {
 /// actually purchased can be multiplied by the 
 /// {@link shopping_cart_items.volume} value of the parent entity.
 /// 
-/// @tag Carts
+/// @namespace Carts
 /// @author Samchon
 model shopping_cart_item_stocks {
     //----
@@ -1806,7 +1806,7 @@ model shopping_cart_item_stocks {
 /// candidate item selected by the customer. Otherwise, enter the value 
 /// entered by the customer.
 /// 
-/// @tag Carts
+/// @namespace Carts
 /// @author Samchon
 model shopping_cart_item_stock_choices {
     //----
@@ -1875,7 +1875,7 @@ model shopping_cart_item_stock_choices {
 /// {@link shopping_order_goods}, but only those selected by the customer 
 /// become the {@link shopping_order_goods}.
 /// 
-/// @tag Orders
+/// @namespace Orders
 /// @author Samchon
 model shopping_orders {
     //----
@@ -1957,7 +1957,7 @@ model shopping_orders {
 /// In addition, even after payment has been made, there may be cases where 
 /// it is suddenly canceled, so please be aware of this as well.
 /// 
-/// @tag Orders
+/// @namespace Orders
 /// @author Samchon
 model shopping_order_publishes {
     //----
@@ -2028,7 +2028,7 @@ model shopping_order_publishes {
 /// the unit in which customers issue issues or request exchanges or refunds 
 /// for ordered products.
 /// 
-/// @tag Orders
+/// @namespace Orders
 /// @author Samchon
 model shopping_order_goods {
     //----
@@ -2100,7 +2100,7 @@ model shopping_order_goods {
 
 /// Delivery information.
 ///
-/// @tag Orders
+/// @namespace Orders
 /// @author Samchon
 model shopping_deliveries {
     //----
@@ -2124,7 +2124,7 @@ model shopping_deliveries {
 
 /// Journey of delivery.
 ///
-/// @tag Orders
+/// @namespace Orders
 /// @author Samchon
 model shopping_delivery_journeys {
     //----
@@ -2167,7 +2167,7 @@ model shopping_delivery_journeys {
 
 /// Which stocks are delivered.
 ///
-/// @tag Orders
+/// @namespace Orders
 /// @author Samchon
 model shopping_delivery_pieces {
     //----
@@ -2242,7 +2242,7 @@ model shopping_delivery_pieces {
 /// For more information, please refer to the properties below and the 
 /// subsidiary entities described later.
 /// 
-/// @tag Coupons
+/// @namespace Coupons
 /// @author Samchon
 model shopping_coupons {
     /// @format uuid
@@ -2424,7 +2424,7 @@ model shopping_coupons {
 /// value is "exclude", it is a coupon that cannot be applied to the reference 
 /// object.
 /// 
-/// @tag Coupons
+/// @namespace Coupons
 /// @author Samchon
 model shopping_coupon_criterias {
     /// @format uuid
@@ -2479,7 +2479,7 @@ model shopping_coupon_criterias {
 /// are applied on a bundle basis. Coupons may or may not be applicable to 
 /// eligible sections.
 /// 
-/// @tag Coupons
+/// @namespace Coupons
 /// @author Samchon
 model shopping_coupon_section_criterias {
     /// @format uuid
@@ -2516,7 +2516,7 @@ model shopping_coupon_section_criterias {
 /// conditions are applied on a bundle basis. Coupons may or may not be 
 /// applicable for target channels and categories.
 /// 
-/// @tag Coupons
+/// @namespace Coupons
 /// @author Samchon
 model shopping_coupon_channel_criterias {
     /// @format uuid
@@ -2562,7 +2562,7 @@ model shopping_coupon_channel_criterias {
 /// one coupon, conditions are applied on a bundle basis. Coupons may or may 
 /// not be applicable to eligible sellers.
 /// 
-/// @tag Coupons
+/// @namespace Coupons
 /// @author Samchon
 model shopping_coupon_seller_criterias {
     /// PK + FK.
@@ -2599,7 +2599,7 @@ model shopping_coupon_seller_criterias {
 /// 
 /// And if there are multiple shopping_coupon_sale_criterias records within one coupon, conditions are applied on a bundle basis. Coupons that may or may not be applicable to target properties.
 ///
-/// @tag Coupons
+/// @namespace Coupons
 /// @author Samchon
 model shopping_coupon_sale_criterias {
     /// PK + FK.
@@ -2636,7 +2636,7 @@ model shopping_coupon_sale_criterias {
 /// {@link shopping_customers.href}, which records the customer's access 
 /// address, restrictions can be made in units of specific URLs or variables.
 /// 
-/// @tag Coupons
+/// @namespace Coupons
 /// @author Samchon
 model shopping_coupon_funnel_criterias {
     /// PK + FK.
@@ -2674,7 +2674,7 @@ model shopping_coupon_funnel_criterias {
 /// discarded after that expiration date. Of course, it doesn't matter if you 
 /// use the discount coupon for your order within the deadline.
 /// 
-/// @tag Coupons
+/// @namespace Coupons
 /// @author Samchon
 model shopping_coupon_tickets {
     /// @format uuid
@@ -2743,7 +2743,7 @@ model shopping_coupon_tickets {
 /// payment of the ticket, but it can also be deleted when the attribution 
 /// order itself is canceled.
 /// 
-/// @tag Coupons
+/// @namespace Coupons
 /// @author Samchon
 model shopping_coupon_ticket_payments {
     /// @format uuid
@@ -2798,7 +2798,7 @@ model shopping_coupon_ticket_payments {
 /// tickets multiple times using a discount coupon as a secret code, the 
 /// issuing code must also be supported by the corresponding quantity.
 /// 
-/// @tag Coupons
+/// @namespace Coupons
 /// @author Samchon
 model shopping_coupon_disposables {
     /// @format uuid

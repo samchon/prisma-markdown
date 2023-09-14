@@ -2,34 +2,54 @@ import { DMMF } from "@prisma/generator-helper";
 import { MermaidWriter } from "./MermaidWriter";
 import { DescriptionWriter } from "./DescriptionWriter";
 import { MapUtil } from "../utils/MapUtil";
-import { ITagSection } from "../structure/ITagSection";
 
 export namespace MarkdownWriter {
     export const write = (schema: DMMF.Datamodel): string => {
-        const dict: Map<string, ITagSection> = new Map();
-        for (const model of schema.models) {
-            const tags: string[] = takeTags("tag")(model);
-            if (tags.length === 0)
-                MapUtil.take(dict)("default", () => ({
+        const dict: Map<string, IChapter> = new Map();
+        const modelList: DMMF.Model[] = schema.models.filter(
+            (model) => !isHidden(model),
+        );
+
+        // @NAMESPACE
+        for (const model of modelList) {
+            const tags: string[] = takeTags("namespace")(model);
+            if (tags.length === 0) {
+                const basic = MapUtil.take(dict)("default", () => ({
                     name: "default",
-                    models: [],
-                    erdOnly: [],
-                })).models.push(model);
-            else
-                for (const name of tags)
-                    MapUtil.take(dict)(name, () => ({
+                    descriptions: new Set(),
+                    diagrams: new Set(),
+                }));
+                basic.descriptions.add(model);
+                basic.diagrams.add(model);
+            } else
+                for (const name of tags) {
+                    const section = MapUtil.take(dict)(name, () => ({
                         name,
-                        models: [],
-                        erdOnly: [],
-                    })).models.push(model);
+                        descriptions: new Set(),
+                        diagrams: new Set(),
+                    }));
+                    section.descriptions.add(model);
+                    section.diagrams.add(model);
+                }
         }
-        for (const model of schema.models)
-            for (const name of takeTags("erdTag")(model))
+
+        // @DESCRIBE
+        for (const model of modelList)
+            for (const name of takeTags("describe")(model))
                 MapUtil.take(dict)(name, () => ({
                     name,
-                    models: [],
-                    erdOnly: [],
-                })).erdOnly.push(model);
+                    descriptions: new Set(),
+                    diagrams: new Set(),
+                })).descriptions.add(model);
+
+        // @ERD
+        for (const model of modelList)
+            for (const name of takeTags("erd")(model))
+                MapUtil.take(dict)(name, () => ({
+                    name,
+                    descriptions: new Set(),
+                    diagrams: new Set(),
+                })).diagrams.add(model);
 
         const preface: string = [
             `# Prisma Markdown`,
@@ -39,14 +59,14 @@ export namespace MarkdownWriter {
             preface +
             "\n\n" +
             [...dict.values()]
-                .filter((s) => !!s.models.length)
-                .map(writeTag)
+                .filter((s) => !!s.descriptions.size)
+                .map(writeChapter)
                 .join("\n\n\n")
         );
     };
 
     const takeTags =
-        (kind: "tag" | "erdTag") =>
+        (kind: "namespace" | "describe" | "erd") =>
         (model: DMMF.Model): string[] => {
             if (!model.documentation?.length) return [];
 
@@ -69,16 +89,20 @@ export namespace MarkdownWriter {
             return [...output];
         };
 
-    const writeTag = (section: ITagSection): string =>
+    const isHidden = (model: DMMF.Model): boolean =>
+        model.documentation?.includes("@hidden") ?? false;
+
+    const writeChapter = (chapter: IChapter): string =>
         [
-            `## ${section.name}`,
-            MermaidWriter.write(section),
+            `## ${chapter.name}`,
+            MermaidWriter.write([...chapter.diagrams]),
             "",
-            section.models.map(DescriptionWriter.table).join("\n\n"),
+            [...chapter.descriptions].map(DescriptionWriter.table).join("\n\n"),
         ].join("\n");
 }
 
-interface ITagPair {
-    models: Set<string>;
-    erdOnly: Set<string>;
+interface IChapter {
+    name: string;
+    descriptions: Set<DMMF.Model>;
+    diagrams: Set<DMMF.Model>;
 }
