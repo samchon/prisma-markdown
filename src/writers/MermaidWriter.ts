@@ -68,9 +68,22 @@ export namespace MermaidWriter {
             );
             if (target === undefined) return "";
 
+            const oneToOne: boolean = scalar.isId || scalar.isUnique;
             const arrow: string = [
-                scalar.isId || scalar.isUnique ? "|" : "}",
-                scalar.isRequired ? "|" : "o",
+                oneToOne ? "|" : "}",
+                !scalar.isRequired ||
+                (oneToOne &&
+                    props.group.some(
+                        (m) =>
+                            m.name === field.type &&
+                            m.fields.some(
+                                (f) =>
+                                    f.relationName === field.relationName &&
+                                    !f.isRequired,
+                            ),
+                    ))
+                    ? "o"
+                    : "|",
                 "--",
                 props.model === target ? "o" : "|",
                 "|",
