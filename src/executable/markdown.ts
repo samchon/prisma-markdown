@@ -13,7 +13,10 @@ generatorHandler({
         prettyName: "prisma-markdown",
     }),
     onGenerate: async (options) => {
-        const content: string = MarkdownWriter.write(options.dmmf.datamodel);
+        const content: string = MarkdownWriter.write(
+            options.dmmf.datamodel,
+            options.generator.config,
+        );
         await fs.writeFileSync(
             options.generator.output?.value ?? "ERD.md",
             content,

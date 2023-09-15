@@ -34,6 +34,7 @@ At next, add the generator to the schema file.
 generator markdown {
   provider = "prisma-markdown"
   output   = "./ERD.md"
+  title    = "Shopping Mall"
 }
 ```
 

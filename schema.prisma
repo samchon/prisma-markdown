@@ -6,6 +6,7 @@ datasource db {
 generator markdown {
     provider = "node ./lib/executable/markdown"
     output   = "./ERD.md"
+    title    = "Shopping Mall"
 }
 
 //-----------------------------------------------------------

@@ -7,7 +7,7 @@ export namespace DescriptionWriter {
             `### \`${model.dbName ?? model.name}\``,
             ...(description.length ? [description] : []),
             "",
-            "  - Properties",
+            "**Properties**",
             ...model.fields.filter((f) => f.kind !== "object").map(writeField),
         ].join("\n");
     };
@@ -15,15 +15,11 @@ export namespace DescriptionWriter {
     const writeField = (field: DMMF.Field): string => {
         const description: string = writeDescription(field.documentation ?? "");
         const lines: string[] = description.split("\n");
-        if (lines.length === 0)
-            return `    - \`${field.dbName ?? field.name}\``;
-        else if (lines.length === 1)
-            return `    - \`${field.dbName ?? field.name}\`: ${lines[0]}`;
+        const head = `  - \`${field.dbName ?? field.name}\``;
 
-        return [
-            `    - \`${field.dbName ?? field.name}\`:`,
-            ...lines.map((line) => `      > ${line}`),
-        ].join("\n");
+        if (lines.length === 0) return head;
+        else if (lines.length === 1) return `${head}: ${lines[0]}`;
+        return [head, ...lines.map((line) => `    > ${line}`)].join("\n");
     };
 
     const writeDescription = (documentation: string | null): string => {
