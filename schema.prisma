@@ -5,7 +5,6 @@ datasource db {
 
 generator markdown {
     provider = "node ./lib/executable/markdown"
-    output   = "./ERD.md"
     title    = "Shopping Mall"
 }
 
@@ -78,6 +77,7 @@ model attachment_files {
 /// In other words, to keep evidence, and prevent fraud.
 ///
 /// @namespace Articles
+/// @erd Inquiries
 /// @author Samchon
 model bbs_articles {
     /// @format uuid
@@ -104,7 +104,9 @@ model bbs_articles {
     snapshots bbs_article_snapshots[]
 
     /// List of comments.
-    comments bbs_article_comments[]
+    comments                               bbs_article_comments[]
+    shopping_sale_snapshot_inquiries       shopping_sale_snapshot_inquiries[]
+    shopping_sale_snapshot_inquiry_answers shopping_sale_snapshot_inquiry_answers[]
 
     @@index([created_at])
 }
@@ -117,6 +119,7 @@ model bbs_articles {
 /// fraud.
 ///
 /// @namespace Articles
+/// @erd Inquiries
 /// @author Samchon
 model bbs_article_snapshots {
     //----
@@ -153,7 +156,8 @@ model bbs_article_snapshots {
     article bbs_articles @relation(fields: [bbs_article_id], references: [id], onDelete: Cascade)
 
     /// List of wrappers of attachment files.
-    to_files bbs_article_snapshot_files[]
+    to_files                                bbs_article_snapshot_files[]
+    shopping_sale_snapshot_review_snapshots shopping_sale_snapshot_review_snapshots[]
 
     @@index([bbs_article_id, created_at])
 }
@@ -221,6 +225,7 @@ model bbs_article_snapshot_files {
 /// hierarchical reply structure through the `parent_id` attribute.
 ///
 /// @namespace Articles
+/// @erd Inquiries
 /// @author Samchon
 model bbs_article_comments {
     //----
@@ -272,7 +277,8 @@ model bbs_article_comments {
     /// accumulated every time the comment is modified.
     ///
     /// @minItems 1
-    snapshots bbs_article_comment_snapshots[]
+    snapshots                               bbs_article_comment_snapshots[]
+    shopping_sale_snapshot_inquiry_comments shopping_sale_snapshot_inquiry_comments[]
 
     @@index([bbs_article_id, parent_id, created_at])
 }
@@ -651,10 +657,13 @@ model shopping_customers {
     external_user shopping_external_users? @relation(fields: [shopping_external_user_id], references: [id], onDelete: Cascade)
 
     /// Belonged citizen.
-    citizen                 shopping_citizens?        @relation(fields: [shopping_citizen_id], references: [id], onDelete: Cascade)
-    shopping_carts          shopping_carts[]
-    shopping_orders         shopping_orders[]
-    shopping_coupon_tickets shopping_coupon_tickets[]
+    citizen                                 shopping_citizens?                        @relation(fields: [shopping_citizen_id], references: [id], onDelete: Cascade)
+    shopping_carts                          shopping_carts[]
+    shopping_orders                         shopping_orders[]
+    shopping_coupon_tickets                 shopping_coupon_tickets[]
+    shopping_deposit_charges                shopping_deposit_charges[]
+    shopping_sale_snapshot_inquiries        shopping_sale_snapshot_inquiries[]
+    shopping_sale_snapshot_inquiry_comments shopping_sale_snapshot_inquiry_comments[]
 }
 
 /// External user information.
@@ -780,9 +789,11 @@ model shopping_citizens {
     //----
     // RELATIONS
     //----
-    channel            shopping_channels?   @relation(fields: [shopping_channel_id], references: [id], onDelete: Cascade)
-    shopping_customers shopping_customers[]
-    shopping_members   shopping_members[]
+    channel                    shopping_channels?           @relation(fields: [shopping_channel_id], references: [id], onDelete: Cascade)
+    shopping_customers         shopping_customers[]
+    shopping_members           shopping_members[]
+    shopping_deposit_histories shopping_deposit_histories[]
+    shopping_mileage_histories shopping_mileage_histories[]
 }
 
 /// Member Account.
@@ -935,12 +946,14 @@ model shopping_sellers {
     //----
     // RELATIONS
     //----
-    base                             shopping_members                   @relation(fields: [id], references: [id], onDelete: Cascade)
-    shopping_sales                   shopping_sales[]
-    shopping_order_goods             shopping_order_goods[]
-    shopping_deliveries              shopping_deliveries[]
-    shopping_coupons                 shopping_coupons[]
-    shopping_coupon_seller_criterias shopping_coupon_seller_criterias[]
+    base                                    shopping_members                          @relation(fields: [id], references: [id], onDelete: Cascade)
+    shopping_sales                          shopping_sales[]
+    shopping_order_goods                    shopping_order_goods[]
+    shopping_deliveries                     shopping_deliveries[]
+    shopping_coupons                        shopping_coupons[]
+    shopping_coupon_seller_criterias        shopping_coupon_seller_criterias[]
+    shopping_sale_snapshot_inquiry_answers  shopping_sale_snapshot_inquiry_answers[]
+    shopping_sale_snapshot_inquiry_comments shopping_sale_snapshot_inquiry_comments[]
 }
 
 /// Administrator account.
@@ -986,21 +999,44 @@ model shopping_addresses {
     // COLUMNS
     //----
     /// @format uuid
-    id           String   @id @db.Uuid
-    mobile       String   @db.VarChar
-    name         String   @db.VarChar
-    country      String   @db.VarChar
-    province     String   @db.VarChar
-    city         String   @db.VarChar
-    department   String   @db.VarChar
-    possession   String   @db.VarChar
-    zip_code     String   @db.VarChar
-    special_note String?  @db.VarChar
-    created_at   DateTime @db.Timestamptz
+    id String @id @db.Uuid
+
+    /// Mobile number.
+    mobile String @db.VarChar
+
+    /// Representative name of the address.
+    ///
+    /// Sometimes be receiver's name, and sometimes be place name.
+    name String @db.VarChar
+
+    /// Target country.
+    country String @db.VarChar
+
+    /// Target province.
+    province String @db.VarChar
+
+    /// Target city.
+    city String @db.VarChar
+
+    /// Department name.
+    department String @db.VarChar
+
+    /// Detailed address containing room number.
+    possession String @db.VarChar
+
+    /// Zip code, or postal code.
+    zip_code String @db.VarChar
+
+    /// Special description if required.
+    special_note String? @db.VarChar
+
+    /// Creation time of record.
+    created_at DateTime @db.Timestamptz
 
     //----
     // RELATIONS
     //----
+    /// List of orders.
     orders shopping_orders[]
 
     @@index([mobile])
@@ -1124,11 +1160,12 @@ model shopping_sale_snapshots {
     // RELATIONS
     //----
     /// Belonged sale.
-    sale                            shopping_sales                    @relation(fields: [shopping_sale_id], references: [id], onDelete: Cascade)
-    shopping_sale_snapshot_contents shopping_sale_snapshot_contents?
-    shopping_sale_snapshot_channels shopping_sale_snapshot_channels[]
-    shopping_sale_snapshot_units    shopping_sale_snapshot_units[]
-    shopping_cart_items             shopping_cart_items[]
+    sale                             shopping_sales                     @relation(fields: [shopping_sale_id], references: [id], onDelete: Cascade)
+    shopping_sale_snapshot_contents  shopping_sale_snapshot_contents?
+    shopping_sale_snapshot_channels  shopping_sale_snapshot_channels[]
+    shopping_sale_snapshot_units     shopping_sale_snapshot_units[]
+    shopping_cart_items              shopping_cart_items[]
+    shopping_sale_snapshot_inquiries shopping_sale_snapshot_inquiries[]
 }
 
 /// Content information of sale snapshot.
@@ -1645,7 +1682,7 @@ model shopping_carts {
 /// this into an actual {@link shopping_orders order} in the future, 
 /// `shopping_cart_items` be changed to {@link shopping_order_goods}.
 /// 
-/// And while adding a listing snapshot to the shopping cart, the customer 
+/// And while adding a sale snapshot to the shopping cart, the customer 
 /// inevitably selects specific {@link shopping_sale_snapshot_units units} and 
 /// {@link shopping_sale_snapshot_unit_stocks final stocks} within the listing 
 /// snapshot. Information about these units and stocks is recorded in the 
@@ -1725,7 +1762,7 @@ model shopping_cart_items {
 /// among those {@link shopping_sale_snapshot_units units}.
 /// 
 /// Therefore, if the customer selects multiple units and stocks from the 
-/// target listing snapshot, the attributed {@link shopping_cart_items} record 
+/// target sale snapshot, the attributed {@link shopping_cart_items} record 
 /// also has multiple corresponding `shopping_cart_item_stocks` records.
 /// 
 /// And `shopping_cart_item_stocks` has a `quantity` property that indicates 
@@ -1943,7 +1980,7 @@ model shopping_orders {
 /// 
 /// `shopping_order_publishes` is an entity that embodies the series of 
 /// processes in which a customer pays for his or her 
-/// {@link shopping_orders order, thereby completing the order. And only after 
+/// {@link shopping_orders order}, thereby completing the order. And only after 
 /// the order is completed, can the seller recognize that the customer has 
 /// purchased his product.
 /// 
@@ -2092,8 +2129,9 @@ model shopping_order_goods {
     cart_item shopping_cart_items @relation(fields: [shopping_cart_item_id], references: [id], onDelete: Cascade)
 
     /// Belonged seller.
-    seller                   shopping_sellers           @relation(fields: [shopping_seller_id], references: [id], onDelete: Cascade)
-    shopping_delivery_pieces shopping_delivery_pieces[]
+    seller                         shopping_sellers                 @relation(fields: [shopping_seller_id], references: [id], onDelete: Cascade)
+    shopping_delivery_pieces       shopping_delivery_pieces[]
+    shopping_sale_snapshot_reviews shopping_sale_snapshot_reviews[]
 
     @@index([shopping_order_id])
     @@index([shopping_cart_item_id])
@@ -2101,6 +2139,22 @@ model shopping_order_goods {
 
 /// Delivery information.
 ///
+/// When delivering purchase(s) to {@link shopping_customers customer}, 
+/// {@link shopping_selleres seller} can deliver multiple 
+/// {@link shopping_sale_snapshot_unit_stocks stocks}, {@link shopping_order_goods goods} 
+/// at once. Also, it is possible to deliver a stock or good in multiple times due to 
+/// physical restriction like volume or weight.
+///
+/// As you can see from above, the relationship between delivery with 
+/// {@link shopping_orders order} (or good) is not 1: 1 or N: 1, but M: N. Entity 
+/// `shopping_deliveries` has been designed to represent such relationship, by referencing
+/// target stocks or goods through subsidiary entity {@link shopping_delivery_pieces}.
+///
+/// Also, delivery does not end with only one step. It has multiple processes like
+/// manufacturing, planning, shipping and delivering. Those steps are represented by
+/// another subsidiary entity {@link shopping_delivery_journeys}.
+///
+/// @todo No shipper entity yet
 /// @namespace Orders
 /// @author Samchon
 model shopping_deliveries {
@@ -2114,6 +2168,9 @@ model shopping_deliveries {
     ///
     /// @format uuid
     shopping_seller_id String @db.Uuid
+
+    /// Invoice code if exists.
+    invoice_code String? @db.VarChar
 
     //----
     // RELATIONS
@@ -2627,7 +2684,7 @@ model shopping_coupon_sale_criterias {
 
 /// Limit the funnel of discount coupons.
 /// 
-/// `hub_coupon_funnel_criterias` is a subtype entity of 
+/// `shopping_coupon_funnel_criterias` is a subtype entity of 
 /// {@link shopping_coupon_criterias}, and is used when you want to issue or 
 /// exclude discount coupons only to {@link shopping_customers customers} who 
 /// came from a specific path.
@@ -2837,11 +2894,575 @@ model shopping_coupon_disposables {
 //-----------------------------------------------------------
 // COINS
 //-----------------------------------------------------------
+/// Meta information of the deposit.
+/// 
+/// `shopping_deposits` is an entity that embodies the specifications for 
+/// incomes and outcomes at a shopping mall. In other words, 
+/// `shopping_deposits` is not {@link shopping_deposit_histories}, which 
+/// refers to the deposit/outcome details of deposits, but is simply 
+/// metadata that specifies specifications for income/outcome scenarios.
+///
+/// @namespace Coins
+/// @author Samchon
+model shopping_deposits {
+    //----
+    // COLUMNS
+    //----
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Identifier code.
+    code String @db.VarChar
+
+    /// The source table occuring the deposit event.
+    source String @db.VarChar
+
+    /// Direction of deposit.
+    ///
+    /// - `1`: Income
+    /// - `-1`: outcome
+    direction Int @db.Integer
+
+    /// Creation time of record.
+    created_at DateTime @db.Timestamptz
+
+    //// Deletion time of record.
+    deleted_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    /// List of histories; income/outcome details.
+    histories shopping_deposit_histories[]
+
+    @@unique([code])
+    @@index([source])
+}
+
+/// Deposit income/outcome details of customers (citizens).
+///
+/// `shopping_deposit_histories` is an entity that embodies the 
+/// {@link shopping_customers customer}'s income/outcome history.
+///
+/// You can think of it as a kind of accounting ledger table. Therefore, 
+/// note that, `value` must have positive number only, even if it is a 
+/// outcome. The minus value must be expressed by multiplying the 
+/// {@link shopping_deposits.direction} value of the corresponding.
+///
+/// @namespace Coins
+/// @author Samchon
+model shopping_deposit_histories {
+    //----
+    // COLUMNS
+    //----
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged metadata's {@link shopping_deposits.id}
+    ///
+    /// @format uuid
+    shopping_deposit_id String @db.Uuid
+
+    /// Belonged citizen's {@link shopping_citizens.id}
+    ///
+    /// @format uuid
+    shopping_citizen_id String @db.Uuid
+
+    /// The source record occured deposit/outcome. 
+    ///
+    /// @format uuid
+    source_id String @db.Uuid
+
+    /// Income/outcome amount of deposit.
+    /// 
+    /// It must be a positive number, and you can check 
+    /// {@link shopping_deposits.direction} for incomes and outcomes. 
+    /// If you want to express the figures for incomes and outcomes as 
+    /// positive/negative numbers, you can also multiply this field value by 
+    /// the attributed {@link shopping_deposits.direction} value.
+    ///
+    /// @minimum 0
+    value Float @db.DoublePrecision
+
+    /// Creation time of record.
+    created_at DateTime @db.Timestamptz
+
+    /// Cancelled time of record.
+    cancelled_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    deposit shopping_deposits @relation(fields: [shopping_deposit_id], references: [id])
+    citizen shopping_citizens @relation(fields: [shopping_citizen_id], references: [id])
+}
+
+/// Deposit deposit.
+/// 
+/// `shopping_deposit_charges` is an entity that symbolizes the act of a 
+/// {@link shopping_customers customer} applying for a deposit to a shopping 
+/// mall.
+/// 
+/// However, `shopping_deposit_charges` expresses the customer's intention to 
+/// make a deposit, but it has not yet been confirmed. Only when the customer 
+/// completes the {@link shopping_deposit_charge_publishes.paid_at payment} 
+/// will the deposit increase be confirmed.
+/// 
+/// @namespace Coins
+/// @author Samchon
+model shopping_deposit_charges {
+    //----
+    // COLUMNS
+    //----
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged metadata's {@link shopping_deposits.id}
+    ///
+    /// @format uuid
+    shopping_customer_id String @db.Uuid
+
+    /// Charging amount.
+    ///
+    /// @exclusiveMinimum 0
+    amount Float @db.DoublePrecision
+
+    /// Creation time of record.
+    created_at DateTime @db.Timestamptz
+
+    /// Deletion time of record.
+    ///
+    /// Only when be stopped before publishing.
+    deleted_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    customer shopping_customers                 @relation(fields: [shopping_customer_id], references: [id])
+    publish  shopping_deposit_charge_publishes?
+}
+
+/// Payment progress information for deposits.
+/// 
+/// `shopping_deposit_charge_publishes` is an entity that embodies the process 
+/// of a {@link shopping_customers customer} applying for a deposit and making 
+/// a payment.
+/// 
+/// Please note that the existence of the `shopping_deposit_charge_publishes` 
+/// record does not mean that payment has been completed. Payment is complete 
+/// only when payment (`paid_at`) is complete. This is what the 
+/// "process of payment" mentioned above means.
+/// 
+/// However, even after payment has been made, there may be cases where it is 
+/// suddenly canceled, so you must be careful about this as well.
+/// 
+/// @namespace Coins
+/// @author Samchon
+model shopping_deposit_charge_publishes {
+    //----
+    // COLUMNS
+    //----
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged charge appliance's {@link shopping_deposit_charges.id}
+    ///
+    /// @format uuid
+    shopping_deposit_charge_id String @db.Uuid
+
+    /// Password for encryption.
+    /// 
+    /// This shopping mall system uses a randomly issued password to encrypt 
+    /// payment history, and is completely unrelated to the user.
+    password String? @db.VarChar
+
+    /// Creation time of record.
+    ///
+    /// Note that, this property does not mean the payment completion time.
+    created_at DateTime @db.Timestamptz
+
+    /// Completion time of payment.
+    /// 
+    /// This property is the only way to know if the payment has been 
+    /// completed. If this property is null, the payment has not been 
+    /// completed yet.
+    paid_at DateTime? @db.Timestamptz
+
+    /// The time when the payment was cancelled or reverted.
+    cancelled_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    charge shopping_deposit_charges @relation(fields: [shopping_deposit_charge_id], references: [id])
+
+    @@unique([shopping_deposit_charge_id])
+}
+
+/// Meta information of mileage.
+/// 
+/// `shopping_mileages` is an entity that embodies specifications for mileage 
+/// deposits and outcomes at a shopping mall. In other words, 
+/// `shopping_mileages` is not {@link shopping_mileage_histories}, which means 
+/// mileage deposit and outcome history, but is simply metadata that 
+/// specifies specifications for scenarios in which mileage is deposited and 
+/// withdrawn.
+///
+/// @namespace Coins
+/// @author Samchon
+model shopping_mileages {
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Identifier code.
+    code String @db.VarChar
+
+    /// The source table occuring the mileage event.
+    source String @db.VarChar
+
+    /// Direction of mileage.
+    ///
+    /// - `1`: Income
+    /// - `-1`: outcome
+    direction Int @db.Integer
+
+    /// Default value of mileage.
+    ///
+    /// Possible to mit, and how to use this default value is up to the
+    /// backend program. It is okay to use it as a default value when
+    /// creating a new record, or percentage value to be applied.
+    ///
+    /// @minimum 0
+    default Float? @db.DoublePrecision
+
+    /// Creation time of record.
+    created_at DateTime @db.Timestamptz
+
+    /// Deletion time of record.
+    deleted_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    histories shopping_mileage_histories[]
+
+    @@unique([code])
+}
+
+/// Mileagea income/outcome details of customers (citizens).
+///
+/// `shopping_mileage_histories` is an entity that embodies the 
+/// {@link shopping_customers customer}'s deposit/outcome history.
+///
+/// You can think of it as a kind of accounting ledger table. Therefore, 
+/// note that, `value` must have positive number only, even if it is a 
+/// outcome. The minus value must be expressed by multiplying the 
+/// {@link shopping_mileages.direction} value of the corresponding.
+///
+/// @namespace Coins
+/// @author Samchon
+model shopping_mileage_histories {
+    //----
+    // COLUMNS
+    //----
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged metadata's {@link shopping_mileages.id}
+    ///
+    /// @format uuid
+    shopping_mileage_id String @db.Uuid
+
+    /// Belonged citizen's {@link shopping_citizens.id}
+    ///
+    /// @format uuid
+    shopping_citizen_id String @db.Uuid
+
+    /// The source record occured income/outcome. 
+    ///
+    /// @format uuid
+    source_id String @db.Uuid
+
+    /// Income/outcome amount of mileage.
+    /// 
+    /// It must be a positive number, and you can check 
+    /// {@link shopping_mileages.direction} for incomes and outcomes. 
+    /// If you want to express the figures for incomes and outcomes as 
+    /// positive/negative numbers, you can also multiply this field value by 
+    /// the attributed {@link shopping_mileages.direction} value.
+    ///
+    /// @minimum 0
+    value Float @db.DoublePrecision
+
+    /// Creation time of record.
+    created_at DateTime @db.Timestamptz
+
+    /// Cancelled time of record.
+    cancelled_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    mileage shopping_mileages @relation(fields: [shopping_mileage_id], references: [id])
+    citizen shopping_citizens @relation(fields: [shopping_citizen_id], references: [id])
+}
 
 //-----------------------------------------------------------
 // INQUIRIES
 //-----------------------------------------------------------
+/// Inquiry about a sale snapshot.
+/// 
+/// `shopping_sale_snapshot_inquiries` is a subtype entity of 
+/// {@link bbs_articles}, and represents inquiries written by 
+/// {@link shopping_customers customers} about a {@link shopping_sales sale} 
+/// registered by the {@link shopping_sellers seller} (however, to trace the
+/// exact {@link shopping_sale_snapshots snapshot}, it is referencing not
+/// sale but snapshot).
+/// 
+/// In addition, since the customer is waiting for the seller's response after 
+/// writing the inquiry, whether the seller has viewed the inquiry written by 
+/// the customer is provided for reference as `read_by_seller_at` at property. 
+/// Of course, since the inquery itself is a subtype of a article, it is also 
+/// possible for sellers to communicate with each other through 
+/// {@link shopping_sale_snapshot_inquiry_comments comments} before an 
+/// {@link shopping_sale_snapshot_inquiry_responses official response}.
+/// 
+/// However, comments themselves can only be made by customers, even if they 
+/// are not the person who wrote the article. Of course, it cannot be written 
+/// unless the seller is a party.
+///
+/// @namespace Inquiries
+/// @author Samchon
+model shopping_sale_snapshot_inquiries {
+    //----
+    // COLUMNS
+    //----
+    /// PK + FK.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
 
-//-----------------------------------------------------------
-// ISSUES
-//-----------------------------------------------------------
+    /// Belonged snapshot's {@link shopping_sale_snapshots.id}
+    ///
+    /// @format uuid
+    shopping_sale_snapshot_id String @db.Uuid
+
+    /// Writer customer's {@link shopping_customers.id}
+    ///
+    /// @format uuid
+    shopping_customer_id String @db.Uuid
+
+    /// Type of the inquiry article.
+    ///
+    /// - `question`
+    /// - `review`
+    type String @db.VarChar
+
+    /// The first time when the seller read the inquiry.
+    read_by_seller_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    base     bbs_articles            @relation(fields: [id], references: [id], onDelete: Cascade)
+    snapshot shopping_sale_snapshots @relation(fields: [shopping_sale_snapshot_id], references: [id], onDelete: Cascade)
+    customer shopping_customers      @relation(fields: [shopping_customer_id], references: [id], onDelete: Cascade)
+
+    of_question                            shopping_sale_snapshot_questions?
+    of_review                              shopping_sale_snapshot_reviews?
+    shopping_sale_snapshot_inquiry_answers shopping_sale_snapshot_inquiry_answers[]
+}
+
+/// Question about sale snapshot.
+/// 
+/// `shopping_sale_snapshot_questions` is a subtype entity of 
+/// {@link shopping_sale_snapshot_inquiries}, and is used when a 
+/// {@link shopping_customers customer} wants to ask something about a 
+/// sale ({@link shopping_sale_snapshots snapshot} at the time) registered by 
+/// the {@link shopping_sellers seller}.
+/// 
+/// And, like most shopping malls, `shopping_sale_snapshot_questions` also 
+/// provides a `secret` attribute, allowing you to create a "secret message" 
+/// that can only be viewed by the seller and the customer who wrote the 
+/// question.
+///
+/// @namespace Inquiries
+/// @author Samchon
+model shopping_sale_snapshot_questions {
+    //----
+    // COLUMNS
+    //----
+    /// PK + FK.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Whether secret or not.
+    secret Boolean @db.Boolean
+
+    //----
+    // RELATIONS
+    //----
+    base shopping_sale_snapshot_inquiries @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+/// Reviews for sale snapshots.
+/// 
+/// `shopping_sale_snapshot_reviews` is a subtype entity of 
+/// {@link shopping_sale_snapshot_inquiries}, and is used when a 
+/// {@link shopping_customers customer} purchases a sale 
+/// ({@link shopping_sale_snapshots snapshot} at the time) registered by the 
+/// {@link shopping_sellers seller} as a product and leaves a review and 
+/// rating for it.
+/// 
+/// For reference, `shopping_sale_snapshot_reviews` and 
+/// {@link shopping_order_goods} have a logarithmic relationship of N: 1, 
+/// but this does not mean that customers can continue to write reviews for 
+/// the same product indefinitely. Wouldn't there be restrictions, such as 
+/// if you write a review once, you can write an additional review a month 
+/// later?
+///
+/// @namespace Inquiries
+/// @author Samchon
+model shopping_sale_snapshot_reviews {
+    //----
+    // COLUMNS
+    //----
+    /// PK + FK.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged good's {@link shopping_order_goods.id}
+    ///
+    /// @format uuid
+    shopping_order_good_id String @db.Uuid
+
+    //----
+    // RELATIONS
+    //----
+    base shopping_sale_snapshot_inquiries @relation(fields: [id], references: [id], onDelete: Cascade)
+    good shopping_order_goods             @relation(fields: [shopping_order_good_id], references: [id], onDelete: Cascade)
+
+    @@index([shopping_order_good_id])
+}
+
+/// A snapshot of the content of the review for the sale snapshot.
+/// 
+/// `shopping_sale_snapshot_review_snapshots` is a subtype entity of 
+/// {@link bbs_article_snapshots} and is designed to add a `score` property 
+/// to the content of {@link shopping_sale_snapshot_reviews review article).
+/// 
+/// In other words, after writing a review article, customers can edit it 
+/// and change the evaluation `score` at any time.
+///
+/// @namespace Inquiries
+/// @author Samchon
+model shopping_sale_snapshot_review_snapshots {
+    //----
+    // COLUMNS
+    //----
+    /// PK + FK.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Estimation score value.
+    ///
+    /// @minimum 0
+    /// @maximum 100
+    score Float @db.DoublePrecision
+
+    //----
+    // RELATIONS
+    //----
+    base bbs_article_snapshots @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+/// Answers to questions about sale snapshots.
+/// 
+/// `shopping_sale_snapshot_inquiry_answers` is an entity that embodies the 
+/// official answer written by the {@link shopping_sellers seller} to the 
+/// {@link shopping_sale_snapshot_inquiries inquiry} written by the 
+/// {@link shopping_customers customer}.
+/// 
+/// Of course, in addition to writing an official response like this, it is 
+/// also possible for the seller to communicate with the questioner and 
+/// multiple customers through 
+/// {@link shopping_sale_snapshot_inquiry_comments comments} in the 
+/// attribution inquiry.
+/// 
+/// For refererence, it is not possible to write comments on this answer. 
+/// Encourage people to write comments on the inquiry article. This is to 
+/// prevent comments from being scattered in both inquiry and response 
+/// articles.
+///
+/// @namespace Inquiries
+/// @author Samchon
+model shopping_sale_snapshot_inquiry_answers {
+    //----
+    // COLUMNS
+    //----
+    /// PK + FK
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged inquiry's {@link shopping_sale_snapshot_inquiries.id}
+    ///
+    /// @format uuid
+    shopping_sale_snapshot_inquiry_id String @db.Uuid
+
+    /// Answered seller's {@link shopping_sellers.id}
+    ///
+    /// @format uuid
+    shopping_seller_id String @db.Uuid
+
+    //----
+    // RELATIONS
+    //----
+    base    bbs_articles                     @relation(fields: [id], references: [id], onDelete: Cascade)
+    inquiry shopping_sale_snapshot_inquiries @relation(fields: [shopping_sale_snapshot_inquiry_id], references: [id], onDelete: Cascade)
+    seller  shopping_sellers                 @relation(fields: [shopping_seller_id], references: [id], onDelete: Cascade)
+}
+
+/// A comment written on a question post.
+/// 
+/// `shopping_sale_snapshot_inquiry_comments` is a subtype entity of 
+/// {@link bbs_article_comments), and is used when you want to communicate with 
+/// multiple people about an {@link shopping_sale_snapshot_inquiries inquiry} 
+/// written by a {@link shopping_customers customer}.
+/// 
+/// For reference, only related parties can write comments for 
+/// {@link shopping_sellers sellers}, but there is no limit to customers. 
+/// In other words, anyone can freely write a comment, even if they are not 
+/// the person who wrote the inquiry.
+///
+/// @namespace Inquiries
+/// @author Samchon
+model shopping_sale_snapshot_inquiry_comments {
+    //----
+    // COLUMNS
+    //----
+    /// PK + FK
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Writer seller's {@link shopping_sellers.id}
+    ///
+    /// @format uuid
+    shopping_seller_id String? @db.Uuid
+
+    /// Writer customer's {@link shopping_customers.id}
+    ///
+    /// @format uuid
+    shopping_customer_id String? @db.Uuid
+
+    //----
+    // RELATIONS
+    //----
+    base     bbs_article_comments @relation(fields: [id], references: [id], onDelete: Cascade)
+    seller   shopping_sellers?    @relation(fields: [shopping_seller_id], references: [id], onDelete: Cascade)
+    customer shopping_customers?  @relation(fields: [shopping_customer_id], references: [id], onDelete: Cascade)
+}

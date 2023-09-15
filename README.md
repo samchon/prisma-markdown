@@ -16,7 +16,7 @@ If you want to see how markdown document being generated, visit below examples:
   - Markdown Content: [samchon/prisma-markdown/ERD.md](https://github.com/samchon/prisma-markdown/blob/master/ERD.md)
   - Prisma Schema: [samchon/prisma-markdown/schema.prisma](https://github.com/samchon/prisma-markdown/blob/master/schema.prisma)
 
-![Example Case](https://github.com/samchon/prisma-markdown/assets/13158709/592bca96-a889-4cf0-b139-5a4497ecfbd0)
+[![Example Case](https://github-production-user-asset-6210df.s3.amazonaws.com/13158709/268175441-80ca9c8e-4c96-4deb-a8cb-674e9845ebf6.png)](https://github.com/samchon/prisma-markdown/blob/master/ERD.md)
 
 
 

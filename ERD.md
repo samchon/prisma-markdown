@@ -682,16 +682,19 @@ The address information.
 
 **Properties**
   - `id`: 
-  - `mobile`: 
-  - `name`: 
-  - `country`: 
-  - `province`: 
-  - `city`: 
-  - `department`: 
-  - `possession`: 
-  - `zip_code`: 
-  - `special_note`: 
-  - `created_at`: 
+  - `mobile`: Mobile number.
+  - `name`
+    > Representative name of the address.
+    > 
+    > Sometimes be receiver's name, and sometimes be place name.
+  - `country`: Target country.
+  - `province`: Target province.
+  - `city`: Target city.
+  - `department`: Department name.
+  - `possession`: Detailed address containing room number.
+  - `zip_code`: Zip code, or postal code.
+  - `special_note`: Special description if required.
+  - `created_at`: Creation time of record.
 
 
 ## Sales
@@ -1215,7 +1218,7 @@ Item in a shopping cart.
 this into an actual [order](#shopping_orders) in the future, 
 `shopping_cart_items` be changed to [shopping_order_goods](#shopping_order_goods).
 
-And while adding a listing snapshot to the shopping cart, the customer 
+And while adding a sale snapshot to the shopping cart, the customer 
 inevitably selects specific [units](#shopping_sale_snapshot_units) and 
 [final stocks](#shopping_sale_snapshot_unit_stocks) within the listing 
 snapshot. Information about these units and stocks is recorded in the 
@@ -1256,7 +1259,7 @@ and the [stock](#shopping_sale_snapshot_unit_stocks) finally selected
 among those [units](#shopping_sale_snapshot_units).
 
 Therefore, if the customer selects multiple units and stocks from the 
-target listing snapshot, the attributed [shopping_cart_items](#shopping_cart_items) record 
+target sale snapshot, the attributed [shopping_cart_items](#shopping_cart_items) record 
 also has multiple corresponding `shopping_cart_item_stocks` records.
 
 And `shopping_cart_item_stocks` has a `quantity` property that indicates 
@@ -1333,6 +1336,7 @@ shopping_order_goods {
 shopping_deliveries {
     String id PK
     String shopping_seller_id FK
+    String invoice_code "nullable"
 }
 shopping_delivery_journeys {
     String id PK
@@ -1411,7 +1415,7 @@ Order completion and payment information.
 
 `shopping_order_publishes` is an entity that embodies the series of 
 processes in which a customer pays for his or her 
-{@link shopping_orders order, thereby completing the order. And only after 
+[order](#shopping_orders), thereby completing the order. And only after 
 the order is completed, can the seller recognize that the customer has 
 purchased his product.
 
@@ -1504,9 +1508,25 @@ for ordered products.
 ### `shopping_deliveries`
 Delivery information.
 
+When delivering purchase(s) to [customer](#shopping_customers), 
+[seller](#shopping_selleres) can deliver multiple 
+[stocks](#shopping_sale_snapshot_unit_stocks), [goods](#shopping_order_goods) 
+at once. Also, it is possible to deliver a stock or good in multiple times due to 
+physical restriction like volume or weight.
+
+As you can see from above, the relationship between delivery with 
+[order](#shopping_orders) (or good) is not 1: 1 or N: 1, but M: N. Entity 
+`shopping_deliveries` has been designed to represent such relationship, by referencing
+target stocks or goods through subsidiary entity [shopping_delivery_pieces](#shopping_delivery_pieces).
+
+Also, delivery does not end with only one step. It has multiple processes like
+manufacturing, planning, shipping and delivering. Those steps are represented by
+another subsidiary entity [shopping_delivery_journeys](#shopping_delivery_journeys).
+
 **Properties**
   - `id`: 
   - `shopping_seller_id`: Belonged seller's [id](#shopping_sellers)
+  - `invoice_code`: Invoice code if exists.
 
 ### `shopping_delivery_journeys`
 Journey of delivery.
@@ -1862,7 +1882,7 @@ And if there are multiple shopping_coupon_sale_criterias records within one coup
 ### `shopping_coupon_funnel_criterias`
 Limit the funnel of discount coupons.
 
-`hub_coupon_funnel_criterias` is a subtype entity of 
+`shopping_coupon_funnel_criterias` is a subtype entity of 
 [shopping_coupon_criterias](#shopping_coupon_criterias), and is used when you want to issue or 
 exclude discount coupons only to [customers](#shopping_customers) who 
 came from a specific path.
@@ -1959,3 +1979,444 @@ issuing code must also be supported by the corresponding quantity.
     > Another word, one-time password for issuance.
   - `created_at`: Creation time of record.
   - `expired_at`: Expired time of record.
+
+
+## Coins
+```mermaid
+erDiagram
+shopping_deposits {
+    String id PK
+    String code UK
+    String source
+    Int direction
+    DateTime created_at
+    DateTime deleted_at "nullable"
+}
+shopping_deposit_histories {
+    String id PK
+    String shopping_deposit_id FK
+    String shopping_citizen_id FK
+    String source_id
+    Float value
+    DateTime created_at
+    DateTime cancelled_at "nullable"
+}
+shopping_deposit_charges {
+    String id PK
+    String shopping_customer_id FK
+    Float amount
+    DateTime created_at
+    DateTime deleted_at "nullable"
+}
+shopping_deposit_charge_publishes {
+    String id PK
+    String shopping_deposit_charge_id FK
+    String password "nullable"
+    DateTime created_at
+    DateTime paid_at "nullable"
+    DateTime cancelled_at "nullable"
+}
+shopping_mileages {
+    String id PK
+    String code UK
+    String source
+    Int direction
+    Float default "nullable"
+    DateTime created_at
+    DateTime deleted_at "nullable"
+}
+shopping_mileage_histories {
+    String id PK
+    String shopping_mileage_id FK
+    String shopping_citizen_id FK
+    String source_id
+    Float value
+    DateTime created_at
+    DateTime cancelled_at "nullable"
+}
+shopping_customers {
+    String id PK
+    String shopping_channel_id FK
+    String shopping_member_id FK "nullable"
+    String shopping_external_user_id FK "nullable"
+    String shopping_citizen_id FK "nullable"
+    String href
+    String referrer
+    String ip
+    DateTime created_at
+}
+shopping_citizens {
+    String id PK
+    String shopping_channel_id FK "nullable"
+    String mobile
+    String name
+    DateTime created_at
+    DateTime deleted_at "nullable"
+}
+shopping_deposit_histories }|--|| shopping_deposits : deposit
+shopping_deposit_histories }|--|| shopping_citizens : citizen
+shopping_deposit_charges }|--|| shopping_customers : customer
+shopping_deposit_charge_publishes |o--|| shopping_deposit_charges : charge
+shopping_mileage_histories }|--|| shopping_mileages : mileage
+shopping_mileage_histories }|--|| shopping_citizens : citizen
+shopping_customers }o--|| shopping_citizens : citizen
+```
+
+### `shopping_deposits`
+Meta information of the deposit.
+
+`shopping_deposits` is an entity that embodies the specifications for 
+incomes and outcomes at a shopping mall. In other words, 
+`shopping_deposits` is not [shopping_deposit_histories](#shopping_deposit_histories), which 
+refers to the deposit/outcome details of deposits, but is simply 
+metadata that specifies specifications for income/outcome scenarios.
+
+**Properties**
+  - `id`: 
+  - `code`: Identifier code.
+  - `source`: The source table occuring the deposit event.
+  - `direction`
+    > Direction of deposit.
+    > 
+    > - `1`: Income
+    > - `-1`: outcome
+  - `created_at`: Creation time of record.
+  - `deleted_at`: / Deletion time of record.
+
+### `shopping_deposit_histories`
+Deposit income/outcome details of customers (citizens).
+
+`shopping_deposit_histories` is an entity that embodies the 
+[customer](#shopping_customers)'s income/outcome history.
+
+You can think of it as a kind of accounting ledger table. Therefore, 
+note that, `value` must have positive number only, even if it is a 
+outcome. The minus value must be expressed by multiplying the 
+[shopping_deposits.direction](#shopping_deposits) value of the corresponding.
+
+**Properties**
+  - `id`: 
+  - `shopping_deposit_id`: Belonged metadata's [shopping_deposits.id](#shopping_deposits)
+  - `shopping_citizen_id`: Belonged citizen's [shopping_citizens.id](#shopping_citizens)
+  - `source_id`: The source record occured deposit/outcome. 
+  - `value`
+    > Income/outcome amount of deposit.
+    > 
+    > It must be a positive number, and you can check 
+    > [shopping_deposits.direction](#shopping_deposits) for incomes and outcomes. 
+    > If you want to express the figures for incomes and outcomes as 
+    > positive/negative numbers, you can also multiply this field value by 
+    > the attributed [shopping_deposits.direction](#shopping_deposits) value.
+  - `created_at`: Creation time of record.
+  - `cancelled_at`: Cancelled time of record.
+
+### `shopping_deposit_charges`
+Deposit deposit.
+
+`shopping_deposit_charges` is an entity that symbolizes the act of a 
+[customer](#shopping_customers) applying for a deposit to a shopping 
+mall.
+
+However, `shopping_deposit_charges` expresses the customer's intention to 
+make a deposit, but it has not yet been confirmed. Only when the customer 
+completes the [payment](#shopping_deposit_charge_publishes) 
+will the deposit increase be confirmed.
+
+**Properties**
+  - `id`: 
+  - `shopping_customer_id`: Belonged metadata's [shopping_deposits.id](#shopping_deposits)
+  - `amount`: Charging amount.
+  - `created_at`: Creation time of record.
+  - `deleted_at`
+    > Deletion time of record.
+    > 
+    > Only when be stopped before publishing.
+
+### `shopping_deposit_charge_publishes`
+Payment progress information for deposits.
+
+`shopping_deposit_charge_publishes` is an entity that embodies the process 
+of a [customer](#shopping_customers) applying for a deposit and making 
+a payment.
+
+Please note that the existence of the `shopping_deposit_charge_publishes` 
+record does not mean that payment has been completed. Payment is complete 
+only when payment (`paid_at`) is complete. This is what the 
+"process of payment" mentioned above means.
+
+However, even after payment has been made, there may be cases where it is 
+suddenly canceled, so you must be careful about this as well.
+
+**Properties**
+  - `id`: 
+  - `shopping_deposit_charge_id`: Belonged charge appliance's [shopping_deposit_charges.id](#shopping_deposit_charges)
+  - `password`
+    > Password for encryption.
+    > 
+    > This shopping mall system uses a randomly issued password to encrypt 
+    > payment history, and is completely unrelated to the user.
+  - `created_at`
+    > Creation time of record.
+    > 
+    > Note that, this property does not mean the payment completion time.
+  - `paid_at`
+    > Completion time of payment.
+    > 
+    > This property is the only way to know if the payment has been 
+    > completed. If this property is null, the payment has not been 
+    > completed yet.
+  - `cancelled_at`: The time when the payment was cancelled or reverted.
+
+### `shopping_mileages`
+Meta information of mileage.
+
+`shopping_mileages` is an entity that embodies specifications for mileage 
+deposits and outcomes at a shopping mall. In other words, 
+`shopping_mileages` is not [shopping_mileage_histories](#shopping_mileage_histories), which means 
+mileage deposit and outcome history, but is simply metadata that 
+specifies specifications for scenarios in which mileage is deposited and 
+withdrawn.
+
+**Properties**
+  - `id`: 
+  - `code`: Identifier code.
+  - `source`: The source table occuring the mileage event.
+  - `direction`
+    > Direction of mileage.
+    > 
+    > - `1`: Income
+    > - `-1`: outcome
+  - `default`
+    > Default value of mileage.
+    > 
+    > Possible to mit, and how to use this default value is up to the
+    > backend program. It is okay to use it as a default value when
+    > creating a new record, or percentage value to be applied.
+  - `created_at`: Creation time of record.
+  - `deleted_at`: Deletion time of record.
+
+### `shopping_mileage_histories`
+Mileagea income/outcome details of customers (citizens).
+
+`shopping_mileage_histories` is an entity that embodies the 
+[customer](#shopping_customers)'s deposit/outcome history.
+
+You can think of it as a kind of accounting ledger table. Therefore, 
+note that, `value` must have positive number only, even if it is a 
+outcome. The minus value must be expressed by multiplying the 
+[shopping_mileages.direction](#shopping_mileages) value of the corresponding.
+
+**Properties**
+  - `id`: 
+  - `shopping_mileage_id`: Belonged metadata's [shopping_mileages.id](#shopping_mileages)
+  - `shopping_citizen_id`: Belonged citizen's [shopping_citizens.id](#shopping_citizens)
+  - `source_id`: The source record occured income/outcome. 
+  - `value`
+    > Income/outcome amount of mileage.
+    > 
+    > It must be a positive number, and you can check 
+    > [shopping_mileages.direction](#shopping_mileages) for incomes and outcomes. 
+    > If you want to express the figures for incomes and outcomes as 
+    > positive/negative numbers, you can also multiply this field value by 
+    > the attributed [shopping_mileages.direction](#shopping_mileages) value.
+  - `created_at`: Creation time of record.
+  - `cancelled_at`: Cancelled time of record.
+
+
+## Inquiries
+```mermaid
+erDiagram
+shopping_sale_snapshot_inquiries {
+    String id PK
+    String shopping_sale_snapshot_id FK
+    String shopping_customer_id FK
+    String type
+    DateTime read_by_seller_at "nullable"
+}
+shopping_sale_snapshot_questions {
+    String id PK
+    Boolean secret
+}
+shopping_sale_snapshot_reviews {
+    String id PK
+    String shopping_order_good_id FK
+}
+shopping_sale_snapshot_review_snapshots {
+    String id PK
+    Float score
+}
+shopping_sale_snapshot_inquiry_answers {
+    String id PK
+    String shopping_sale_snapshot_inquiry_id FK
+    String shopping_seller_id FK
+}
+shopping_sale_snapshot_inquiry_comments {
+    String id PK
+    String shopping_seller_id FK "nullable"
+    String shopping_customer_id FK "nullable"
+}
+bbs_articles {
+    String id PK
+    DateTime created_at
+    DateTime deleted_at "nullable"
+}
+bbs_article_snapshots {
+    String id PK
+    String bbs_article_id FK
+    String format
+    String title
+    String body
+    DateTime created_at
+}
+bbs_article_comments {
+    String id PK
+    String bbs_article_id FK
+    String parent_id FK "nullable"
+    DateTime created_at
+    DateTime deleted_at "nullable"
+}
+shopping_sale_snapshots {
+    String id PK
+    String shopping_sale_id FK
+    DateTime created_at
+}
+shopping_sale_snapshot_inquiries ||--|| bbs_articles : base
+shopping_sale_snapshot_inquiries }|--|| shopping_sale_snapshots : snapshot
+shopping_sale_snapshot_questions |o--|| shopping_sale_snapshot_inquiries : base
+shopping_sale_snapshot_reviews |o--|| shopping_sale_snapshot_inquiries : base
+shopping_sale_snapshot_review_snapshots ||--|| bbs_article_snapshots : base
+shopping_sale_snapshot_inquiry_answers ||--|| bbs_articles : base
+shopping_sale_snapshot_inquiry_answers }|--|| shopping_sale_snapshot_inquiries : inquiry
+shopping_sale_snapshot_inquiry_comments ||--|| bbs_article_comments : base
+bbs_article_snapshots }|--|| bbs_articles : article
+bbs_article_comments }|--|| bbs_articles : article
+bbs_article_comments }o--o| bbs_article_comments : parent
+```
+
+### `shopping_sale_snapshot_inquiries`
+Inquiry about a sale snapshot.
+
+`shopping_sale_snapshot_inquiries` is a subtype entity of 
+[bbs_articles](#bbs_articles), and represents inquiries written by 
+[customers](#shopping_customers) about a [sale](#shopping_sales) 
+registered by the [seller](#shopping_sellers) (however, to trace the
+exact [snapshot](#shopping_sale_snapshots), it is referencing not
+sale but snapshot).
+
+In addition, since the customer is waiting for the seller's response after 
+writing the inquiry, whether the seller has viewed the inquiry written by 
+the customer is provided for reference as `read_by_seller_at` at property. 
+Of course, since the inquery itself is a subtype of a article, it is also 
+possible for sellers to communicate with each other through 
+[comments](#shopping_sale_snapshot_inquiry_comments) before an 
+[official response](#shopping_sale_snapshot_inquiry_responses).
+
+However, comments themselves can only be made by customers, even if they 
+are not the person who wrote the article. Of course, it cannot be written 
+unless the seller is a party.
+
+**Properties**
+  - `id`: PK + FK.
+  - `shopping_sale_snapshot_id`: Belonged snapshot's [shopping_sale_snapshots.id](#shopping_sale_snapshots)
+  - `shopping_customer_id`: Writer customer's [shopping_customers.id](#shopping_customers)
+  - `type`
+    > Type of the inquiry article.
+    > 
+    > - `question`
+    > - `review`
+  - `read_by_seller_at`: The first time when the seller read the inquiry.
+
+### `shopping_sale_snapshot_questions`
+Question about sale snapshot.
+
+`shopping_sale_snapshot_questions` is a subtype entity of 
+[shopping_sale_snapshot_inquiries](#shopping_sale_snapshot_inquiries), and is used when a 
+[customer](#shopping_customers) wants to ask something about a 
+sale ([snapshot](#shopping_sale_snapshots) at the time) registered by 
+the [seller](#shopping_sellers).
+
+And, like most shopping malls, `shopping_sale_snapshot_questions` also 
+provides a `secret` attribute, allowing you to create a "secret message" 
+that can only be viewed by the seller and the customer who wrote the 
+question.
+
+**Properties**
+  - `id`: PK + FK.
+  - `secret`: Whether secret or not.
+
+### `shopping_sale_snapshot_reviews`
+Reviews for sale snapshots.
+
+`shopping_sale_snapshot_reviews` is a subtype entity of 
+[shopping_sale_snapshot_inquiries](#shopping_sale_snapshot_inquiries), and is used when a 
+[customer](#shopping_customers) purchases a sale 
+([snapshot](#shopping_sale_snapshots) at the time) registered by the 
+[seller](#shopping_sellers) as a product and leaves a review and 
+rating for it.
+
+For reference, `shopping_sale_snapshot_reviews` and 
+[shopping_order_goods](#shopping_order_goods) have a logarithmic relationship of N: 1, 
+but this does not mean that customers can continue to write reviews for 
+the same product indefinitely. Wouldn't there be restrictions, such as 
+if you write a review once, you can write an additional review a month 
+later?
+
+**Properties**
+  - `id`: PK + FK.
+  - `shopping_order_good_id`: Belonged good's [shopping_order_goods.id](#shopping_order_goods)
+
+### `shopping_sale_snapshot_review_snapshots`
+A snapshot of the content of the review for the sale snapshot.
+
+`shopping_sale_snapshot_review_snapshots` is a subtype entity of 
+[bbs_article_snapshots](#bbs_article_snapshots) and is designed to add a `score` property 
+to the content of {@link shopping_sale_snapshot_reviews review article).
+
+In other words, after writing a review article, customers can edit it 
+and change the evaluation `score` at any time.
+
+**Properties**
+  - `id`: PK + FK.
+  - `score`: Estimation score value.
+
+### `shopping_sale_snapshot_inquiry_answers`
+Answers to questions about sale snapshots.
+
+`shopping_sale_snapshot_inquiry_answers` is an entity that embodies the 
+official answer written by the [seller](#shopping_sellers) to the 
+[inquiry](#shopping_sale_snapshot_inquiries) written by the 
+[customer](#shopping_customers).
+
+Of course, in addition to writing an official response like this, it is 
+also possible for the seller to communicate with the questioner and 
+multiple customers through 
+[comments](#shopping_sale_snapshot_inquiry_comments) in the 
+attribution inquiry.
+
+For refererence, it is not possible to write comments on this answer. 
+Encourage people to write comments on the inquiry article. This is to 
+prevent comments from being scattered in both inquiry and response 
+articles.
+
+**Properties**
+  - `id`: PK + FK
+  - `shopping_sale_snapshot_inquiry_id`: Belonged inquiry's [shopping_sale_snapshot_inquiries.id](#shopping_sale_snapshot_inquiries)
+  - `shopping_seller_id`: Answered seller's [shopping_sellers.id](#shopping_sellers)
+
+### `shopping_sale_snapshot_inquiry_comments`
+A comment written on a question post.
+
+`shopping_sale_snapshot_inquiry_comments` is a subtype entity of 
+{@link bbs_article_comments), and is used when you want to communicate with 
+multiple people about an [inquiry](#shopping_sale_snapshot_inquiries) 
+written by a [customer](#shopping_customers).
+
+For reference, only related parties can write comments for 
+[sellers](#shopping_sellers), but there is no limit to customers. 
+In other words, anyone can freely write a comment, even if they are not 
+the person who wrote the inquiry.
+
+**Properties**
+  - `id`: PK + FK
+  - `shopping_seller_id`: Writer seller's [shopping_sellers.id](#shopping_sellers)
+  - `shopping_customer_id`: Writer customer's [shopping_customers.id](#shopping_customers)
