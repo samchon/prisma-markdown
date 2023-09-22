@@ -572,7 +572,7 @@ model shopping_sections {
 /// 
 /// The first purpose of this is to track the customer's inflow path in detail, and it is 
 /// for cases where the same person enters as a non-member, puts items in the 
-/// {@link shopping_cart_items shopping cart} in advance, and only authenticates 
+/// {@link shopping_cart_commodities shopping cart} in advance, and only authenticates 
 /// their real name or registers/logs in at the moment of 
 /// {@link shopping_order_publishes payment}. It is the second. Lastly, it is 
 /// to accurately track the activities that a person performs at the 
@@ -1134,6 +1134,12 @@ model shopping_sales {
 /// belonged {@link shopping_sales sale}. The snapshot record is created
 /// whenever the seller newly creates or updates the sale.
 ///
+/// Sale | Cart | Order
+/// -----|------|------
+/// x | {@link shopping_carts} | {@link shopping_orders}
+/// {@link shopping_sale_snapshots} | {@link shopping_cart_commodities} | {@link shopping_order_goods}
+/// {@link shopping_sale_snapshot_unit_stocks} | {@link shopping_cart_commodity_stocks} | x
+///
 /// @namespace Sales
 /// @erd Systematic
 /// @erd Inquiries
@@ -1164,7 +1170,7 @@ model shopping_sale_snapshots {
     shopping_sale_snapshot_contents  shopping_sale_snapshot_contents?
     shopping_sale_snapshot_channels  shopping_sale_snapshot_channels[]
     shopping_sale_snapshot_units     shopping_sale_snapshot_units[]
-    shopping_cart_items              shopping_cart_items[]
+    shopping_cart_commodities        shopping_cart_commodities[]
     shopping_sale_snapshot_inquiries shopping_sale_snapshot_inquiries[]
 }
 
@@ -1373,8 +1379,8 @@ model shopping_sale_snapshot_units {
     options shopping_sale_snapshot_unit_options[]
 
     /// List of stocks.
-    stocks                    shopping_sale_snapshot_unit_stocks[]
-    shopping_cart_item_stocks shopping_cart_item_stocks[]
+    stocks                         shopping_sale_snapshot_unit_stocks[]
+    shopping_cart_commodity_stocks shopping_cart_commodity_stocks[]
 }
 
 /// Individual option information on units for sale.
@@ -1454,8 +1460,8 @@ model shopping_sale_snapshot_unit_options {
     unit shopping_sale_snapshot_units @relation(fields: [shopping_sale_snapshot_unit_id], references: [id], onDelete: Cascade)
 
     /// List of candidates.
-    candidates                       shopping_sale_snapshot_unit_option_candidates[]
-    shopping_cart_item_stock_choices shopping_cart_item_stock_choices[]
+    candidates                            shopping_sale_snapshot_unit_option_candidates[]
+    shopping_cart_commodity_stock_choices shopping_cart_commodity_stock_choices[]
 
     @@unique([shopping_sale_snapshot_unit_id, name])
 }
@@ -1502,8 +1508,8 @@ model shopping_sale_snapshot_unit_option_candidates {
     option shopping_sale_snapshot_unit_options @relation(fields: [shopping_sale_snapshot_unit_option_id], references: [id], onDelete: Cascade)
 
     /// List of choices in stock.
-    choices                          shopping_sale_snapshot_unit_stock_choices[]
-    shopping_cart_item_stock_choices shopping_cart_item_stock_choices[]
+    choices                               shopping_sale_snapshot_unit_stock_choices[]
+    shopping_cart_commodity_stock_choices shopping_cart_commodity_stock_choices[]
 
     @@unique([shopping_sale_snapshot_unit_option_id, name])
 }
@@ -1584,8 +1590,8 @@ model shopping_sale_snapshot_unit_stocks {
     /// List of choices.
     ///
     /// Which candidate values are chosen in each option.
-    choices                   shopping_sale_snapshot_unit_stock_choices[]
-    shopping_cart_item_stocks shopping_cart_item_stocks[]
+    choices                        shopping_sale_snapshot_unit_stock_choices[]
+    shopping_cart_commodity_stocks shopping_cart_commodity_stocks[]
 
     @@unique([shopping_sale_snapshot_unit_id, name])
 }
@@ -1644,6 +1650,12 @@ model shopping_sale_snapshot_unit_stock_choices {
 /// `shopping_carts` is literally a space where 
 /// {@link shopping_customers customer} temporarily stores products before
 /// {@link shopping_orders purchase}.
+///
+/// Sale | Cart | Order
+/// -----|------|------
+/// x | {@link shopping_carts} | {@link shopping_orders}
+/// {@link shopping_sale_snapshots} | {@link shopping_cart_commodities} | {@link shopping_order_goods}
+/// {@link shopping_sale_snapshot_unit_stocks} | {@link shopping_cart_commodity_stocks} | x
 /// 
 /// @namespace Carts
 /// @author Samchon
@@ -1668,33 +1680,34 @@ model shopping_carts {
     /// Belonged customer.
     customer shopping_customers @relation(fields: [shopping_customer_id], references: [id], onDelete: Cascade)
 
-    /// List of items containing sale snapshot.
-    items shopping_cart_items[]
+    /// List of commodities containing sale snapshot.
+    commodities shopping_cart_commodities[]
 }
 
 /// Item in a shopping cart.
 ///
-/// `shopping_cart_items` is an entity that represents a 
+/// `shopping_cart_commodities` is an entity that represents a 
 /// {@link shopping_sale_snapshots snapshot} of the items that 
 /// {@link shopping_customers customer} has placed into his 
 /// {@link shopping_carts shopping cart} with a 
 /// {@link shopping_orders purchase} in mind. And if the customer continues 
 /// this into an actual {@link shopping_orders order} in the future, 
-/// `shopping_cart_items` be changed to {@link shopping_order_goods}.
+/// `shopping_cart_commodities` be changed to {@link shopping_order_goods}.
 /// 
 /// And while adding a sale snapshot to the shopping cart, the customer 
 /// inevitably selects specific {@link shopping_sale_snapshot_units units} and 
 /// {@link shopping_sale_snapshot_unit_stocks final stocks} within the listing 
 /// snapshot. Information about these units and stocks is recorded in the 
-/// subsidiary entity {@link shopping_cart_item_stocks}. There is also an 
+/// subsidiary entity {@link shopping_cart_commodity_stocks}. There is also an 
 /// attribute `volume` that indicates how many sets of snapshots of the 
-/// target item will be purchased. This "volume" is a value that will be 
-/// multiplied by {@link shopping_cart_item_stocks.quantity}, the quantity 
+/// target commodity will be purchased. This "volume" is a value that will be 
+/// multiplied by {@link shopping_cart_commodity_stocks.quantity}, the quantity 
 /// for each component.
+///
 /// 
 /// @namespace Carts
 /// @author Samchon
-model shopping_cart_items {
+model shopping_cart_commodities {
     //----
     // COLUMNS
     //----
@@ -1713,7 +1726,7 @@ model shopping_cart_items {
 
     /// Volume count.
     ///
-    /// The value multiplied to {@link shopping_cart_item_stocks.quantity}.
+    /// The value multiplied to {@link shopping_cart_commodity_stocks.quantity}.
     ///
     /// @format uint 
     /// @minimum 1
@@ -1724,10 +1737,10 @@ model shopping_cart_items {
 
     /// Whether be published or not.
     ///
-    /// Is current item ordered and be paid?
+    /// Is current commodity ordered and be paid?
     ///
-    /// Until purchase the item, the item can be reused to create new 
-    /// cart item. This variable can be computed by referencing 
+    /// Until purchase the commodity, the commodity can be reused to create new 
+    /// cart commodity. This variable can be computed by referencing 
     /// {@link Orders order} related tables, but just denormalized for the
     /// performance reason.
     published Boolean
@@ -1742,7 +1755,7 @@ model shopping_cart_items {
     snapshot shopping_sale_snapshots @relation(fields: [shopping_sale_snapshot_id], references: [id], onDelete: Cascade)
 
     /// List of wrapper of final stocks.
-    stocks shopping_cart_item_stocks[]
+    stocks shopping_cart_commodity_stocks[]
 
     /// List of order goods for purchase.
     order_goods shopping_order_goods[]
@@ -1751,10 +1764,10 @@ model shopping_cart_items {
     @@index([shopping_sale_snapshot_id])
 }
 
-/// Final stock information of item added to the shopping cart.
+/// Final stock information of commodity added to the shopping cart.
 /// 
-/// `shopping_cart_item_stocks` is a subsidiary entity of 
-/// {@link shopping_cart_items} that embodies the information of the 
+/// `shopping_cart_commodity_stocks` is a subsidiary entity of 
+/// {@link shopping_cart_commodities} that embodies the information of the 
 /// {@link shopping_sale_snapshots snapshot} of the items in the shopping cart, 
 /// and is a concept that corresponds to the individual 
 /// {@link shopping_sale_snapshot_units units} in the target item snapshot 
@@ -1762,27 +1775,27 @@ model shopping_cart_items {
 /// among those {@link shopping_sale_snapshot_units units}.
 /// 
 /// Therefore, if the customer selects multiple units and stocks from the 
-/// target sale snapshot, the attributed {@link shopping_cart_items} record 
-/// also has multiple corresponding `shopping_cart_item_stocks` records.
+/// target sale snapshot, the attributed {@link shopping_cart_commodities} record 
+/// also has multiple corresponding `shopping_cart_commodity_stocks` records.
 /// 
-/// And `shopping_cart_item_stocks` has a `quantity` property that indicates 
+/// And `shopping_cart_commodity_stocks` has a `quantity` property that indicates 
 /// how many final stocks would be purchased in total. The final quantity 
 /// actually purchased can be multiplied by the 
-/// {@link shopping_cart_items.volume} value of the parent entity.
-/// 
+/// {@link shopping_cart_commodities.volume} value of the parent entity.
+///
 /// @namespace Carts
 /// @author Samchon
-model shopping_cart_item_stocks {
+model shopping_cart_commodity_stocks {
     //----
     // COLUMNS
     //----
     /// @format uuid
     id String @id @db.Uuid
 
-    /// Belonged item's {@link shopping_cart_items.id}
+    /// Belonged commodity's {@link shopping_cart_commodities.id}
     ///
     /// @format uuid
-    shopping_cart_item_id String @db.Uuid
+    shopping_cart_commodity_id String @db.Uuid
 
     /// Target unit's {@link shopping_sale_snapshot_units.id}
     ///
@@ -1800,7 +1813,7 @@ model shopping_cart_item_stocks {
     /// @minimum 1
     quantity Int @db.Integer
 
-    /// Sequence order in belonged cart item.
+    /// Sequence order in belonged cart commodity.
     ///
     /// @type int
     sequence Int @db.Integer
@@ -1808,28 +1821,28 @@ model shopping_cart_item_stocks {
     //----
     // RELATIONS
     //----
-    /// Belonged cart item.
-    item shopping_cart_items @relation(fields: [shopping_cart_item_id], references: [id], onDelete: Cascade)
+    /// Belonged cart commodity.
+    commodity shopping_cart_commodities @relation(fields: [shopping_cart_commodity_id], references: [id], onDelete: Cascade)
 
     /// Target unit.
-    unit shopping_sale_snapshot_units @relation(fields: [shopping_sale_snapshot_unit_id], references: [id], onDelete: Cascade)
+    unit shopping_sale_snapshot_units @relation(map: "rel_shopping_cart_commodity_stocks_unit", fields: [shopping_sale_snapshot_unit_id], references: [id], onDelete: Cascade)
 
     /// Target final stock.
-    stock shopping_sale_snapshot_unit_stocks @relation(fields: [shopping_sale_snapshot_unit_stock_id], references: [id], onDelete: Cascade)
+    stock shopping_sale_snapshot_unit_stocks @relation(map: "rel_shopping_cart_commodity_stocks_stock", fields: [shopping_sale_snapshot_unit_stock_id], references: [id], onDelete: Cascade)
 
     /// List of choices, how customer has determined for each option.
-    choices                  shopping_cart_item_stock_choices[]
+    choices                  shopping_cart_commodity_stock_choices[]
     shopping_delivery_pieces shopping_delivery_pieces[]
 
-    @@index([shopping_cart_item_id])
-    @@index([shopping_sale_snapshot_unit_id])
-    @@index([shopping_sale_snapshot_unit_stock_id])
+    @@index([shopping_cart_commodity_id])
+    @@index([shopping_sale_snapshot_unit_id], map: "idx_shopping_cart_commodity_stocks_unit")
+    @@index([shopping_sale_snapshot_unit_stock_id], map: "idx_shopping_cart_commodity_stocks_stock")
 }
 
 /// Option choice information for the final stock added to the shopping cart.
 /// 
-/// `shopping_cart_item_stock_choices` is a subsidiary entity of 
-/// {@link shopping_cart_item_stocks}. It records which 
+/// `shopping_cart_commodity_stock_choices` is a subsidiary entity of 
+/// {@link shopping_cart_commodity_stocks}. It records which 
 /// {@link shopping_sale_snapshot_unit_options options} the customer 
 /// specifically used while putting a specific 
 /// {@link shopping_sale_snapshot_units unit} and specific 
@@ -1838,25 +1851,25 @@ model shopping_cart_item_stocks {
 /// which {@link shopping_sale_snapshot_unit_option_candidates candidate values} 
 /// were selected or listed within the shopping cart.
 /// 
-/// Therefore, `shopping_cart_item_stock_choices` has reference properties 
-/// and predicate properties for candidate items in addition to references 
+/// Therefore, `shopping_cart_commodity_stock_choices` has reference properties 
+/// and predicate properties for candidate values in addition to references 
 /// to options. If the `type` of target option is "select", enter the 
-/// candidate item selected by the customer. Otherwise, enter the value 
+/// candidate value selected by the customer. Otherwise, enter the value 
 /// entered by the customer.
-/// 
+///
 /// @namespace Carts
 /// @author Samchon
-model shopping_cart_item_stock_choices {
+model shopping_cart_commodity_stock_choices {
     //----
     // COLUMNS
     //----
     /// @format uuid
     id String @id @db.Uuid
 
-    /// Belonged cart-item-stock's {@link shopping_cart_item_stocks.id}
+    /// Belonged cart-commodity-stock's {@link shopping_cart_commodity_stocks.id}
     ///
     /// @format uuid
-    shopping_cart_item_stock_id String @db.Uuid
+    shopping_cart_commodity_stock_id String @db.Uuid
 
     /// Target option's {@link shopping_sale_snapshot_unit_options.id}
     ///
@@ -1871,7 +1884,7 @@ model shopping_cart_item_stock_choices {
     /// User-written value for descriptive option.
     value String? @db.VarChar
 
-    /// Sequence order in belonged cart-item-stock.
+    /// Sequence order in belonged cart-commodity-stock.
     ///
     /// @type int
     sequence Int @db.Integer
@@ -1879,18 +1892,18 @@ model shopping_cart_item_stock_choices {
     //----
     // RELATIONS
     //----
-    /// Belonged cart-item-stock.
-    stock shopping_cart_item_stocks @relation(fields: [shopping_cart_item_stock_id], references: [id], onDelete: Cascade)
+    /// Belonged cart-commodity-stock.
+    stock shopping_cart_commodity_stocks @relation(fields: [shopping_cart_commodity_stock_id], references: [id], onDelete: Cascade)
 
     /// Target option.
-    option shopping_sale_snapshot_unit_options @relation(map: "rel_shopping_cart_item_stock_choices_option", fields: [shopping_sale_snapshot_unit_option_id], references: [id], onDelete: Cascade)
+    option shopping_sale_snapshot_unit_options @relation(map: "rel_shopping_cart_commodity_stock_choices_option", fields: [shopping_sale_snapshot_unit_option_id], references: [id], onDelete: Cascade)
 
     /// Selected candidate value for "select" typed option.
-    candidate shopping_sale_snapshot_unit_option_candidates? @relation(map: "rel_shopping_cart_item_stock_choices_candidate", fields: [shopping_sale_snapshot_unit_option_candidate_id], references: [id], onDelete: Cascade)
+    candidate shopping_sale_snapshot_unit_option_candidates? @relation(map: "rel_shopping_cart_commodity_stock_choices_candidate", fields: [shopping_sale_snapshot_unit_option_candidate_id], references: [id], onDelete: Cascade)
 
-    @@index([shopping_cart_item_stock_id])
-    @@index([shopping_sale_snapshot_unit_option_id], map: "idx_shopping_cart_item_stock_choices_option")
-    @@index([shopping_sale_snapshot_unit_option_candidate_id], map: "idx_shopping_cart_item_stock_choices_candidate")
+    @@index([shopping_cart_commodity_stock_id])
+    @@index([shopping_sale_snapshot_unit_option_id], map: "idx_shopping_cart_commodity_stock_choices_option")
+    @@index([shopping_sale_snapshot_unit_option_candidate_id], map: "idx_shopping_cart_commodity_stock_choices_candidate")
 }
 
 //-----------------------------------------------------------
@@ -1904,15 +1917,21 @@ model shopping_cart_item_stock_choices {
 /// "order application" stage and not the "order confirmation" stage.
 /// 
 /// And as soon as a customer applies for an order, all 
-/// {@link shopping_cart_items items} in the target shopping cart are 
+/// {@link shopping_cart_commodities commodities} in the target shopping cart are 
 /// promoted to {@link shopping_order_goods}, and those 
 /// {@link shopping_order_goods} records are created under this 
 /// `shopping_orders`. 
 ///
-/// Of course, not all items in the target shopping cart become 
+/// Of course, not all commodities in the target shopping cart become 
 /// {@link shopping_order_goods}, but only those selected by the customer 
 /// become the {@link shopping_order_goods}.
 /// 
+/// Sale | Cart | Order
+/// -----|------|------
+/// x | {@link shopping_carts} | {@link shopping_orders}
+/// {@link shopping_sale_snapshots} | {@link shopping_cart_commodities} | {@link shopping_order_goods}
+/// {@link shopping_sale_snapshot_unit_stocks} | {@link shopping_cart_commodity_stocks} | x
+///
 /// @namespace Orders
 /// @author Samchon
 model shopping_orders {
@@ -1970,10 +1989,110 @@ model shopping_orders {
     publish shopping_order_publishes?
 
     /// List of goods to purchase.
-    items                           shopping_order_goods[]
-    shopping_coupon_ticket_payments shopping_coupon_ticket_payments[]
+    goods shopping_order_goods[]
+
+    /// List of payed tickets for discount
+    ticket_payments shopping_coupon_ticket_payments[]
 
     @@index([shopping_customer_id, created_at])
+}
+
+/// Information about the individual goods that make up your order.
+/// 
+/// `shopping_order_goods` is an entity that represents each good ordered 
+/// by a {@link shopping_customers customer}, and the record is created in the 
+/// process of upgrading the product {@link shopping_cart_commodities commodity} 
+/// in the {@link shopping_carts shopping cart} to a good due to the customer's 
+/// {@link shopping_orders order request}.
+/// 
+/// And `shopping_order_goods`, like {@link shopping_cart_commodities}, is a concept 
+/// that corresponds to the listing 
+/// {@link shopping_sale_snapshots sale snapshot}.
+/// 
+/// For reference, `shopping_order_goods` also contains `volume` information 
+/// separately from the belonging {@link shopping_cart_commodities.volume}. This is 
+/// because there are often cases where you put 3 books in your shopping cart 
+/// and then change them to 4 during the actual order application process. 
+/// This is to increase the reusability of the shopping cart by changing the 
+/// volume attribute of the current entity rather than directly changing the 
+/// shopping_cart_commodities information.
+/// 
+/// In addition, `shopping_order_goods` becomes the most basic unit for 
+/// the post-order process, that is, after-sales service (A/S). For example, 
+/// after receiving a customer's product, confirming the order is recorded 
+/// in the `confirmed_at` attribute. Additionally, `shopping_order_goods` is 
+/// the unit in which customers issue issues or request exchanges or refunds 
+/// for ordered products.
+///
+/// @namespace Orders
+/// @author Samchon
+model shopping_order_goods {
+    //----
+    // COLUMNS
+    //----
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged order's {@link shopping_orders.id}
+    /// 
+    /// @format uuid
+    shopping_order_id String @db.Uuid
+
+    /// Belonged cart commodity's {@link shopping_cart_commodities.id}
+    ///
+    /// @format uuid
+    shopping_cart_commodity_id String @db.Uuid
+
+    /// Belonged seller's {@link shopping_sellers.id}
+    ///
+    /// It can be computed by referencing related {@link shopping_sales},
+    /// but denormalized for performance reason.
+    ///
+    /// @format uuid
+    shopping_seller_id String @db.Uuid
+
+    /// Volume count.
+    ///
+    /// The value multiplied to {@link shopping_cart_commodity_stocks.quantity}.
+    /// It's purpose is exactly same with {@link shopping_cart_commodities.volume},
+    /// but rewritten because the {@link shopping_cart_commodities} records are
+    /// reusable until payment.
+    ///
+    /// @format uint 
+    /// @minimum 1
+    volume Int @db.Integer
+
+    /// Sequence order(?) in belonged order.
+    ///
+    /// @format int
+    sequence Int @db.Integer
+
+    /// Confirmation time of order good.
+    ///
+    /// When be confirmed, customer can't request refund or exchange.
+    ///
+    /// The confirmation be accomplished by following cases.
+    ///
+    /// - Customer does it directly.
+    /// - 14 days after the delivery.
+    confirmed_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    /// Belonged order.
+    order shopping_orders @relation(fields: [shopping_order_id], references: [id], onDelete: Cascade)
+
+    /// Belonged cart commodity.
+    commodity shopping_cart_commodities @relation(fields: [shopping_cart_commodity_id], references: [id], onDelete: Cascade)
+
+    /// Belonged seller.
+    seller                         shopping_sellers                 @relation(fields: [shopping_seller_id], references: [id], onDelete: Cascade)
+    shopping_delivery_pieces       shopping_delivery_pieces[]
+    shopping_sale_snapshot_reviews shopping_sale_snapshot_reviews[]
+
+    @@index([shopping_order_id])
+    @@index([shopping_cart_commodity_id])
 }
 
 /// Order completion and payment information.
@@ -2039,104 +2158,6 @@ model shopping_order_publishes {
     @@unique([shopping_order_id])
 }
 
-/// Information about the individual goods that make up your order.
-/// 
-/// `shopping_order_goods` is an entity that represents each good ordered 
-/// by a {@link shopping_customers customer}, and the record is created in the 
-/// process of upgrading the product {@link shopping_cart_items item} in the 
-/// {@link shopping_carts shopping cart} to a good due to the customer's 
-/// {@link shopping_orders order request}.
-/// 
-/// And `shopping_order_goods`, like {@link shopping_cart_items}, is a concept 
-/// that corresponds to the listing 
-/// {@link shopping_sale_snapshots sale snapshot}.
-/// 
-/// For reference, `shopping_order_goods` also contains `volume` information 
-/// separately from the belonging {@link shopping_cart_items.volume}. This is 
-/// because there are often cases where you put 3 books in your shopping cart 
-/// and then change them to 4 during the actual order application process. 
-/// This is to increase the reusability of the shopping cart by changing the 
-/// volume attribute of the current entity rather than directly changing the 
-/// shopping_cart_items information.
-/// 
-/// In addition, `shopping_order_goods` becomes the most basic unit for 
-/// the post-order process, that is, after-sales service (A/S). For example, 
-/// after receiving a customer's product, confirming the order is recorded 
-/// in the `confirmed_at` attribute. Additionally, `shopping_order_goods` is 
-/// the unit in which customers issue issues or request exchanges or refunds 
-/// for ordered products.
-/// 
-/// @namespace Orders
-/// @author Samchon
-model shopping_order_goods {
-    //----
-    // COLUMNS
-    //----
-    /// @format uuid
-    id String @id @db.Uuid
-
-    /// Belonged order's {@link shopping_orders.id}
-    /// 
-    /// @format uuid
-    shopping_order_id String @db.Uuid
-
-    /// Belonged cart item's {@link shopping_cart_items.id}
-    ///
-    /// @format uuid
-    shopping_cart_item_id String @db.Uuid
-
-    /// Belonged seller's {@link shopping_sellers.id}
-    ///
-    /// It can be computed by referencing related {@link shopping_sales},
-    /// but denormalized for performance reason.
-    ///
-    /// @format uuid
-    shopping_seller_id String @db.Uuid
-
-    /// Volume count.
-    ///
-    /// The value multiplied to {@link shopping_cart_item_stocks.quantity}.
-    /// It's purpose is exactly same with {@link shopping_cart_items.volume},
-    /// but rewritten because the {@link shopping_cart_items} records are
-    /// reusable until payment.
-    ///
-    /// @format uint 
-    /// @minimum 1
-    volume Int @db.Integer
-
-    /// Sequence order(?) in belonged order.
-    ///
-    /// @format int
-    sequence Int @db.Integer
-
-    /// Confirmation time of order good.
-    ///
-    /// When be confirmed, customer can't request refund or exchange.
-    ///
-    /// The confirmation be accomplished by following cases.
-    ///
-    /// - Customer does it directly.
-    /// - 14 days after the delivery.
-    confirmed_at DateTime? @db.Timestamptz
-
-    //----
-    // RELATIONS
-    //----
-    /// Belonged order.
-    order shopping_orders @relation(fields: [shopping_order_id], references: [id], onDelete: Cascade)
-
-    /// Belonged cart item.
-    cart_item shopping_cart_items @relation(fields: [shopping_cart_item_id], references: [id], onDelete: Cascade)
-
-    /// Belonged seller.
-    seller                         shopping_sellers                 @relation(fields: [shopping_seller_id], references: [id], onDelete: Cascade)
-    shopping_delivery_pieces       shopping_delivery_pieces[]
-    shopping_sale_snapshot_reviews shopping_sale_snapshot_reviews[]
-
-    @@index([shopping_order_id])
-    @@index([shopping_cart_item_id])
-}
-
 /// Delivery information.
 ///
 /// When delivering purchase(s) to {@link shopping_customers customer}, 
@@ -2180,6 +2201,52 @@ model shopping_deliveries {
     pieces   shopping_delivery_pieces[]
 }
 
+/// Which stocks are delivered.
+///
+/// @namespace Orders
+/// @author Samchon
+model shopping_delivery_pieces {
+    //----
+    // COLUMNS
+    //----
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged delivery's {@link shopping_deliveries id}
+    ///
+    /// @format uuid
+    shopping_delivery_id String @db.Uuid
+
+    /// Target good's {@link shopping_order_goods id}
+    ///
+    /// @format uuid
+    shopping_order_good_id String @db.Uuid
+
+    /// Target stock-wrapper's {@link shopping_sale_snapshot_unit_stocks id}
+    ///
+    /// @format uuid
+    shopping_cart_commodity_stock_id String @db.Uuid
+
+    /// Quantity count.
+    ///
+    /// It can be precision value to express splitted shipping.
+    ///
+    /// @exclusiveMinimum 0
+    quantity Float @db.DoublePrecision
+
+    /// Sequence order in belonged delivery.
+    ///
+    /// @type int
+    sequence Int @db.Integer
+
+    //----
+    // RELATIONS
+    //----
+    delivery             shopping_deliveries            @relation(fields: [shopping_delivery_id], references: [id], onDelete: Cascade)
+    good                 shopping_order_goods           @relation(fields: [shopping_order_good_id], references: [id], onDelete: Cascade)
+    cart_commodity_stock shopping_cart_commodity_stocks @relation(fields: [shopping_cart_commodity_stock_id], references: [id], onDelete: Cascade)
+}
+
 /// Journey of delivery.
 ///
 /// @namespace Orders
@@ -2221,52 +2288,6 @@ model shopping_delivery_journeys {
     //----
     /// Belonged delivery.
     delivery shopping_deliveries @relation(fields: [shopping_delivery_id], references: [id], onDelete: Cascade)
-}
-
-/// Which stocks are delivered.
-///
-/// @namespace Orders
-/// @author Samchon
-model shopping_delivery_pieces {
-    //----
-    // COLUMNS
-    //----
-    /// @format uuid
-    id String @id @db.Uuid
-
-    /// Belonged delivery's {@link shopping_deliveries id}
-    ///
-    /// @format uuid
-    shopping_delivery_id String @db.Uuid
-
-    /// Target good's {@link shopping_order_goods id}
-    ///
-    /// @format uuid
-    shopping_order_good_id String @db.Uuid
-
-    /// Target stock-wrapper's {@link shopping_sale_snapshot_unit_stocks id}
-    ///
-    /// @format uuid
-    shopping_cart_item_stock_id String @db.Uuid
-
-    /// Quantity count.
-    ///
-    /// It can be precision value to express splitted shipping.
-    ///
-    /// @exclusiveMinimum 0
-    quantity Float @db.DoublePrecision
-
-    /// Sequence order in belonged delivery.
-    ///
-    /// @type int
-    sequence Int @db.Integer
-
-    //----
-    // RELATIONS
-    //----
-    delivery        shopping_deliveries       @relation(fields: [shopping_delivery_id], references: [id], onDelete: Cascade)
-    good            shopping_order_goods      @relation(fields: [shopping_order_good_id], references: [id], onDelete: Cascade)
-    cart_item_stock shopping_cart_item_stocks @relation(fields: [shopping_cart_item_stock_id], references: [id], onDelete: Cascade)
 }
 
 //-----------------------------------------------------------

@@ -473,7 +473,7 @@ time it **connects**, even if it is the same person.
 
 The first purpose of this is to track the customer's inflow path in detail, and it is 
 for cases where the same person enters as a non-member, puts items in the 
-[shopping cart](#shopping_cart_items) in advance, and only authenticates 
+[shopping cart](#shopping_cart_commodities) in advance, and only authenticates 
 their real name or registers/logs in at the moment of 
 [payment](#shopping_order_publishes). It is the second. Lastly, it is 
 to accurately track the activities that a person performs at the 
@@ -878,6 +878,12 @@ Sale snapshot information.
 belonged [sale](#shopping_sales). The snapshot record is created
 whenever the seller newly creates or updates the sale.
 
+Sale | Cart | Order
+-----|------|------
+x | [shopping_carts](#shopping_carts) | [shopping_orders](#shopping_orders)
+[shopping_sale_snapshots](#shopping_sale_snapshots) | [shopping_cart_commodities](#shopping_cart_commodities) | [shopping_order_goods](#shopping_order_goods)
+[shopping_sale_snapshot_unit_stocks](#shopping_sale_snapshot_unit_stocks) | [shopping_cart_commodity_stocks](#shopping_cart_commodity_stocks) | x
+
 **Properties**
   - `id`: 
   - `shopping_sale_id`: Belonged sale's [shopping_sales.id](#shopping_sales)
@@ -1121,7 +1127,7 @@ shopping_carts {
     String shopping_customer_id FK
     DateTime created_at
 }
-shopping_cart_items {
+shopping_cart_commodities {
     String id PK
     String shopping_cart_id FK
     String shopping_sale_snapshot_id FK
@@ -1129,17 +1135,17 @@ shopping_cart_items {
     DateTime created_at
     Boolean published
 }
-shopping_cart_item_stocks {
+shopping_cart_commodity_stocks {
     String id PK
-    String shopping_cart_item_id FK
+    String shopping_cart_commodity_id FK
     String shopping_sale_snapshot_unit_id FK
     String shopping_sale_snapshot_unit_stock_id FK
     Int quantity
     Int sequence
 }
-shopping_cart_item_stock_choices {
+shopping_cart_commodity_stock_choices {
     String id PK
-    String shopping_cart_item_stock_id FK
+    String shopping_cart_commodity_stock_id FK
     String shopping_sale_snapshot_unit_option_id FK
     String shopping_sale_snapshot_unit_option_candidate_id FK "nullable"
     String value "nullable"
@@ -1181,14 +1187,14 @@ shopping_sale_snapshot_unit_stocks {
     Float tax
     Int sequence
 }
-shopping_cart_items }|--|| shopping_carts : cart
-shopping_cart_items }|--|| shopping_sale_snapshots : snapshot
-shopping_cart_item_stocks }|--|| shopping_cart_items : item
-shopping_cart_item_stocks }|--|| shopping_sale_snapshot_units : unit
-shopping_cart_item_stocks }|--|| shopping_sale_snapshot_unit_stocks : stock
-shopping_cart_item_stock_choices }|--|| shopping_cart_item_stocks : stock
-shopping_cart_item_stock_choices }|--|| shopping_sale_snapshot_unit_options : option
-shopping_cart_item_stock_choices }o--|| shopping_sale_snapshot_unit_option_candidates : candidate
+shopping_cart_commodities }|--|| shopping_carts : cart
+shopping_cart_commodities }|--|| shopping_sale_snapshots : snapshot
+shopping_cart_commodity_stocks }|--|| shopping_cart_commodities : commodity
+shopping_cart_commodity_stocks }|--|| shopping_sale_snapshot_units : unit
+shopping_cart_commodity_stocks }|--|| shopping_sale_snapshot_unit_stocks : stock
+shopping_cart_commodity_stock_choices }|--|| shopping_cart_commodity_stocks : stock
+shopping_cart_commodity_stock_choices }|--|| shopping_sale_snapshot_unit_options : option
+shopping_cart_commodity_stock_choices }o--|| shopping_sale_snapshot_unit_option_candidates : candidate
 shopping_sale_snapshot_units }|--|| shopping_sale_snapshots : snapshot
 shopping_sale_snapshot_unit_options }|--|| shopping_sale_snapshot_units : unit
 shopping_sale_snapshot_unit_option_candidates }|--|| shopping_sale_snapshot_unit_options : option
@@ -1202,30 +1208,36 @@ Shopping Cart.
 [customer](#shopping_customers) temporarily stores products before
 [purchase](#shopping_orders).
 
+Sale | Cart | Order
+-----|------|------
+x | [shopping_carts](#shopping_carts) | [shopping_orders](#shopping_orders)
+[shopping_sale_snapshots](#shopping_sale_snapshots) | [shopping_cart_commodities](#shopping_cart_commodities) | [shopping_order_goods](#shopping_order_goods)
+[shopping_sale_snapshot_unit_stocks](#shopping_sale_snapshot_unit_stocks) | [shopping_cart_commodity_stocks](#shopping_cart_commodity_stocks) | x
+
 **Properties**
   - `id`: 
   - `shopping_customer_id`: Belonged customer's [shopping_customers.id](#shopping_customers)
   - `created_at`: Creation time of record.
 
-### `shopping_cart_items`
+### `shopping_cart_commodities`
 Item in a shopping cart.
 
-`shopping_cart_items` is an entity that represents a 
+`shopping_cart_commodities` is an entity that represents a 
 [snapshot](#shopping_sale_snapshots) of the items that 
 [customer](#shopping_customers) has placed into his 
 [shopping cart](#shopping_carts) with a 
 [purchase](#shopping_orders) in mind. And if the customer continues 
 this into an actual [order](#shopping_orders) in the future, 
-`shopping_cart_items` be changed to [shopping_order_goods](#shopping_order_goods).
+`shopping_cart_commodities` be changed to [shopping_order_goods](#shopping_order_goods).
 
 And while adding a sale snapshot to the shopping cart, the customer 
 inevitably selects specific [units](#shopping_sale_snapshot_units) and 
 [final stocks](#shopping_sale_snapshot_unit_stocks) within the listing 
 snapshot. Information about these units and stocks is recorded in the 
-subsidiary entity [shopping_cart_item_stocks](#shopping_cart_item_stocks). There is also an 
+subsidiary entity [shopping_cart_commodity_stocks](#shopping_cart_commodity_stocks). There is also an 
 attribute `volume` that indicates how many sets of snapshots of the 
-target item will be purchased. This "volume" is a value that will be 
-multiplied by [shopping_cart_item_stocks.quantity](#shopping_cart_item_stocks), the quantity 
+target commodity will be purchased. This "volume" is a value that will be 
+multiplied by [shopping_cart_commodity_stocks.quantity](#shopping_cart_commodity_stocks), the quantity 
 for each component.
 
 **Properties**
@@ -1235,23 +1247,23 @@ for each component.
   - `volume`
     > Volume count.
     > 
-    > The value multiplied to [shopping_cart_item_stocks.quantity](#shopping_cart_item_stocks).
+    > The value multiplied to [shopping_cart_commodity_stocks.quantity](#shopping_cart_commodity_stocks).
   - `created_at`: Creation time of record.
   - `published`
     > Whether be published or not.
     > 
-    > Is current item ordered and be paid?
+    > Is current commodity ordered and be paid?
     > 
-    > Until purchase the item, the item can be reused to create new 
-    > cart item. This variable can be computed by referencing 
+    > Until purchase the commodity, the commodity can be reused to create new 
+    > cart commodity. This variable can be computed by referencing 
     > [order](#Orders) related tables, but just denormalized for the
     > performance reason.
 
-### `shopping_cart_item_stocks`
-Final stock information of item added to the shopping cart.
+### `shopping_cart_commodity_stocks`
+Final stock information of commodity added to the shopping cart.
 
-`shopping_cart_item_stocks` is a subsidiary entity of 
-[shopping_cart_items](#shopping_cart_items) that embodies the information of the 
+`shopping_cart_commodity_stocks` is a subsidiary entity of 
+[shopping_cart_commodities](#shopping_cart_commodities) that embodies the information of the 
 [snapshot](#shopping_sale_snapshots) of the items in the shopping cart, 
 and is a concept that corresponds to the individual 
 [units](#shopping_sale_snapshot_units) in the target item snapshot 
@@ -1259,27 +1271,27 @@ and the [stock](#shopping_sale_snapshot_unit_stocks) finally selected
 among those [units](#shopping_sale_snapshot_units).
 
 Therefore, if the customer selects multiple units and stocks from the 
-target sale snapshot, the attributed [shopping_cart_items](#shopping_cart_items) record 
-also has multiple corresponding `shopping_cart_item_stocks` records.
+target sale snapshot, the attributed [shopping_cart_commodities](#shopping_cart_commodities) record 
+also has multiple corresponding `shopping_cart_commodity_stocks` records.
 
-And `shopping_cart_item_stocks` has a `quantity` property that indicates 
+And `shopping_cart_commodity_stocks` has a `quantity` property that indicates 
 how many final stocks would be purchased in total. The final quantity 
 actually purchased can be multiplied by the 
-[shopping_cart_items.volume](#shopping_cart_items) value of the parent entity.
+[shopping_cart_commodities.volume](#shopping_cart_commodities) value of the parent entity.
 
 **Properties**
   - `id`: 
-  - `shopping_cart_item_id`: Belonged item's [shopping_cart_items.id](#shopping_cart_items)
+  - `shopping_cart_commodity_id`: Belonged commodity's [shopping_cart_commodities.id](#shopping_cart_commodities)
   - `shopping_sale_snapshot_unit_id`: Target unit's [shopping_sale_snapshot_units.id](#shopping_sale_snapshot_units)
   - `shopping_sale_snapshot_unit_stock_id`: Target final stock's [shopping_sale_snapshot_unit_stocks.id](#shopping_sale_snapshot_unit_stocks)
   - `quantity`: Quantity count.
-  - `sequence`: Sequence order in belonged cart item.
+  - `sequence`: Sequence order in belonged cart commodity.
 
-### `shopping_cart_item_stock_choices`
+### `shopping_cart_commodity_stock_choices`
 Option choice information for the final stock added to the shopping cart.
 
-`shopping_cart_item_stock_choices` is a subsidiary entity of 
-[shopping_cart_item_stocks](#shopping_cart_item_stocks). It records which 
+`shopping_cart_commodity_stock_choices` is a subsidiary entity of 
+[shopping_cart_commodity_stocks](#shopping_cart_commodity_stocks). It records which 
 [options](#shopping_sale_snapshot_unit_options) the customer 
 specifically used while putting a specific 
 [unit](#shopping_sale_snapshot_units) and specific 
@@ -1288,19 +1300,19 @@ specifically used while putting a specific
 which [candidate values](#shopping_sale_snapshot_unit_option_candidates) 
 were selected or listed within the shopping cart.
 
-Therefore, `shopping_cart_item_stock_choices` has reference properties 
-and predicate properties for candidate items in addition to references 
+Therefore, `shopping_cart_commodity_stock_choices` has reference properties 
+and predicate properties for candidate values in addition to references 
 to options. If the `type` of target option is "select", enter the 
-candidate item selected by the customer. Otherwise, enter the value 
+candidate value selected by the customer. Otherwise, enter the value 
 entered by the customer.
 
 **Properties**
   - `id`: 
-  - `shopping_cart_item_stock_id`: Belonged cart-item-stock's [shopping_cart_item_stocks.id](#shopping_cart_item_stocks)
+  - `shopping_cart_commodity_stock_id`: Belonged cart-commodity-stock's [shopping_cart_commodity_stocks.id](#shopping_cart_commodity_stocks)
   - `shopping_sale_snapshot_unit_option_id`: Target option's [shopping_sale_snapshot_unit_options.id](#shopping_sale_snapshot_unit_options)
   - `shopping_sale_snapshot_unit_option_candidate_id`: Selected candidate's [shopping_sale_snapshot_unit_option_candidates.id](#shopping_sale_snapshot_unit_option_candidates)
   - `value`: User-written value for descriptive option.
-  - `sequence`: Sequence order in belonged cart-item-stock.
+  - `sequence`: Sequence order in belonged cart-commodity-stock.
 
 
 ## Orders
@@ -1316,6 +1328,15 @@ shopping_orders {
     DateTime created_at
     DateTime deleted_at "nullable"
 }
+shopping_order_goods {
+    String id PK
+    String shopping_order_id FK
+    String shopping_cart_commodity_id FK
+    String shopping_seller_id FK
+    Int volume
+    Int sequence
+    DateTime confirmed_at "nullable"
+}
 shopping_order_publishes {
     String id PK
     String shopping_order_id FK
@@ -1324,19 +1345,18 @@ shopping_order_publishes {
     DateTime paid_at "nullable"
     DateTime cancelled_at "nullable"
 }
-shopping_order_goods {
-    String id PK
-    String shopping_order_id FK
-    String shopping_cart_item_id FK
-    String shopping_seller_id FK
-    Int volume
-    Int sequence
-    DateTime confirmed_at "nullable"
-}
 shopping_deliveries {
     String id PK
     String shopping_seller_id FK
     String invoice_code "nullable"
+}
+shopping_delivery_pieces {
+    String id PK
+    String shopping_delivery_id FK
+    String shopping_order_good_id FK
+    String shopping_cart_commodity_stock_id FK
+    Float quantity
+    Int sequence
 }
 shopping_delivery_journeys {
     String id PK
@@ -1347,14 +1367,6 @@ shopping_delivery_journeys {
     DateTime created_at
     DateTime started_at
     DateTime completed_at "nullable"
-}
-shopping_delivery_pieces {
-    String id PK
-    String shopping_delivery_id FK
-    String shopping_order_good_id FK
-    String shopping_cart_item_stock_id FK
-    Float quantity
-    Int sequence
 }
 shopping_addresses {
     String id PK
@@ -1370,11 +1382,11 @@ shopping_addresses {
     DateTime created_at
 }
 shopping_orders }o--|| shopping_addresses : address
-shopping_order_publishes |o--|| shopping_orders : order
 shopping_order_goods }|--|| shopping_orders : order
-shopping_delivery_journeys }|--|| shopping_deliveries : delivery
+shopping_order_publishes |o--|| shopping_orders : order
 shopping_delivery_pieces }|--|| shopping_deliveries : delivery
 shopping_delivery_pieces }|--|| shopping_order_goods : good
+shopping_delivery_journeys }|--|| shopping_deliveries : delivery
 ```
 
 ### `shopping_orders`
@@ -1386,14 +1398,20 @@ However, please note that at this time, you are still at the
 "order application" stage and not the "order confirmation" stage.
 
 And as soon as a customer applies for an order, all 
-[items](#shopping_cart_items) in the target shopping cart are 
+[commodities](#shopping_cart_commodities) in the target shopping cart are 
 promoted to [shopping_order_goods](#shopping_order_goods), and those 
 [shopping_order_goods](#shopping_order_goods) records are created under this 
 `shopping_orders`. 
 
-Of course, not all items in the target shopping cart become 
+Of course, not all commodities in the target shopping cart become 
 [shopping_order_goods](#shopping_order_goods), but only those selected by the customer 
 become the [shopping_order_goods](#shopping_order_goods).
+
+Sale | Cart | Order
+-----|------|------
+x | [shopping_carts](#shopping_carts) | [shopping_orders](#shopping_orders)
+[shopping_sale_snapshots](#shopping_sale_snapshots) | [shopping_cart_commodities](#shopping_cart_commodities) | [shopping_order_goods](#shopping_order_goods)
+[shopping_sale_snapshot_unit_stocks](#shopping_sale_snapshot_unit_stocks) | [shopping_cart_commodity_stocks](#shopping_cart_commodity_stocks) | x
 
 **Properties**
   - `id`: 
@@ -1409,6 +1427,61 @@ become the [shopping_order_goods](#shopping_order_goods).
     > If order be published, unable to erase it. In that case, you
     > [shopping_order_publishes.cancelled_at](#shopping_order_publishes) instead, or utilize
     > [shopping_order_good_reverts](#shopping_order_good_reverts) instead.
+
+### `shopping_order_goods`
+Information about the individual goods that make up your order.
+
+`shopping_order_goods` is an entity that represents each good ordered 
+by a [customer](#shopping_customers), and the record is created in the 
+process of upgrading the product [commodity](#shopping_cart_commodities) 
+in the [shopping cart](#shopping_carts) to a good due to the customer's 
+[order request](#shopping_orders).
+
+And `shopping_order_goods`, like [shopping_cart_commodities](#shopping_cart_commodities), is a concept 
+that corresponds to the listing 
+[sale snapshot](#shopping_sale_snapshots).
+
+For reference, `shopping_order_goods` also contains `volume` information 
+separately from the belonging [shopping_cart_commodities.volume](#shopping_cart_commodities). This is 
+because there are often cases where you put 3 books in your shopping cart 
+and then change them to 4 during the actual order application process. 
+This is to increase the reusability of the shopping cart by changing the 
+volume attribute of the current entity rather than directly changing the 
+shopping_cart_commodities information.
+
+In addition, `shopping_order_goods` becomes the most basic unit for 
+the post-order process, that is, after-sales service (A/S). For example, 
+after receiving a customer's product, confirming the order is recorded 
+in the `confirmed_at` attribute. Additionally, `shopping_order_goods` is 
+the unit in which customers issue issues or request exchanges or refunds 
+for ordered products.
+
+**Properties**
+  - `id`: 
+  - `shopping_order_id`: Belonged order's [shopping_orders.id](#shopping_orders)
+  - `shopping_cart_commodity_id`: Belonged cart commodity's [shopping_cart_commodities.id](#shopping_cart_commodities)
+  - `shopping_seller_id`
+    > Belonged seller's [shopping_sellers.id](#shopping_sellers)
+    > 
+    > It can be computed by referencing related [shopping_sales](#shopping_sales),
+    > but denormalized for performance reason.
+  - `volume`
+    > Volume count.
+    > 
+    > The value multiplied to [shopping_cart_commodity_stocks.quantity](#shopping_cart_commodity_stocks).
+    > It's purpose is exactly same with [shopping_cart_commodities.volume](#shopping_cart_commodities),
+    > but rewritten because the [shopping_cart_commodities](#shopping_cart_commodities) records are
+    > reusable until payment.
+  - `sequence`: Sequence order(?) in belonged order.
+  - `confirmed_at`
+    > Confirmation time of order good.
+    > 
+    > When be confirmed, customer can't request refund or exchange.
+    > 
+    > The confirmation be accomplished by following cases.
+    > 
+    > - Customer does it directly.
+    > - 14 days after the delivery.
 
 ### `shopping_order_publishes`
 Order completion and payment information.
@@ -1450,61 +1523,6 @@ it is suddenly canceled, so please be aware of this as well.
     > completed yet.
   - `cancelled_at`: The time when the payment was cancelled or reverted.
 
-### `shopping_order_goods`
-Information about the individual goods that make up your order.
-
-`shopping_order_goods` is an entity that represents each good ordered 
-by a [customer](#shopping_customers), and the record is created in the 
-process of upgrading the product [item](#shopping_cart_items) in the 
-[shopping cart](#shopping_carts) to a good due to the customer's 
-[order request](#shopping_orders).
-
-And `shopping_order_goods`, like [shopping_cart_items](#shopping_cart_items), is a concept 
-that corresponds to the listing 
-[sale snapshot](#shopping_sale_snapshots).
-
-For reference, `shopping_order_goods` also contains `volume` information 
-separately from the belonging [shopping_cart_items.volume](#shopping_cart_items). This is 
-because there are often cases where you put 3 books in your shopping cart 
-and then change them to 4 during the actual order application process. 
-This is to increase the reusability of the shopping cart by changing the 
-volume attribute of the current entity rather than directly changing the 
-shopping_cart_items information.
-
-In addition, `shopping_order_goods` becomes the most basic unit for 
-the post-order process, that is, after-sales service (A/S). For example, 
-after receiving a customer's product, confirming the order is recorded 
-in the `confirmed_at` attribute. Additionally, `shopping_order_goods` is 
-the unit in which customers issue issues or request exchanges or refunds 
-for ordered products.
-
-**Properties**
-  - `id`: 
-  - `shopping_order_id`: Belonged order's [shopping_orders.id](#shopping_orders)
-  - `shopping_cart_item_id`: Belonged cart item's [shopping_cart_items.id](#shopping_cart_items)
-  - `shopping_seller_id`
-    > Belonged seller's [shopping_sellers.id](#shopping_sellers)
-    > 
-    > It can be computed by referencing related [shopping_sales](#shopping_sales),
-    > but denormalized for performance reason.
-  - `volume`
-    > Volume count.
-    > 
-    > The value multiplied to [shopping_cart_item_stocks.quantity](#shopping_cart_item_stocks).
-    > It's purpose is exactly same with [shopping_cart_items.volume](#shopping_cart_items),
-    > but rewritten because the [shopping_cart_items](#shopping_cart_items) records are
-    > reusable until payment.
-  - `sequence`: Sequence order(?) in belonged order.
-  - `confirmed_at`
-    > Confirmation time of order good.
-    > 
-    > When be confirmed, customer can't request refund or exchange.
-    > 
-    > The confirmation be accomplished by following cases.
-    > 
-    > - Customer does it directly.
-    > - 14 days after the delivery.
-
 ### `shopping_deliveries`
 Delivery information.
 
@@ -1528,6 +1546,20 @@ another subsidiary entity [shopping_delivery_journeys](#shopping_delivery_journe
   - `shopping_seller_id`: Belonged seller's [id](#shopping_sellers)
   - `invoice_code`: Invoice code if exists.
 
+### `shopping_delivery_pieces`
+Which stocks are delivered.
+
+**Properties**
+  - `id`: 
+  - `shopping_delivery_id`: Belonged delivery's [id](#shopping_deliveries)
+  - `shopping_order_good_id`: Target good's [id](#shopping_order_goods)
+  - `shopping_cart_commodity_stock_id`: Target stock-wrapper's [id](#shopping_sale_snapshot_unit_stocks)
+  - `quantity`
+    > Quantity count.
+    > 
+    > It can be precision value to express splitted shipping.
+  - `sequence`: Sequence order in belonged delivery.
+
 ### `shopping_delivery_journeys`
 Journey of delivery.
 
@@ -1545,20 +1577,6 @@ Journey of delivery.
   - `created_at`: Creation time of record.
   - `started_at`: Start time of journey.
   - `completed_at`: Completion time of journey.
-
-### `shopping_delivery_pieces`
-Which stocks are delivered.
-
-**Properties**
-  - `id`: 
-  - `shopping_delivery_id`: Belonged delivery's [id](#shopping_deliveries)
-  - `shopping_order_good_id`: Target good's [id](#shopping_order_goods)
-  - `shopping_cart_item_stock_id`: Target stock-wrapper's [id](#shopping_sale_snapshot_unit_stocks)
-  - `quantity`
-    > Quantity count.
-    > 
-    > It can be precision value to express splitted shipping.
-  - `sequence`: Sequence order in belonged delivery.
 
 
 ## Coupons
