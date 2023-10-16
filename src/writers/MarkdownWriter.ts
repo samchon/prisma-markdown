@@ -2,6 +2,7 @@ import { DMMF } from "@prisma/generator-helper";
 import { MermaidWriter } from "./MermaidWriter";
 import { DescriptionWriter } from "./DescriptionWriter";
 import { MapUtil } from "../utils/MapUtil";
+import { PrismaUtil } from "../utils/PrismaUtil";
 
 export namespace MarkdownWriter {
     export const write = (
@@ -76,27 +77,13 @@ export namespace MarkdownWriter {
 
     const takeTags =
         (kind: "namespace" | "describe" | "erd") =>
-        (model: DMMF.Model): string[] => {
-            if (!model.documentation?.length) return [];
-
-            const output: Set<string> = new Set();
-            const splitted: string[] = model.documentation
-                .split("\r\n")
-                .join("\n")
-                .split("\n");
-            for (const line of splitted) {
-                const first: number = line.indexOf(`@${kind} `);
-                if (first === -1) continue;
-
-                const last: number = line.indexOf(" ", kind.length + 2);
-                output.add(
-                    last === -1
-                        ? line.slice(first + kind.length + 2)
-                        : line.slice(first + kind.length + 2, last),
-                );
-            }
-            return [...output];
-        };
+        (model: DMMF.Model): string[] => [
+            ...new Set(
+                PrismaUtil.tagValues(kind)(model).map(
+                    (str) => str.split(" ")[0],
+                ),
+            ),
+        ];
 
     const isHidden = (model: DMMF.Model): boolean =>
         model.documentation?.includes("@hidden") ?? false;
