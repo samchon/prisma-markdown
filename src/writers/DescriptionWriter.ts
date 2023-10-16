@@ -1,8 +1,9 @@
 import { DMMF } from "@prisma/client/runtime/library";
+import { PrismaUtil } from "../utils/PrismaUtil";
 
 export namespace DescriptionWriter {
     export const table = (model: DMMF.Model): string => {
-        const description: string = writeDescription(model.documentation ?? "");
+        const description: string = writeDescription(model);
         return [
             `### \`${model.dbName ?? model.name}\``,
             ...(description.length ? [description] : []),
@@ -13,7 +14,7 @@ export namespace DescriptionWriter {
     };
 
     const writeField = (field: DMMF.Field): string => {
-        const description: string = writeDescription(field.documentation ?? "");
+        const description: string = writeDescription(field);
         const lines: string[] = description.split("\n");
         const head = `  - \`${field.dbName ?? field.name}\``;
 
@@ -22,8 +23,8 @@ export namespace DescriptionWriter {
         return [head, ...lines.map((line) => `    > ${line}`)].join("\n");
     };
 
-    const writeDescription = (documentation: string | null): string => {
-        const content: string[] = (documentation ?? "")
+    const writeDescription = (target: DMMF.Model | DMMF.Field): string => {
+        const content: string[] = (target.documentation ?? "")
             .split("\r\n")
             .join("\n")
             .split("\n");
@@ -36,10 +37,14 @@ export namespace DescriptionWriter {
         while (first < content.length && empty(content[first])) ++first;
         while (last >= 0 && empty(content[last])) --last;
 
-        return content
-            .slice(first, last + 1)
-            .map(replaceLinks)
-            .join("\n");
+        const summary: string[] = PrismaUtil.tagValues("summary")(target);
+        const body: string[] = content.slice(first, last + 1).map(replaceLinks);
+
+        return summary.length
+            ? body.length
+                ? [summary[0], "", ...body].join("\n")
+                : summary[0]
+            : body.join("\n");
     };
 
     const replaceLinks = (content: string): string => {

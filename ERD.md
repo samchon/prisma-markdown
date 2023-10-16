@@ -10,6 +10,7 @@
 - [Coupons](#Coupons)
 - [Coins](#Coins)
 - [Inquiries](#Inquiries)
+- [default](#default)
 
 ## Articles
 ```mermaid
@@ -2438,3 +2439,32 @@ the person who wrote the inquiry.
   - `id`: PK + FK
   - `shopping_seller_id`: Writer seller's [shopping_sellers.id](#shopping_sellers)
   - `shopping_customer_id`: Writer customer's [shopping_customers.id](#shopping_customers)
+
+
+## default
+```mermaid
+erDiagram
+mv_cache_times {
+    String id PK
+    String schema
+    String table
+    String key
+    DateTime value
+}
+```
+
+### `mv_cache_times`
+Table for caching.
+
+**Properties**
+  - `id`: Primary Key.
+  - `schema`: Target schema.
+  - `table`
+    > Target table.
+    > 
+    > Database table name.
+  - `key`
+    > Identifier of target record.
+    > 
+    > Even when key type is not string, it must be converted to the string value.
+  - `value`: The time when the cache data being archived.

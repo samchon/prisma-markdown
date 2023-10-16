@@ -3487,3 +3487,34 @@ model shopping_sale_snapshot_inquiry_comments {
     seller   shopping_sellers?    @relation(fields: [shopping_seller_id], references: [id], onDelete: Cascade)
     customer shopping_customers?  @relation(fields: [shopping_customer_id], references: [id], onDelete: Cascade)
 }
+
+/// @summary Table for caching.
+///
+/// @author Samchon
+model mv_cache_times {
+    //----
+    // COLUMNS
+    //----
+    /// @summary Primary Key.
+    ///
+    /// @Format uuid
+    id String @id @db.Uuid
+
+    /// @summary Target schema.
+    schema String @db.VarChar
+
+    /// @summary Target table.
+    ///
+    /// Database table name.
+    table String @db.VarChar
+
+    /// @summary Identifier of target record.
+    ///
+    /// Even when key type is not string, it must be converted to the string value.
+    key String @db.VarChar
+
+    /// The time when the cache data being archived.
+    value DateTime @db.Timestamptz
+
+    @@unique([schema, table, key])
+}
