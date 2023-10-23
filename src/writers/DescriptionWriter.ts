@@ -2,14 +2,20 @@ import { DMMF } from "@prisma/client/runtime/library";
 import { PrismaUtil } from "../utils/PrismaUtil";
 
 export namespace DescriptionWriter {
-    export const table = (model: DMMF.Model): string => {
+    export const table = (
+        model: DMMF.Model,
+        config?: Record<string, string | string[] | undefined>,
+    ): string => {
         const description: string = writeDescription(model);
+        const separated: boolean = config?.separated === "true";
+
         return [
             `### \`${model.dbName ?? model.name}\``,
             ...(description.length ? [description] : []),
             "",
             "**Properties**",
             ...model.fields.filter((f) => f.kind !== "object").map(writeField),
+            ...(separated ? ["---"] : []),
         ].join("\n");
     };
 

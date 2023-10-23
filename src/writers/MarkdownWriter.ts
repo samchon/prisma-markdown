@@ -65,13 +65,15 @@ export namespace MarkdownWriter {
             "",
             ...[...dict.keys()].map((name) => `- [${name}](#${name})`),
         ].join("\n");
+        const separated: boolean = config?.separated === "true";
+
         return (
             preface +
             "\n\n" +
             [...dict.values()]
                 .filter((s) => !!s.descriptions.size)
-                .map(writeChapter)
-                .join("\n\n\n")
+                .map((chapter) => writeChapter(chapter, config))
+                .join(separated ? "\n\n<br/>\n\n" : "\n\n\n")
         );
     };
 
@@ -88,12 +90,17 @@ export namespace MarkdownWriter {
     const isHidden = (model: DMMF.Model): boolean =>
         model.documentation?.includes("@hidden") ?? false;
 
-    const writeChapter = (chapter: IChapter): string =>
+    const writeChapter = (
+        chapter: IChapter,
+        config?: Record<string, string | string[] | undefined>,
+    ): string =>
         [
             `## ${chapter.name}`,
             MermaidWriter.write([...chapter.diagrams]),
             "",
-            [...chapter.descriptions].map(DescriptionWriter.table).join("\n\n"),
+            [...chapter.descriptions]
+                .map((model) => DescriptionWriter.table(model, config))
+                .join("\n\n"),
         ].join("\n");
 }
 
