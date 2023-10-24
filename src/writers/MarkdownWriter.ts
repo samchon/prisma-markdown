@@ -127,7 +127,11 @@ export namespace MarkdownWriter {
                 const table: string = `_${relations[0].name}To${relations[1].name}`;
                 if (dict.has(table)) continue;
 
-                modelList.push(implicitToExplicit(relations[0])(relations[1]));
+                const newbie: DMMF.Model = implicitToExplicit(relations[0])(
+                    relations[1],
+                );
+                modelList.push(newbie);
+                dict.set(table, newbie);
             }
     };
 

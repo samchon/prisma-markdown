@@ -44,19 +44,11 @@ erDiagram
     String A FK
     String B FK
 }
-"_attachment_filesTobbs_article_snapshots" {
-    String A FK
-    String B FK
-}
 "_attachment_filesTobbs_article_comment_snapshots" {
     String A FK
     String B FK
 }
 "_bbs_article_commentsTobbs_article_comments" {
-    String A FK
-    String B FK
-}
-"_attachment_filesTobbs_article_comment_snapshots" {
     String A FK
     String B FK
 }
@@ -66,14 +58,10 @@ erDiagram
 "bbs_article_comment_snapshots" }|--|| "bbs_article_comments" : comment
 "_attachment_filesTobbs_article_snapshots" }|--|| "attachment_files" : attachment_files
 "_attachment_filesTobbs_article_snapshots" }|--|| "bbs_article_snapshots" : bbs_article_snapshots
-"_attachment_filesTobbs_article_snapshots" }|--|| "attachment_files" : attachment_files
-"_attachment_filesTobbs_article_snapshots" }|--|| "bbs_article_snapshots" : bbs_article_snapshots
 "_attachment_filesTobbs_article_comment_snapshots" }|--|| "attachment_files" : attachment_files
 "_attachment_filesTobbs_article_comment_snapshots" }|--|| "bbs_article_comment_snapshots" : bbs_article_comment_snapshots
 "_bbs_article_commentsTobbs_article_comments" }|--|| "bbs_article_comments" : bbs_article_comments
 "_bbs_article_commentsTobbs_article_comments" }|--|| "bbs_article_comments" : bbs_article_comments
-"_attachment_filesTobbs_article_comment_snapshots" }|--|| "attachment_files" : attachment_files
-"_attachment_filesTobbs_article_comment_snapshots" }|--|| "bbs_article_comment_snapshots" : bbs_article_comment_snapshots
 ```
 
 ### `bbs_articles`
@@ -208,13 +196,6 @@ Pair relationship table between [attachment_files](#attachment_files) and [bbs_a
   - `A`: 
   - `B`: 
 
-### `_attachment_filesTobbs_article_snapshots`
-Pair relationship table between [attachment_files](#attachment_files) and [bbs_article_snapshots](#bbs_article_snapshots)
-
-**Properties**
-  - `A`: 
-  - `B`: 
-
 ### `_attachment_filesTobbs_article_comment_snapshots`
 Pair relationship table between [attachment_files](#attachment_files) and [bbs_article_comment_snapshots](#bbs_article_comment_snapshots)
 
@@ -224,13 +205,6 @@ Pair relationship table between [attachment_files](#attachment_files) and [bbs_a
 
 ### `_bbs_article_commentsTobbs_article_comments`
 Pair relationship table between [bbs_article_comments](#bbs_article_comments) and [bbs_article_comments](#bbs_article_comments)
-
-**Properties**
-  - `A`: 
-  - `B`: 
-
-### `_attachment_filesTobbs_article_comment_snapshots`
-Pair relationship table between [attachment_files](#attachment_files) and [bbs_article_comment_snapshots](#bbs_article_comment_snapshots)
 
 **Properties**
   - `A`: 
