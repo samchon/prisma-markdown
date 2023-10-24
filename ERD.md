@@ -15,18 +15,18 @@
 ## Articles
 ```mermaid
 erDiagram
-attachment_files {
+"attachment_files" {
     String id PK
     String name "nullable"
     String extension "nullable"
     String url
 }
-bbs_articles {
+"bbs_articles" {
     String id PK
     DateTime created_at
     DateTime deleted_at "nullable"
 }
-bbs_article_snapshots {
+"bbs_article_snapshots" {
     String id PK
     String bbs_article_id FK
     String format
@@ -34,40 +34,46 @@ bbs_article_snapshots {
     String body
     DateTime created_at
 }
-bbs_article_snapshot_files {
+"bbs_article_snapshot_files" {
     String id PK
     String bbs_article_snapshot_id FK
     String attachment_file_id FK
     Int sequence
 }
-bbs_article_comments {
+"bbs_article_comments" {
     String id PK
     String bbs_article_id FK
     String parent_id FK "nullable"
     DateTime created_at
     DateTime deleted_at "nullable"
 }
-bbs_article_comment_snapshots {
+"bbs_article_comment_snapshots" {
     String id PK
     String bbs_article_comment_id FK
     String format
     String body
     DateTime created_at
 }
-bbs_article_comment_snapshot_files {
+"bbs_article_comment_snapshot_files" {
     String id PK
     String bbs_article_comment_snapshot_id FK
     String attachment_file_id FK
     Int sequence
 }
-bbs_article_snapshots }|--|| bbs_articles : article
-bbs_article_snapshot_files }|--|| bbs_article_snapshots : snapshot
-bbs_article_snapshot_files }|--|| attachment_files : file
-bbs_article_comments }|--|| bbs_articles : article
-bbs_article_comments }o--o| bbs_article_comments : parent
-bbs_article_comment_snapshots }|--|| bbs_article_comments : comment
-bbs_article_comment_snapshot_files }|--|| bbs_article_comment_snapshots : snapshot
-bbs_article_comment_snapshot_files }|--|| attachment_files : file
+"_bbs_article_commentsTobbs_article_comments" {
+    String A FK
+    String B FK
+}
+"bbs_article_snapshots" }|--|| "bbs_articles" : article
+"bbs_article_snapshot_files" }|--|| "bbs_article_snapshots" : snapshot
+"bbs_article_snapshot_files" }|--|| "attachment_files" : file
+"bbs_article_comments" }|--|| "bbs_articles" : article
+"bbs_article_comments" }o--o| "bbs_article_comments" : parent
+"bbs_article_comment_snapshots" }|--|| "bbs_article_comments" : comment
+"bbs_article_comment_snapshot_files" }|--|| "bbs_article_comment_snapshots" : snapshot
+"bbs_article_comment_snapshot_files" }|--|| "attachment_files" : file
+"_bbs_article_commentsTobbs_article_comments" }|--|| "bbs_article_comments" : bbs_article_comments
+"_bbs_article_commentsTobbs_article_comments" }|--|| "bbs_article_comments" : bbs_article_comments
 ```
 
 ### `attachment_files`
@@ -228,11 +234,18 @@ relationship between [bbs_article_comment_snapshots](#bbs_article_comment_snapsh
     > 
     > Sequence order of the attached file in the belonged snapshot.
 
+### `_bbs_article_commentsTobbs_article_comments`
+Pair relationship table between [bbs_article_comments](#bbs_article_comments) and [bbs_article_comments](#bbs_article_comments)
+
+**Properties**
+  - `A`: 
+  - `B`: 
+
 
 ## Systematic
 ```mermaid
 erDiagram
-shopping_channels {
+"shopping_channels" {
     String id PK
     String code UK
     String name UK
@@ -241,7 +254,7 @@ shopping_channels {
     DateTime updated_at
     DateTime deleted_at "nullable"
 }
-shopping_channel_categories {
+"shopping_channel_categories" {
     String id PK
     String shopping_channel_id FK
     String parent_id FK "nullable"
@@ -250,7 +263,7 @@ shopping_channel_categories {
     DateTime updated_at
     DateTime deleted_at "nullable"
 }
-shopping_sections {
+"shopping_sections" {
     String id PK
     String code UK
     String name UK
@@ -258,7 +271,11 @@ shopping_sections {
     DateTime updated_at
     DateTime deleted_at "nullable"
 }
-shopping_sales {
+"_shopping_channel_categoriesToshopping_channel_categories" {
+    String A FK
+    String B FK
+}
+"shopping_sales" {
     String id PK
     String shopping_section_id FK
     String shopping_seller_id FK
@@ -268,29 +285,31 @@ shopping_sales {
     DateTime paused_at "nullable"
     DateTime suspended_at "nullable"
 }
-shopping_sale_snapshots {
+"shopping_sale_snapshots" {
     String id PK
     String shopping_sale_id FK
     DateTime created_at
 }
-shopping_sale_snapshot_channels {
+"shopping_sale_snapshot_channels" {
     String id PK
     String shopping_sale_snapshot_id FK
     String shopping_channel_id FK
 }
-shopping_sale_snapshot_channel_categories {
+"shopping_sale_snapshot_channel_categories" {
     String id PK
     String shopping_sale_snapshot_channel_id FK
     String shopping_channel_category_id FK
 }
-shopping_channel_categories }|--|| shopping_channels : channel
-shopping_channel_categories }o--o| shopping_channel_categories : parent
-shopping_sales }|--|| shopping_sections : section
-shopping_sale_snapshots }|--|| shopping_sales : sale
-shopping_sale_snapshot_channels }|--|| shopping_sale_snapshots : snapshot
-shopping_sale_snapshot_channels }|--|| shopping_channels : channel
-shopping_sale_snapshot_channel_categories }|--|| shopping_sale_snapshot_channels : to_channel
-shopping_sale_snapshot_channel_categories }|--|| shopping_channel_categories : category
+"shopping_channel_categories" }|--|| "shopping_channels" : channel
+"shopping_channel_categories" }o--o| "shopping_channel_categories" : parent
+"_shopping_channel_categoriesToshopping_channel_categories" }|--|| "shopping_channel_categories" : shopping_channel_categories
+"_shopping_channel_categoriesToshopping_channel_categories" }|--|| "shopping_channel_categories" : shopping_channel_categories
+"shopping_sales" }|--|| "shopping_sections" : section
+"shopping_sale_snapshots" }|--|| "shopping_sales" : sale
+"shopping_sale_snapshot_channels" }|--|| "shopping_sale_snapshots" : snapshot
+"shopping_sale_snapshot_channels" }|--|| "shopping_channels" : channel
+"shopping_sale_snapshot_channel_categories" }|--|| "shopping_sale_snapshot_channels" : to_channel
+"shopping_sale_snapshot_channel_categories" }|--|| "shopping_channel_categories" : category
 ```
 
 ### `shopping_channels`
@@ -381,11 +400,18 @@ just use only one. This concept is designed to be expandable in the future.
   - `updated_at`: Update time of record.
   - `deleted_at`: Deletion time of record.
 
+### `_shopping_channel_categoriesToshopping_channel_categories`
+Pair relationship table between [shopping_channel_categories](#shopping_channel_categories) and [shopping_channel_categories](#shopping_channel_categories)
+
+**Properties**
+  - `A`: 
+  - `B`: 
+
 
 ## Actors
 ```mermaid
 erDiagram
-shopping_customers {
+"shopping_customers" {
     String id PK
     String shopping_channel_id FK
     String shopping_member_id FK "nullable"
@@ -396,7 +422,7 @@ shopping_customers {
     String ip
     DateTime created_at
 }
-shopping_external_users {
+"shopping_external_users" {
     String id PK
     String application
     String uid
@@ -405,7 +431,7 @@ shopping_external_users {
     String password
     DateTime created_at
 }
-shopping_citizens {
+"shopping_citizens" {
     String id PK
     String shopping_channel_id FK "nullable"
     String mobile
@@ -413,7 +439,7 @@ shopping_citizens {
     DateTime created_at
     DateTime deleted_at "nullable"
 }
-shopping_members {
+"shopping_members" {
     String id PK
     String shopping_channel_id FK
     String shopping_citizen_id FK "nullable"
@@ -423,24 +449,24 @@ shopping_members {
     DateTime updated_at
     DateTime withdrawn_at "nullable"
 }
-shopping_member_emails {
+"shopping_member_emails" {
     String id PK
     String shopping_channel_id FK
     String shopping_member_id FK
     String value
     DateTime created_at
 }
-shopping_sellers {
+"shopping_sellers" {
     String id PK
     DateTime created_at
     DateTime deleted_at "nullable"
 }
-shopping_administrators {
+"shopping_administrators" {
     String id PK
     DateTime created_at
     DateTime deleted_at "nullable"
 }
-shopping_addresses {
+"shopping_addresses" {
     String id PK
     String mobile
     String name
@@ -453,13 +479,13 @@ shopping_addresses {
     String special_note "nullable"
     DateTime created_at
 }
-shopping_customers }o--|| shopping_members : member
-shopping_customers }o--|| shopping_external_users : external_user
-shopping_customers }o--|| shopping_citizens : citizen
-shopping_members }o--|| shopping_citizens : citizen
-shopping_member_emails }|--|| shopping_members : member
-shopping_sellers |o--|| shopping_members : base
-shopping_administrators |o--|| shopping_members : base
+"shopping_customers" }o--|| "shopping_members" : member
+"shopping_customers" }o--|| "shopping_external_users" : external_user
+"shopping_customers" }o--|| "shopping_citizens" : citizen
+"shopping_members" }o--|| "shopping_citizens" : citizen
+"shopping_member_emails" }|--|| "shopping_members" : member
+"shopping_sellers" |o--|| "shopping_members" : base
+"shopping_administrators" |o--|| "shopping_members" : base
 ```
 
 ### `shopping_customers`
@@ -701,7 +727,7 @@ The address information.
 ## Sales
 ```mermaid
 erDiagram
-shopping_sales {
+"shopping_sales" {
     String id PK
     String shopping_section_id FK
     String shopping_seller_id FK
@@ -711,12 +737,12 @@ shopping_sales {
     DateTime paused_at "nullable"
     DateTime suspended_at "nullable"
 }
-shopping_sale_snapshots {
+"shopping_sale_snapshots" {
     String id PK
     String shopping_sale_id FK
     DateTime created_at
 }
-shopping_sale_snapshot_contents {
+"shopping_sale_snapshot_contents" {
     String id PK
     String shopping_sale_snapshot_id FK
     String title
@@ -724,17 +750,17 @@ shopping_sale_snapshot_contents {
     String body
     String revert_policy "nullable"
 }
-shopping_sale_snapshot_channels {
+"shopping_sale_snapshot_channels" {
     String id PK
     String shopping_sale_snapshot_id FK
     String shopping_channel_id FK
 }
-shopping_sale_snapshot_channel_categories {
+"shopping_sale_snapshot_channel_categories" {
     String id PK
     String shopping_sale_snapshot_channel_id FK
     String shopping_channel_category_id FK
 }
-shopping_sale_snapshot_units {
+"shopping_sale_snapshot_units" {
     String id PK
     String shopping_sale_snapshot_id FK
     String name
@@ -742,7 +768,7 @@ shopping_sale_snapshot_units {
     Boolean required
     Int sequence
 }
-shopping_sale_snapshot_unit_options {
+"shopping_sale_snapshot_unit_options" {
     String id PK
     String shopping_sale_snapshot_unit_id FK
     String name
@@ -750,13 +776,13 @@ shopping_sale_snapshot_unit_options {
     Boolean variable
     Int sequence
 }
-shopping_sale_snapshot_unit_option_candidates {
+"shopping_sale_snapshot_unit_option_candidates" {
     String id PK
     String shopping_sale_snapshot_unit_option_id FK
     String name
     Int sequence
 }
-shopping_sale_snapshot_unit_stocks {
+"shopping_sale_snapshot_unit_stocks" {
     String id PK
     String shopping_sale_snapshot_unit_id FK
     String name
@@ -765,13 +791,13 @@ shopping_sale_snapshot_unit_stocks {
     Float tax
     Int sequence
 }
-shopping_sale_snapshot_unit_stock_choices {
+"shopping_sale_snapshot_unit_stock_choices" {
     String id PK
     String shopping_sale_snapshot_unit_stock_id FK
     String shopping_sale_snapshot_unit_option_candidate_id FK
     Int sequence
 }
-shopping_channels {
+"shopping_channels" {
     String id PK
     String code UK
     String name UK
@@ -780,7 +806,7 @@ shopping_channels {
     DateTime updated_at
     DateTime deleted_at "nullable"
 }
-shopping_channel_categories {
+"shopping_channel_categories" {
     String id PK
     String shopping_channel_id FK
     String parent_id FK "nullable"
@@ -789,7 +815,7 @@ shopping_channel_categories {
     DateTime updated_at
     DateTime deleted_at "nullable"
 }
-shopping_sections {
+"shopping_sections" {
     String id PK
     String code UK
     String name UK
@@ -797,27 +823,33 @@ shopping_sections {
     DateTime updated_at
     DateTime deleted_at "nullable"
 }
-shopping_sellers {
+"shopping_sellers" {
     String id PK
     DateTime created_at
     DateTime deleted_at "nullable"
 }
-shopping_sales }|--|| shopping_sections : section
-shopping_sales }|--|| shopping_sellers : seller
-shopping_sale_snapshots }|--|| shopping_sales : sale
-shopping_sale_snapshot_contents |o--|| shopping_sale_snapshots : snapshot
-shopping_sale_snapshot_channels }|--|| shopping_sale_snapshots : snapshot
-shopping_sale_snapshot_channels }|--|| shopping_channels : channel
-shopping_sale_snapshot_channel_categories }|--|| shopping_sale_snapshot_channels : to_channel
-shopping_sale_snapshot_channel_categories }|--|| shopping_channel_categories : category
-shopping_sale_snapshot_units }|--|| shopping_sale_snapshots : snapshot
-shopping_sale_snapshot_unit_options }|--|| shopping_sale_snapshot_units : unit
-shopping_sale_snapshot_unit_option_candidates }|--|| shopping_sale_snapshot_unit_options : option
-shopping_sale_snapshot_unit_stocks }|--|| shopping_sale_snapshot_units : unit
-shopping_sale_snapshot_unit_stock_choices }|--|| shopping_sale_snapshot_unit_stocks : stock
-shopping_sale_snapshot_unit_stock_choices }|--|| shopping_sale_snapshot_unit_option_candidates : candidate
-shopping_channel_categories }|--|| shopping_channels : channel
-shopping_channel_categories }o--o| shopping_channel_categories : parent
+"_shopping_channel_categoriesToshopping_channel_categories" {
+    String A FK
+    String B FK
+}
+"shopping_sales" }|--|| "shopping_sections" : section
+"shopping_sales" }|--|| "shopping_sellers" : seller
+"shopping_sale_snapshots" }|--|| "shopping_sales" : sale
+"shopping_sale_snapshot_contents" |o--|| "shopping_sale_snapshots" : snapshot
+"shopping_sale_snapshot_channels" }|--|| "shopping_sale_snapshots" : snapshot
+"shopping_sale_snapshot_channels" }|--|| "shopping_channels" : channel
+"shopping_sale_snapshot_channel_categories" }|--|| "shopping_sale_snapshot_channels" : to_channel
+"shopping_sale_snapshot_channel_categories" }|--|| "shopping_channel_categories" : category
+"shopping_sale_snapshot_units" }|--|| "shopping_sale_snapshots" : snapshot
+"shopping_sale_snapshot_unit_options" }|--|| "shopping_sale_snapshot_units" : unit
+"shopping_sale_snapshot_unit_option_candidates" }|--|| "shopping_sale_snapshot_unit_options" : option
+"shopping_sale_snapshot_unit_stocks" }|--|| "shopping_sale_snapshot_units" : unit
+"shopping_sale_snapshot_unit_stock_choices" }|--|| "shopping_sale_snapshot_unit_stocks" : stock
+"shopping_sale_snapshot_unit_stock_choices" }|--|| "shopping_sale_snapshot_unit_option_candidates" : candidate
+"shopping_channel_categories" }|--|| "shopping_channels" : channel
+"shopping_channel_categories" }o--o| "shopping_channel_categories" : parent
+"_shopping_channel_categoriesToshopping_channel_categories" }|--|| "shopping_channel_categories" : shopping_channel_categories
+"_shopping_channel_categoriesToshopping_channel_categories" }|--|| "shopping_channel_categories" : shopping_channel_categories
 ```
 
 ### `shopping_sales`
@@ -1123,12 +1155,12 @@ can also be ignored.
 ## Carts
 ```mermaid
 erDiagram
-shopping_carts {
+"shopping_carts" {
     String id PK
     String shopping_customer_id FK
     DateTime created_at
 }
-shopping_cart_commodities {
+"shopping_cart_commodities" {
     String id PK
     String shopping_cart_id FK
     String shopping_sale_snapshot_id FK
@@ -1136,7 +1168,7 @@ shopping_cart_commodities {
     DateTime created_at
     Boolean published
 }
-shopping_cart_commodity_stocks {
+"shopping_cart_commodity_stocks" {
     String id PK
     String shopping_cart_commodity_id FK
     String shopping_sale_snapshot_unit_id FK
@@ -1144,7 +1176,7 @@ shopping_cart_commodity_stocks {
     Int quantity
     Int sequence
 }
-shopping_cart_commodity_stock_choices {
+"shopping_cart_commodity_stock_choices" {
     String id PK
     String shopping_cart_commodity_stock_id FK
     String shopping_sale_snapshot_unit_option_id FK
@@ -1152,12 +1184,12 @@ shopping_cart_commodity_stock_choices {
     String value "nullable"
     Int sequence
 }
-shopping_sale_snapshots {
+"shopping_sale_snapshots" {
     String id PK
     String shopping_sale_id FK
     DateTime created_at
 }
-shopping_sale_snapshot_units {
+"shopping_sale_snapshot_units" {
     String id PK
     String shopping_sale_snapshot_id FK
     String name
@@ -1165,7 +1197,7 @@ shopping_sale_snapshot_units {
     Boolean required
     Int sequence
 }
-shopping_sale_snapshot_unit_options {
+"shopping_sale_snapshot_unit_options" {
     String id PK
     String shopping_sale_snapshot_unit_id FK
     String name
@@ -1173,13 +1205,13 @@ shopping_sale_snapshot_unit_options {
     Boolean variable
     Int sequence
 }
-shopping_sale_snapshot_unit_option_candidates {
+"shopping_sale_snapshot_unit_option_candidates" {
     String id PK
     String shopping_sale_snapshot_unit_option_id FK
     String name
     Int sequence
 }
-shopping_sale_snapshot_unit_stocks {
+"shopping_sale_snapshot_unit_stocks" {
     String id PK
     String shopping_sale_snapshot_unit_id FK
     String name
@@ -1188,18 +1220,18 @@ shopping_sale_snapshot_unit_stocks {
     Float tax
     Int sequence
 }
-shopping_cart_commodities }|--|| shopping_carts : cart
-shopping_cart_commodities }|--|| shopping_sale_snapshots : snapshot
-shopping_cart_commodity_stocks }|--|| shopping_cart_commodities : commodity
-shopping_cart_commodity_stocks }|--|| shopping_sale_snapshot_units : unit
-shopping_cart_commodity_stocks }|--|| shopping_sale_snapshot_unit_stocks : stock
-shopping_cart_commodity_stock_choices }|--|| shopping_cart_commodity_stocks : stock
-shopping_cart_commodity_stock_choices }|--|| shopping_sale_snapshot_unit_options : option
-shopping_cart_commodity_stock_choices }o--|| shopping_sale_snapshot_unit_option_candidates : candidate
-shopping_sale_snapshot_units }|--|| shopping_sale_snapshots : snapshot
-shopping_sale_snapshot_unit_options }|--|| shopping_sale_snapshot_units : unit
-shopping_sale_snapshot_unit_option_candidates }|--|| shopping_sale_snapshot_unit_options : option
-shopping_sale_snapshot_unit_stocks }|--|| shopping_sale_snapshot_units : unit
+"shopping_cart_commodities" }|--|| "shopping_carts" : cart
+"shopping_cart_commodities" }|--|| "shopping_sale_snapshots" : snapshot
+"shopping_cart_commodity_stocks" }|--|| "shopping_cart_commodities" : commodity
+"shopping_cart_commodity_stocks" }|--|| "shopping_sale_snapshot_units" : unit
+"shopping_cart_commodity_stocks" }|--|| "shopping_sale_snapshot_unit_stocks" : stock
+"shopping_cart_commodity_stock_choices" }|--|| "shopping_cart_commodity_stocks" : stock
+"shopping_cart_commodity_stock_choices" }|--|| "shopping_sale_snapshot_unit_options" : option
+"shopping_cart_commodity_stock_choices" }o--|| "shopping_sale_snapshot_unit_option_candidates" : candidate
+"shopping_sale_snapshot_units" }|--|| "shopping_sale_snapshots" : snapshot
+"shopping_sale_snapshot_unit_options" }|--|| "shopping_sale_snapshot_units" : unit
+"shopping_sale_snapshot_unit_option_candidates" }|--|| "shopping_sale_snapshot_unit_options" : option
+"shopping_sale_snapshot_unit_stocks" }|--|| "shopping_sale_snapshot_units" : unit
 ```
 
 ### `shopping_carts`
@@ -1319,7 +1351,7 @@ entered by the customer.
 ## Orders
 ```mermaid
 erDiagram
-shopping_orders {
+"shopping_orders" {
     String id PK
     String shopping_customer_id FK
     String shopping_address_id FK "nullable"
@@ -1329,7 +1361,7 @@ shopping_orders {
     DateTime created_at
     DateTime deleted_at "nullable"
 }
-shopping_order_goods {
+"shopping_order_goods" {
     String id PK
     String shopping_order_id FK
     String shopping_cart_commodity_id FK
@@ -1338,7 +1370,7 @@ shopping_order_goods {
     Int sequence
     DateTime confirmed_at "nullable"
 }
-shopping_order_publishes {
+"shopping_order_publishes" {
     String id PK
     String shopping_order_id FK
     String password "nullable"
@@ -1346,12 +1378,12 @@ shopping_order_publishes {
     DateTime paid_at "nullable"
     DateTime cancelled_at "nullable"
 }
-shopping_deliveries {
+"shopping_deliveries" {
     String id PK
     String shopping_seller_id FK
     String invoice_code "nullable"
 }
-shopping_delivery_pieces {
+"shopping_delivery_pieces" {
     String id PK
     String shopping_delivery_id FK
     String shopping_order_good_id FK
@@ -1359,7 +1391,7 @@ shopping_delivery_pieces {
     Float quantity
     Int sequence
 }
-shopping_delivery_journeys {
+"shopping_delivery_journeys" {
     String id PK
     String shopping_delivery_id FK
     String type
@@ -1369,7 +1401,7 @@ shopping_delivery_journeys {
     DateTime started_at
     DateTime completed_at "nullable"
 }
-shopping_addresses {
+"shopping_addresses" {
     String id PK
     String mobile
     String name
@@ -1382,12 +1414,12 @@ shopping_addresses {
     String special_note "nullable"
     DateTime created_at
 }
-shopping_orders }o--|| shopping_addresses : address
-shopping_order_goods }|--|| shopping_orders : order
-shopping_order_publishes |o--|| shopping_orders : order
-shopping_delivery_pieces }|--|| shopping_deliveries : delivery
-shopping_delivery_pieces }|--|| shopping_order_goods : good
-shopping_delivery_journeys }|--|| shopping_deliveries : delivery
+"shopping_orders" }o--|| "shopping_addresses" : address
+"shopping_order_goods" }|--|| "shopping_orders" : order
+"shopping_order_publishes" |o--|| "shopping_orders" : order
+"shopping_delivery_pieces" }|--|| "shopping_deliveries" : delivery
+"shopping_delivery_pieces" }|--|| "shopping_order_goods" : good
+"shopping_delivery_journeys" }|--|| "shopping_deliveries" : delivery
 ```
 
 ### `shopping_orders`
@@ -1583,7 +1615,7 @@ Journey of delivery.
 ## Coupons
 ```mermaid
 erDiagram
-shopping_coupons {
+"shopping_coupons" {
     String id PK
     String shopping_administrator_id FK "nullable"
     String shopping_seller_id FK "nullable"
@@ -1604,37 +1636,37 @@ shopping_coupons {
     DateTime updated_at
     DateTime deleted_at "nullable"
 }
-shopping_coupon_criterias {
+"shopping_coupon_criterias" {
     String id PK
     String shopping_coupon_id FK
     String type
     String direction
     Int sequence
 }
-shopping_coupon_section_criterias {
+"shopping_coupon_section_criterias" {
     String id PK
     String shopping_section_id FK
 }
-shopping_coupon_channel_criterias {
+"shopping_coupon_channel_criterias" {
     String id PK
     String shopping_channel_id FK
     String shopping_channel_category_id FK "nullable"
 }
-shopping_coupon_seller_criterias {
+"shopping_coupon_seller_criterias" {
     String id PK
     String shopping_seller_id FK
 }
-shopping_coupon_sale_criterias {
+"shopping_coupon_sale_criterias" {
     String id PK
     String shopping_sale_id FK
 }
-shopping_coupon_funnel_criterias {
+"shopping_coupon_funnel_criterias" {
     String id PK
     String kind
     String key "nullable"
     String value
 }
-shopping_coupon_tickets {
+"shopping_coupon_tickets" {
     String id PK
     String shopping_customer_id FK
     String shopping_coupon_id FK
@@ -1642,7 +1674,7 @@ shopping_coupon_tickets {
     DateTime created_at
     DateTime expired_at "nullable"
 }
-shopping_coupon_ticket_payments {
+"shopping_coupon_ticket_payments" {
     String id PK
     String shopping_coupon_ticket_id FK
     String shopping_order_id FK
@@ -1650,23 +1682,23 @@ shopping_coupon_ticket_payments {
     DateTime created_at
     DateTime deleted_at "nullable"
 }
-shopping_coupon_disposables {
+"shopping_coupon_disposables" {
     String id PK
     String shopping_coupon_id FK
     String code UK
     DateTime created_at
     DateTime expired_at "nullable"
 }
-shopping_coupon_criterias }|--|| shopping_coupons : coupon
-shopping_coupon_section_criterias |o--|| shopping_coupon_criterias : base
-shopping_coupon_channel_criterias |o--|| shopping_coupon_criterias : base
-shopping_coupon_seller_criterias |o--|| shopping_coupon_criterias : base
-shopping_coupon_sale_criterias |o--|| shopping_coupon_criterias : base
-shopping_coupon_funnel_criterias |o--|| shopping_coupon_criterias : base
-shopping_coupon_tickets }|--|| shopping_coupons : coupon
-shopping_coupon_tickets |o--|| shopping_coupon_disposables : disposable
-shopping_coupon_ticket_payments |o--|| shopping_coupon_tickets : ticket
-shopping_coupon_disposables }|--|| shopping_coupons : coupon
+"shopping_coupon_criterias" }|--|| "shopping_coupons" : coupon
+"shopping_coupon_section_criterias" |o--|| "shopping_coupon_criterias" : base
+"shopping_coupon_channel_criterias" |o--|| "shopping_coupon_criterias" : base
+"shopping_coupon_seller_criterias" |o--|| "shopping_coupon_criterias" : base
+"shopping_coupon_sale_criterias" |o--|| "shopping_coupon_criterias" : base
+"shopping_coupon_funnel_criterias" |o--|| "shopping_coupon_criterias" : base
+"shopping_coupon_tickets" }|--|| "shopping_coupons" : coupon
+"shopping_coupon_tickets" |o--|| "shopping_coupon_disposables" : disposable
+"shopping_coupon_ticket_payments" |o--|| "shopping_coupon_tickets" : ticket
+"shopping_coupon_disposables" }|--|| "shopping_coupons" : coupon
 ```
 
 ### `shopping_coupons`
@@ -2003,7 +2035,7 @@ issuing code must also be supported by the corresponding quantity.
 ## Coins
 ```mermaid
 erDiagram
-shopping_deposits {
+"shopping_deposits" {
     String id PK
     String code UK
     String source
@@ -2011,7 +2043,7 @@ shopping_deposits {
     DateTime created_at
     DateTime deleted_at "nullable"
 }
-shopping_deposit_histories {
+"shopping_deposit_histories" {
     String id PK
     String shopping_deposit_id FK
     String shopping_citizen_id FK
@@ -2020,14 +2052,14 @@ shopping_deposit_histories {
     DateTime created_at
     DateTime cancelled_at "nullable"
 }
-shopping_deposit_charges {
+"shopping_deposit_charges" {
     String id PK
     String shopping_customer_id FK
     Float amount
     DateTime created_at
     DateTime deleted_at "nullable"
 }
-shopping_deposit_charge_publishes {
+"shopping_deposit_charge_publishes" {
     String id PK
     String shopping_deposit_charge_id FK
     String password "nullable"
@@ -2035,7 +2067,7 @@ shopping_deposit_charge_publishes {
     DateTime paid_at "nullable"
     DateTime cancelled_at "nullable"
 }
-shopping_mileages {
+"shopping_mileages" {
     String id PK
     String code UK
     String source
@@ -2044,7 +2076,7 @@ shopping_mileages {
     DateTime created_at
     DateTime deleted_at "nullable"
 }
-shopping_mileage_histories {
+"shopping_mileage_histories" {
     String id PK
     String shopping_mileage_id FK
     String shopping_citizen_id FK
@@ -2053,7 +2085,7 @@ shopping_mileage_histories {
     DateTime created_at
     DateTime cancelled_at "nullable"
 }
-shopping_customers {
+"shopping_customers" {
     String id PK
     String shopping_channel_id FK
     String shopping_member_id FK "nullable"
@@ -2064,7 +2096,7 @@ shopping_customers {
     String ip
     DateTime created_at
 }
-shopping_citizens {
+"shopping_citizens" {
     String id PK
     String shopping_channel_id FK "nullable"
     String mobile
@@ -2072,13 +2104,13 @@ shopping_citizens {
     DateTime created_at
     DateTime deleted_at "nullable"
 }
-shopping_deposit_histories }|--|| shopping_deposits : deposit
-shopping_deposit_histories }|--|| shopping_citizens : citizen
-shopping_deposit_charges }|--|| shopping_customers : customer
-shopping_deposit_charge_publishes |o--|| shopping_deposit_charges : charge
-shopping_mileage_histories }|--|| shopping_mileages : mileage
-shopping_mileage_histories }|--|| shopping_citizens : citizen
-shopping_customers }o--|| shopping_citizens : citizen
+"shopping_deposit_histories" }|--|| "shopping_deposits" : deposit
+"shopping_deposit_histories" }|--|| "shopping_citizens" : citizen
+"shopping_deposit_charges" }|--|| "shopping_customers" : customer
+"shopping_deposit_charge_publishes" |o--|| "shopping_deposit_charges" : charge
+"shopping_mileage_histories" }|--|| "shopping_mileages" : mileage
+"shopping_mileage_histories" }|--|| "shopping_citizens" : citizen
+"shopping_customers" }o--|| "shopping_citizens" : citizen
 ```
 
 ### `shopping_deposits`
@@ -2245,41 +2277,41 @@ outcome. The minus value must be expressed by multiplying the
 ## Inquiries
 ```mermaid
 erDiagram
-shopping_sale_snapshot_inquiries {
+"shopping_sale_snapshot_inquiries" {
     String id PK
     String shopping_sale_snapshot_id FK
     String shopping_customer_id FK
     String type
     DateTime read_by_seller_at "nullable"
 }
-shopping_sale_snapshot_questions {
+"shopping_sale_snapshot_questions" {
     String id PK
     Boolean secret
 }
-shopping_sale_snapshot_reviews {
+"shopping_sale_snapshot_reviews" {
     String id PK
     String shopping_order_good_id FK
 }
-shopping_sale_snapshot_review_snapshots {
+"shopping_sale_snapshot_review_snapshots" {
     String id PK
     Float score
 }
-shopping_sale_snapshot_inquiry_answers {
+"shopping_sale_snapshot_inquiry_answers" {
     String id PK
     String shopping_sale_snapshot_inquiry_id FK
     String shopping_seller_id FK
 }
-shopping_sale_snapshot_inquiry_comments {
+"shopping_sale_snapshot_inquiry_comments" {
     String id PK
     String shopping_seller_id FK "nullable"
     String shopping_customer_id FK "nullable"
 }
-bbs_articles {
+"bbs_articles" {
     String id PK
     DateTime created_at
     DateTime deleted_at "nullable"
 }
-bbs_article_snapshots {
+"bbs_article_snapshots" {
     String id PK
     String bbs_article_id FK
     String format
@@ -2287,29 +2319,35 @@ bbs_article_snapshots {
     String body
     DateTime created_at
 }
-bbs_article_comments {
+"bbs_article_comments" {
     String id PK
     String bbs_article_id FK
     String parent_id FK "nullable"
     DateTime created_at
     DateTime deleted_at "nullable"
 }
-shopping_sale_snapshots {
+"shopping_sale_snapshots" {
     String id PK
     String shopping_sale_id FK
     DateTime created_at
 }
-shopping_sale_snapshot_inquiries ||--|| bbs_articles : base
-shopping_sale_snapshot_inquiries }|--|| shopping_sale_snapshots : snapshot
-shopping_sale_snapshot_questions |o--|| shopping_sale_snapshot_inquiries : base
-shopping_sale_snapshot_reviews |o--|| shopping_sale_snapshot_inquiries : base
-shopping_sale_snapshot_review_snapshots ||--|| bbs_article_snapshots : base
-shopping_sale_snapshot_inquiry_answers ||--|| bbs_articles : base
-shopping_sale_snapshot_inquiry_answers }|--|| shopping_sale_snapshot_inquiries : inquiry
-shopping_sale_snapshot_inquiry_comments ||--|| bbs_article_comments : base
-bbs_article_snapshots }|--|| bbs_articles : article
-bbs_article_comments }|--|| bbs_articles : article
-bbs_article_comments }o--o| bbs_article_comments : parent
+"_bbs_article_commentsTobbs_article_comments" {
+    String A FK
+    String B FK
+}
+"shopping_sale_snapshot_inquiries" ||--|| "bbs_articles" : base
+"shopping_sale_snapshot_inquiries" }|--|| "shopping_sale_snapshots" : snapshot
+"shopping_sale_snapshot_questions" |o--|| "shopping_sale_snapshot_inquiries" : base
+"shopping_sale_snapshot_reviews" |o--|| "shopping_sale_snapshot_inquiries" : base
+"shopping_sale_snapshot_review_snapshots" ||--|| "bbs_article_snapshots" : base
+"shopping_sale_snapshot_inquiry_answers" ||--|| "bbs_articles" : base
+"shopping_sale_snapshot_inquiry_answers" }|--|| "shopping_sale_snapshot_inquiries" : inquiry
+"shopping_sale_snapshot_inquiry_comments" ||--|| "bbs_article_comments" : base
+"bbs_article_snapshots" }|--|| "bbs_articles" : article
+"bbs_article_comments" }|--|| "bbs_articles" : article
+"bbs_article_comments" }o--o| "bbs_article_comments" : parent
+"_bbs_article_commentsTobbs_article_comments" }|--|| "bbs_article_comments" : bbs_article_comments
+"_bbs_article_commentsTobbs_article_comments" }|--|| "bbs_article_comments" : bbs_article_comments
 ```
 
 ### `shopping_sale_snapshot_inquiries`
@@ -2444,7 +2482,7 @@ the person who wrote the inquiry.
 ## default
 ```mermaid
 erDiagram
-mv_cache_times {
+"mv_cache_times" {
     String id PK
     String schema
     String table

@@ -19,7 +19,7 @@ export namespace MermaidWriter {
 
     const writeTable = (model: DMMF.Model): string =>
         [
-            `${model.dbName ?? model.name} {`,
+            `${JSON.stringify(model.dbName ?? model.name)} {`,
             ...model.fields
                 .filter((f) => f.kind !== "object")
                 .map(writeField(model))
@@ -86,9 +86,9 @@ export namespace MermaidWriter {
                 "|",
             ].join("");
             return [
-                props.model.dbName ?? props.model.name,
+                JSON.stringify(props.model.dbName ?? props.model.name),
                 arrow,
-                target.dbName ?? target.name,
+                JSON.stringify(target.dbName ?? target.name),
                 ":",
                 field.name,
             ].join(" ");
