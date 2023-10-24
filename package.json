@@ -1,6 +1,6 @@
 {
   "name": "prisma-markdown",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Prisma Markdown documents generator including ERD diagrams and comment descriptions",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -10,7 +10,7 @@
   "scripts": {
     "build": "rimraf lib && tsc",
     "dev": "rimraf lib && tsc --watch",
-    "test": "npx prisma generate"
+    "test": "ts-node test/index.ts"
   },
   "repository": {
     "type": "git",
@@ -36,6 +36,7 @@
     "prettier": "^3.0.3",
     "prisma": "^5.2.0",
     "rimraf": "^5.0.1",
+    "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },
   "dependencies": {

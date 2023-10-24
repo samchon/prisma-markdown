@@ -9,10 +9,12 @@ export namespace MarkdownWriter {
         schema: DMMF.Datamodel,
         config?: Record<string, string | string[] | undefined>,
     ): string => {
+        // LIST UP MODELS
         const dict: Map<string, IChapter> = new Map();
         const modelList: DMMF.Model[] = schema.models.filter(
             (model) => !isHidden(model),
         );
+        findImplicits(modelList);
 
         // @NAMESPACE
         for (const model of modelList) {
@@ -95,6 +97,143 @@ export namespace MarkdownWriter {
             "",
             [...chapter.descriptions].map(DescriptionWriter.table).join("\n\n"),
         ].join("\n");
+
+    const findImplicits = (modelList: DMMF.Model[]) => {
+        const dict: Map<string, DMMF.Model> = new Map();
+        for (const model of modelList)
+            for (const field of model.fields) {
+                if (
+                    field.kind !== "object" ||
+                    field.isList !== true ||
+                    field.isUnique !== false
+                )
+                    continue;
+
+                const opposite: DMMF.Model | undefined = modelList.find(
+                    (model) => model.name === field.type,
+                );
+                const oppositeField = opposite?.fields.find(
+                    (field) =>
+                        field.kind === "object" &&
+                        field.isList &&
+                        field.type === model.name,
+                );
+                if (opposite === undefined || oppositeField === undefined)
+                    continue;
+
+                const relations: DMMF.Model[] = [model, opposite].sort((x, y) =>
+                    x.name.localeCompare(y.name),
+                );
+                const table: string = `_${relations[0].name}To${relations[1].name}`;
+                if (dict.has(table)) continue;
+
+                modelList.push(implicitToExplicit(relations[0])(relations[1]));
+            }
+    };
+
+    const implicitToExplicit =
+        (x: DMMF.Model) =>
+        (y: DMMF.Model): DMMF.Model => {
+            const name: string = `_${x.name}To${y.name}`;
+            const tagger = (kind: "namespace" | "describe" | "erd"): string[] =>
+                [...new Set([...takeTags(kind)(x), ...takeTags(kind)(y)])].map(
+                    (value) => `@${kind} ${value}`,
+                );
+            const description: string[] = [
+                `Pair relationship table between {@link ${
+                    x.dbName ?? x.name
+                }} and {@link ${y.dbName ?? y.name}}`,
+                "",
+                ...tagger("describe"),
+                ...tagger("erd"),
+                ...tagger("namespace"),
+            ];
+            if (description.length === 2) description.splice(1, 1);
+
+            const newbie: DMMF.Model = {
+                name,
+                dbName: null,
+                fields: [
+                    {
+                        kind: "scalar",
+                        name: "A",
+                        type: x.primaryKey?.fields[0] ?? "String",
+                        isRequired: true,
+                        isList: false,
+                        isUnique: false,
+                        isId: false,
+                        isReadOnly: false,
+                        hasDefaultValue: false,
+                    },
+                    {
+                        kind: "scalar",
+                        name: "B",
+                        type: y.primaryKey?.fields[0] ?? "String",
+                        isRequired: true,
+                        isList: false,
+                        isUnique: false,
+                        isId: false,
+                        isReadOnly: false,
+                        hasDefaultValue: false,
+                    },
+                    {
+                        kind: "object",
+                        name: x.name,
+                        type: x.name,
+                        isRequired: true,
+                        isList: false,
+                        isUnique: false,
+                        isId: false,
+                        isReadOnly: false,
+                        hasDefaultValue: false,
+                        relationToFields: [x.primaryKey?.fields[0] ?? "id"],
+                        relationFromFields: ["A"],
+                    },
+                    {
+                        kind: "object",
+                        name: y.name,
+                        type: y.name,
+                        isRequired: true,
+                        isList: false,
+                        isUnique: false,
+                        isId: false,
+                        isReadOnly: false,
+                        hasDefaultValue: false,
+                        relationToFields: [y.primaryKey?.fields[0] ?? "id"],
+                        relationFromFields: ["B"],
+                    },
+                ],
+                uniqueFields: [["A", "B"]],
+                uniqueIndexes: [],
+                primaryKey: null,
+                documentation: description.join("\n"),
+            };
+            x.fields.push({
+                kind: "object",
+                name,
+                type: name,
+                isRequired: true,
+                isList: true,
+                isUnique: false,
+                isId: false,
+                isReadOnly: false,
+                hasDefaultValue: false,
+                relationToFields: ["A"],
+            });
+            y.fields.push({
+                kind: "object",
+                name,
+                type: name,
+                isRequired: true,
+                isList: true,
+                isUnique: false,
+                isId: false,
+                isReadOnly: false,
+                hasDefaultValue: false,
+                relationToFields: ["B"],
+            });
+            return newbie;
+        };
 }
 
 interface IChapter {
