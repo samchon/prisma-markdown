@@ -325,7 +325,7 @@ model bbs_article_comment_snapshots {
     comment bbs_article_comments @relation(fields: [bbs_article_comment_id], references: [id], onDelete: Cascade)
 
     /// List of wrappers of attachment files.
-    files bbs_article_comment_snapshot_files[]
+    to_files bbs_article_comment_snapshot_files[]
 
     @@index([bbs_article_comment_id, created_at])
 }
@@ -3488,27 +3488,27 @@ model shopping_sale_snapshot_inquiry_comments {
     customer shopping_customers?  @relation(fields: [shopping_customer_id], references: [id], onDelete: Cascade)
 }
 
-/// @summary Table for caching.
+/// Table for caching.
 ///
 /// @author Samchon
 model mv_cache_times {
     //----
     // COLUMNS
     //----
-    /// @summary Primary Key.
+    /// Primary Key.
     ///
     /// @Format uuid
     id String @id @db.Uuid
 
-    /// @summary Target schema.
+    /// Target schema.
     schema String @db.VarChar
 
-    /// @summary Target table.
+    /// Target table.
     ///
     /// Database table name.
     table String @db.VarChar
 
-    /// @summary Identifier of target record.
+    /// Identifier of target record.
     ///
     /// Even when key type is not string, it must be converted to the string value.
     key String @db.VarChar

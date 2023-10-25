@@ -60,10 +60,6 @@ erDiagram
     String attachment_file_id FK
     Int sequence
 }
-"_bbs_article_commentsTobbs_article_comments" {
-    String A FK
-    String B FK
-}
 "bbs_article_snapshots" }|--|| "bbs_articles" : article
 "bbs_article_snapshot_files" }|--|| "bbs_article_snapshots" : snapshot
 "bbs_article_snapshot_files" }|--|| "attachment_files" : file
@@ -72,8 +68,6 @@ erDiagram
 "bbs_article_comment_snapshots" }|--|| "bbs_article_comments" : comment
 "bbs_article_comment_snapshot_files" }|--|| "bbs_article_comment_snapshots" : snapshot
 "bbs_article_comment_snapshot_files" }|--|| "attachment_files" : file
-"_bbs_article_commentsTobbs_article_comments" }|--|| "bbs_article_comments" : bbs_article_comments
-"_bbs_article_commentsTobbs_article_comments" }|--|| "bbs_article_comments" : bbs_article_comments
 ```
 
 ### `attachment_files`
@@ -234,13 +228,6 @@ relationship between [bbs_article_comment_snapshots](#bbs_article_comment_snapsh
     > 
     > Sequence order of the attached file in the belonged snapshot.
 
-### `_bbs_article_commentsTobbs_article_comments`
-Pair relationship table between [bbs_article_comments](#bbs_article_comments) and [bbs_article_comments](#bbs_article_comments)
-
-**Properties**
-  - `A`: 
-  - `B`: 
-
 
 ## Systematic
 ```mermaid
@@ -271,10 +258,6 @@ erDiagram
     DateTime updated_at
     DateTime deleted_at "nullable"
 }
-"_shopping_channel_categoriesToshopping_channel_categories" {
-    String A FK
-    String B FK
-}
 "shopping_sales" {
     String id PK
     String shopping_section_id FK
@@ -302,8 +285,6 @@ erDiagram
 }
 "shopping_channel_categories" }|--|| "shopping_channels" : channel
 "shopping_channel_categories" }o--o| "shopping_channel_categories" : parent
-"_shopping_channel_categoriesToshopping_channel_categories" }|--|| "shopping_channel_categories" : shopping_channel_categories
-"_shopping_channel_categoriesToshopping_channel_categories" }|--|| "shopping_channel_categories" : shopping_channel_categories
 "shopping_sales" }|--|| "shopping_sections" : section
 "shopping_sale_snapshots" }|--|| "shopping_sales" : sale
 "shopping_sale_snapshot_channels" }|--|| "shopping_sale_snapshots" : snapshot
@@ -399,13 +380,6 @@ just use only one. This concept is designed to be expandable in the future.
   - `created_at`: Creation time of record.
   - `updated_at`: Update time of record.
   - `deleted_at`: Deletion time of record.
-
-### `_shopping_channel_categoriesToshopping_channel_categories`
-Pair relationship table between [shopping_channel_categories](#shopping_channel_categories) and [shopping_channel_categories](#shopping_channel_categories)
-
-**Properties**
-  - `A`: 
-  - `B`: 
 
 
 ## Actors
@@ -828,10 +802,6 @@ erDiagram
     DateTime created_at
     DateTime deleted_at "nullable"
 }
-"_shopping_channel_categoriesToshopping_channel_categories" {
-    String A FK
-    String B FK
-}
 "shopping_sales" }|--|| "shopping_sections" : section
 "shopping_sales" }|--|| "shopping_sellers" : seller
 "shopping_sale_snapshots" }|--|| "shopping_sales" : sale
@@ -848,8 +818,6 @@ erDiagram
 "shopping_sale_snapshot_unit_stock_choices" }|--|| "shopping_sale_snapshot_unit_option_candidates" : candidate
 "shopping_channel_categories" }|--|| "shopping_channels" : channel
 "shopping_channel_categories" }o--o| "shopping_channel_categories" : parent
-"_shopping_channel_categoriesToshopping_channel_categories" }|--|| "shopping_channel_categories" : shopping_channel_categories
-"_shopping_channel_categoriesToshopping_channel_categories" }|--|| "shopping_channel_categories" : shopping_channel_categories
 ```
 
 ### `shopping_sales`
@@ -2331,10 +2299,6 @@ erDiagram
     String shopping_sale_id FK
     DateTime created_at
 }
-"_bbs_article_commentsTobbs_article_comments" {
-    String A FK
-    String B FK
-}
 "shopping_sale_snapshot_inquiries" ||--|| "bbs_articles" : base
 "shopping_sale_snapshot_inquiries" }|--|| "shopping_sale_snapshots" : snapshot
 "shopping_sale_snapshot_questions" |o--|| "shopping_sale_snapshot_inquiries" : base
@@ -2346,8 +2310,6 @@ erDiagram
 "bbs_article_snapshots" }|--|| "bbs_articles" : article
 "bbs_article_comments" }|--|| "bbs_articles" : article
 "bbs_article_comments" }o--o| "bbs_article_comments" : parent
-"_bbs_article_commentsTobbs_article_comments" }|--|| "bbs_article_comments" : bbs_article_comments
-"_bbs_article_commentsTobbs_article_comments" }|--|| "bbs_article_comments" : bbs_article_comments
 ```
 
 ### `shopping_sale_snapshot_inquiries`

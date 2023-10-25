@@ -118,7 +118,11 @@ export namespace MarkdownWriter {
                         field.isList &&
                         field.type === model.name,
                 );
-                if (opposite === undefined || oppositeField === undefined)
+                if (
+                    opposite === undefined ||
+                    oppositeField === undefined ||
+                    model === opposite
+                )
                     continue;
 
                 const relations: DMMF.Model[] = [model, opposite].sort((x, y) =>
