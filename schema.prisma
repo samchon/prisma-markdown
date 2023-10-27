@@ -1654,10 +1654,15 @@ model shopping_sale_snapshot_unit_stocks {
     /// @minimum 0
     real_price Float @db.DoublePrecision
 
-    /// Tax to pay.
+    /// Initial inventory quantity.
+    ///
+    /// If this stock has been sold over this quantity count, the stock can't
+    /// be sold anymore, because of out of stock. In that case, the seller can
+    /// supplement the inventory quantity by registering some 
+    /// {@link shopping_sale_snapshot_unit_stock_supplements} records.
     ///
     /// @minimum 0
-    tax Float @db.DoublePrecision
+    quantity Int
 
     /// Sequence order in belonged unit.
     sequence Int @db.Integer
@@ -1671,7 +1676,11 @@ model shopping_sale_snapshot_unit_stocks {
     /// List of choices.
     ///
     /// Which candidate values are chosen in each option.
-    choices                        shopping_sale_snapshot_unit_stock_choices[]
+    choices shopping_sale_snapshot_unit_stock_choices[]
+
+    /// List of supplements of inventory quantity.
+    supplements shopping_sale_snapshot_unit_stock_supplements[]
+
     shopping_cart_commodity_stocks shopping_cart_commodity_stocks[]
 
     @@unique([shopping_sale_snapshot_unit_id, name])
@@ -1723,6 +1732,51 @@ model shopping_sale_snapshot_unit_stock_choices {
     candidate shopping_sale_snapshot_unit_option_candidates? @relation(map: "fk_shopping_sale_snapshot_unit_stock_choices_candidate", fields: [shopping_sale_snapshot_unit_option_candidate_id], references: [id], onDelete: Cascade)
 
     @@unique([shopping_sale_snapshot_unit_stock_id, shopping_sale_snapshot_unit_option_candidate_id])
+}
+
+/// Supplementation of inventory quantity of stock.
+///
+/// You know what? If a stock has been sold over its 
+/// {@link shopping_sale_snapshot_unit_stocks.inventory initial inventory quantity},
+/// the stock can't be sold anymore, because of out of stock. In that case, how the
+/// {@link shopping_sellers} should do?
+///
+/// When the sotck is sold out, seller can supplement the inventory record by
+/// registering this `shopping_sale_snapshot_unit_stock_supplements` record. Right,
+/// this `shopping_sale_snapshot_unit_stock_supplements` is an entity that embodies
+/// the supplementation of the inventory quantity of the belonged 
+/// {@link shopping_sale_snapshot_unit_stocks stock}.
+///
+/// @author Samchon
+model shopping_sale_snapshot_unit_stock_supplements {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged stock's {@link shopping_sale_snapshot_unit_stocks.id}
+    ///
+    /// @format uuid
+    shopping_sale_snapshot_unit_stock_id String @db.Uuid
+
+    /// Supplemented inventory quantity.
+    quantity Int
+
+    /// Creation time of record.
+    ///
+    /// When the inventory be supplemented.
+    created_at DateTime @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    /// Belonged stock.
+    stock shopping_sale_snapshot_unit_stocks @relation(fields: [shopping_sale_snapshot_unit_stock_id], references: [id], onDelete: Cascade)
+
+    @@index([shopping_sale_snapshot_unit_stock_id, created_at])
 }
 
 //-----------------------------------------------------------

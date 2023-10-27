@@ -5,6 +5,7 @@
 - [Systematic](#Systematic)
 - [Actors](#Actors)
 - [Sales](#Sales)
+- [default](#default)
 - [Carts](#Carts)
 - [Orders](#Orders)
 - [Coupons](#Coupons)
@@ -778,7 +779,7 @@ erDiagram
     String name
     Float nominal_price
     Float real_price
-    Float tax
+    Int quantity
     Int sequence
 }
 "shopping_sale_snapshot_unit_stock_choices" {
@@ -1121,7 +1122,13 @@ stocks count in the unit is only 1.
     > If this value is greater than the `real_price`, it would be shown
     > like seller is giving a discount.
   - `real_price`: Real price to pay.
-  - `tax`: Tax to pay.
+  - `quantity`
+    > Initial inventory quantity.
+    > 
+    > If this stock has been sold over this quantity count, the stock can't
+    > be sold anymore, because of out of stock. In that case, the seller can
+    > supplement the inventory quantity by registering some 
+    > [shopping_sale_snapshot_unit_stock_supplements](#shopping_sale_snapshot_unit_stock_supplements) records.
   - `sequence`: Sequence order in belonged unit.
 
 ### `shopping_sale_snapshot_unit_stock_choices`
@@ -1134,6 +1141,41 @@ can also be ignored.
   - `shopping_sale_snapshot_unit_stock_id`: Belonged stock's [shopping_sale_snapshot_unit_stocks.id](#shopping_sale_snapshot_unit_stocks)
   - `shopping_sale_snapshot_unit_option_candidate_id`: Belonged candidate's [shopping_sale_snapshot_unit_option_candidates.id](#shopping_sale_snapshot_unit_option_candidates)
   - `sequence`: Sequence order in belonged stock.
+
+
+## default
+```mermaid
+erDiagram
+"shopping_sale_snapshot_unit_stock_supplements" {
+    String id PK
+    String shopping_sale_snapshot_unit_stock_id FK
+    Int quantity
+    DateTime created_at
+}
+```
+
+### `shopping_sale_snapshot_unit_stock_supplements`
+Supplementation of inventory quantity of stock.
+
+You know what? If a stock has been sold over its 
+[initial inventory quantity](#shopping_sale_snapshot_unit_stocks),
+the stock can't be sold anymore, because of out of stock. In that case, how the
+[shopping_sellers](#shopping_sellers) should do?
+
+When the sotck is sold out, seller can supplement the inventory record by
+registering this `shopping_sale_snapshot_unit_stock_supplements` record. Right,
+this `shopping_sale_snapshot_unit_stock_supplements` is an entity that embodies
+the supplementation of the inventory quantity of the belonged 
+[stock](#shopping_sale_snapshot_unit_stocks).
+
+**Properties**
+  - `id`: Primary Key.
+  - `shopping_sale_snapshot_unit_stock_id`: Belonged stock's [shopping_sale_snapshot_unit_stocks.id](#shopping_sale_snapshot_unit_stocks)
+  - `quantity`: Supplemented inventory quantity.
+  - `created_at`
+    > Creation time of record.
+    > 
+    > When the inventory be supplemented.
 
 
 ## Carts
@@ -1203,7 +1245,7 @@ erDiagram
     String name
     Float nominal_price
     Float real_price
-    Float tax
+    Int quantity
     Int sequence
 }
 "shopping_cart_commodities" }|--|| "shopping_carts" : cart
