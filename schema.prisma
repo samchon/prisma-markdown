@@ -1747,6 +1747,7 @@ model shopping_sale_snapshot_unit_stock_choices {
 /// the supplementation of the inventory quantity of the belonged 
 /// {@link shopping_sale_snapshot_unit_stocks stock}.
 ///
+/// @namespace Sales
 /// @author Samchon
 model shopping_sale_snapshot_unit_stock_supplements {
     //----

@@ -5,7 +5,6 @@
 - [Systematic](#Systematic)
 - [Actors](#Actors)
 - [Sales](#Sales)
-- [default](#default)
 - [Carts](#Carts)
 - [Orders](#Orders)
 - [Coupons](#Coupons)
@@ -788,6 +787,12 @@ erDiagram
     String shopping_sale_snapshot_unit_option_candidate_id FK
     Int sequence
 }
+"shopping_sale_snapshot_unit_stock_supplements" {
+    String id PK
+    String shopping_sale_snapshot_unit_stock_id FK
+    Int quantity
+    DateTime created_at
+}
 "shopping_channels" {
     String id PK
     String code UK
@@ -833,6 +838,7 @@ erDiagram
 "shopping_sale_snapshot_unit_stocks" }|--|| "shopping_sale_snapshot_units" : unit
 "shopping_sale_snapshot_unit_stock_choices" }|--|| "shopping_sale_snapshot_unit_stocks" : stock
 "shopping_sale_snapshot_unit_stock_choices" }|--|| "shopping_sale_snapshot_unit_option_candidates" : candidate
+"shopping_sale_snapshot_unit_stock_supplements" }|--|| "shopping_sale_snapshot_unit_stocks" : stock
 "shopping_channel_categories" }|--|| "shopping_channels" : channel
 "shopping_channel_categories" }o--o| "shopping_channel_categories" : parent
 ```
@@ -1141,18 +1147,6 @@ can also be ignored.
   - `shopping_sale_snapshot_unit_stock_id`: Belonged stock's [shopping_sale_snapshot_unit_stocks.id](#shopping_sale_snapshot_unit_stocks)
   - `shopping_sale_snapshot_unit_option_candidate_id`: Belonged candidate's [shopping_sale_snapshot_unit_option_candidates.id](#shopping_sale_snapshot_unit_option_candidates)
   - `sequence`: Sequence order in belonged stock.
-
-
-## default
-```mermaid
-erDiagram
-"shopping_sale_snapshot_unit_stock_supplements" {
-    String id PK
-    String shopping_sale_snapshot_unit_stock_id FK
-    Int quantity
-    DateTime created_at
-}
-```
 
 ### `shopping_sale_snapshot_unit_stock_supplements`
 Supplementation of inventory quantity of stock.
