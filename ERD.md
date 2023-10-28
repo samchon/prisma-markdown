@@ -319,9 +319,9 @@ just use only one. This concept is designed to be expandable in the future.
 ### `shopping_channel_categories`
 Category of channel.
 
-` is a concept that refers to classification categories within a specific 
-channel, and is exactly the same as the concept commonly referred to as 
-"category" in shopping malls.
+`shopping_channel_categories` is a concept that refers to classification 
+categories within a specific channel, and is exactly the same as the concept 
+commonly referred to as "category" in shopping malls.
 
 And `shopping_channel_categories` is different with 
 [shopping_sections](#shopping_sections). [shopping_sections](#shopping_sections) refers to a "corner" 
@@ -469,7 +469,7 @@ Customer information, but not a person but a **connection** basis.
 
 `shopping_customers` is an entity that literally embodies the information 
 of those who participated in the market as customers. By the way, the
-`shopping_Customers` does not mean a person, but a **connection** basis.
+`shopping_customers` does not mean a person, but a **connection** basis.
 Therefore, even if the same person connects to the shopping mall multiple,
 multiple records are created in `shopping_customers`.
 
