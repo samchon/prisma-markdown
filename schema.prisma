@@ -37,6 +37,10 @@ model attachment_files {
     /// @maxLength 255
     name String? @db.VarChar
 
+    //-----------------------------------------------------------
+    // ARTICLES
+    //-----------------------------------------------------------
+
     /// Extension.
     ///
     /// Possible to omit like `README` case.
@@ -53,8 +57,9 @@ model attachment_files {
     //----
     // RELATIONS
     //----
-    bbs_article_snapshot_files          bbs_article_snapshot_files[]
-    bbs_article_comment_snapshots_files bbs_article_comment_snapshot_files[]
+    bbs_article_snapshot_files           bbs_article_snapshot_files[]
+    bbs_article_comment_snapshots_files  bbs_article_comment_snapshot_files[]
+    shopping_sale_snapshot_content_files shopping_sale_snapshot_content_files[]
 }
 
 /// Article entity.
@@ -449,6 +454,7 @@ model shopping_channels {
 
     @@unique([code])
     @@unique([name])
+    @@index([created_at])
 }
 
 /// Category of channel.
@@ -526,8 +532,7 @@ model shopping_channel_categories {
     shopping_coupon_channel_criterias         shopping_coupon_channel_criterias[]
 
     @@unique([shopping_channel_id, parent_id, name])
-    @@index([parent_id, name])
-    @@index([name])
+    @@index([parent_id])
 }
 
 /// Section information.
@@ -579,6 +584,7 @@ model shopping_sections {
 
     @@unique([code])
     @@unique([name])
+    @@index([created_at])
 }
 
 //-----------------------------------------------------------
@@ -587,23 +593,23 @@ model shopping_sections {
 /// Customer information, but not a person but a **connection** basis.
 ///
 /// `shopping_customers` is an entity that literally embodies the information 
-/// of those who participated in the market as customers. However, 
-/// `shopping_customers` is different from {@link shopping_sellers} or 
-/// {@link shopping_administrators}, where each person has one record based on 
-/// membership registration. `shopping_customers` issues a new record every 
-/// time it **connects**, even if it is the same person.
+/// of those who participated in the market as customers. By the way, the
+/// `shopping_Customers` does not mean a person, but a **connection** basis.
+/// Therefore, even if the same person connects to the shopping mall multiple,
+/// multiple records are created in `shopping_customers`.
 /// 
-/// The first purpose of this is to track the customer's inflow path in detail, and it is 
-/// for cases where the same person enters as a non-member, puts items in the 
+/// The first purpose of this is to track the customer's inflow path in detail, and 
+/// it is for cases where the same person enters as a non-member, puts items in the 
 /// {@link shopping_cart_commodities shopping cart} in advance, and only authenticates 
 /// their real name or registers/logs in at the moment of 
 /// {@link shopping_order_publishes payment}. It is the second. Lastly, it is 
 /// to accurately track the activities that a person performs at the 
-/// shopping mall in various ways, such as the same person accessing an 
-/// {@link shopping_external_users external service} to make a purchase, 
-/// creating multiple {@link shopping_members accounts} to make a purchase, 
-/// and making a purchase as a non-member with only 
-/// {@link shopping_citizens real name authentication}.
+/// shopping mall in various ways like below.
+///
+/// - Same person comes from an {@link shopping_external_users external service}
+/// - Same person creates multiple {@link shopping_members accounts}
+/// - Same person makes a purchase as a non-member with only {@link shopping_citizens real name authentication}
+/// - Same person acts both {@link shopping_sellers seller} and {@link shopping_administrators admin} at the same time
 /// 
 /// Therefore, `shopping_customers` can have multiple records with the same 
 /// {@link shopping_citizens}, {@link shopping_members}, and 
@@ -694,6 +700,15 @@ model shopping_customers {
     shopping_sale_snapshot_inquiries        shopping_sale_snapshot_inquiries[]
     shopping_sale_snapshot_inquiry_answers  shopping_sale_snapshot_inquiry_answers[]
     shopping_sale_snapshot_inquiry_comments shopping_sale_snapshot_inquiry_comments[]
+
+    @@index([shopping_channel_id, created_at])
+    @@index([shopping_citizen_id, created_at])
+    @@index([shopping_external_user_id, created_at])
+    @@index([shopping_member_id, created_at])
+    @@index([href])
+    @@index([referrer])
+    @@index([ip])
+    @@index([created_at])
 }
 
 /// External user information.
@@ -767,6 +782,8 @@ model shopping_external_users {
 
     @@unique([application, uid])
     @@unique([application, nickname])
+    @@index([application, created_at])
+    @@index([created_at])
 }
 
 /// Citizen verification information.
@@ -823,11 +840,17 @@ model shopping_citizens {
     //----
     // RELATIONS
     //----
-    channel                    shopping_channels?           @relation(fields: [shopping_channel_id], references: [id], onDelete: Cascade)
-    shopping_customers         shopping_customers[]
-    shopping_members           shopping_members[]
-    shopping_deposit_histories shopping_deposit_histories[]
-    shopping_mileage_histories shopping_mileage_histories[]
+    channel shopping_channels? @relation(fields: [shopping_channel_id], references: [id], onDelete: Cascade)
+
+    customers         shopping_customers[]
+    members           shopping_members[]
+    deposit_histories shopping_deposit_histories[]
+    mileage_histories shopping_mileage_histories[]
+
+    @@unique([shopping_channel_id, mobile])
+    @@index([mobile])
+    @@index([name])
+    @@index([created_at])
 }
 
 /// Member Account.
@@ -905,6 +928,12 @@ model shopping_members {
 
     of_seller shopping_sellers?
     of_admin  shopping_administrators?
+
+    @@unique([shopping_channel_id, nickname])
+    @@unique([shopping_channel_id, shopping_citizen_id])
+    @@index([shopping_citizen_id])
+    @@index([nickname])
+    @@index([created_at])
 }
 
 /// Email address of member.
@@ -928,6 +957,7 @@ model shopping_member_emails {
     /// just denormalized for composing unique constraint.
     ///
     /// @format uuid
+    /// @hidden
     shopping_channel_id String @db.Uuid
 
     /// Belonged member's {@link shopping_members.id}
@@ -948,6 +978,10 @@ model shopping_member_emails {
     //----
     channel shopping_channels @relation(fields: [shopping_channel_id], references: [id], onDelete: Cascade)
     member  shopping_members  @relation(fields: [shopping_member_id], references: [id], onDelete: Cascade)
+
+    @@unique([shopping_channel_id, value])
+    @@unique([shopping_member_id, value])
+    @@index([value])
 }
 
 /// Seller information.
@@ -962,7 +996,6 @@ model shopping_member_emails {
 /// do the {@link shopping_citizens real-name authentication}, too. 
 ///
 /// @namespace Actors
-/// @erd Sales
 /// @author Samchon
 model shopping_sellers {
     //----
@@ -1188,7 +1221,13 @@ model shopping_sales {
     sellerCustomer shopping_customers        @relation(fields: [shopping_seller_customer_id], references: [id], onDelete: Cascade)
     snapshots      shopping_sale_snapshots[]
 
+    inquiries                      shopping_sale_snapshot_inquiries[]
     shopping_coupon_sale_criterias shopping_coupon_sale_criterias[]
+
+    @@index([shopping_section_id])
+    @@index([shopping_seller_customer_id])
+    @@index([created_at])
+    @@index([opened_at, closed_at, suspended_at])
 }
 
 /// Sale snapshot information.
@@ -1233,12 +1272,15 @@ model shopping_sale_snapshots {
     /// Belonged sale.
     sale shopping_sales @relation(fields: [shopping_sale_id], references: [id], onDelete: Cascade)
 
+    content     shopping_sale_snapshot_contents?
     to_channels shopping_sale_snapshot_channels[]
     units       shopping_sale_snapshot_units[]
-    content     shopping_sale_snapshot_contents?
+    tags        shopping_sale_snapshot_tags[]
 
     shopping_cart_commodities        shopping_cart_commodities[]
     shopping_sale_snapshot_inquiries shopping_sale_snapshot_inquiries[]
+
+    @@index([shopping_sale_id, created_at])
 }
 
 /// Content information of sale snapshot.
@@ -1247,7 +1289,7 @@ model shopping_sale_snapshots {
 /// of {@link shopping_sale_snapshots sale snapshot}. Also, it contains
 /// revert policy of the sale.
 ///
-/// @namespace Sales
+/// @describe Sales
 /// @author Samchon
 model shopping_sale_snapshot_contents {
     //----
@@ -1287,8 +1329,43 @@ model shopping_sale_snapshot_contents {
     /// Belonged snapshot.
     snapshot shopping_sale_snapshots @relation(fields: [shopping_sale_snapshot_id], references: [id], onDelete: Cascade)
 
+    to_files shopping_sale_snapshot_content_files[]
+
     @@unique([shopping_sale_snapshot_id])
     @@index([title])
+}
+
+/// Attachment file of sale snapshot content.
+///
+/// @describe Sales
+/// @author Samchon
+model shopping_sale_snapshot_content_files {
+    id                                String @id @db.Uuid
+    shopping_sale_snapshot_content_id String @db.Uuid
+    attachment_file_id                String @db.Uuid
+    sequence                          Int    @db.Integer
+
+    content shopping_sale_snapshot_contents @relation(fields: [shopping_sale_snapshot_content_id], references: [id], onDelete: Cascade)
+    file    attachment_files                @relation(fields: [attachment_file_id], references: [id], onDelete: Cascade)
+
+    @@index([shopping_sale_snapshot_content_id])
+    @@index([attachment_file_id])
+}
+
+/// Search tag of sale snapshot.
+///
+/// @describe Sales
+/// @author Samchon
+model shopping_sale_snapshot_tags {
+    id                        String @id @db.Uuid
+    shopping_sale_snapshot_id String @db.Uuid
+    value                     String @db.VarChar
+    sequence                  Int    @db.Integer
+
+    snapshot shopping_sale_snapshots @relation(fields: [shopping_sale_snapshot_id], references: [id], onDelete: Cascade)
+
+    @@unique([shopping_sale_snapshot_id, value])
+    @@index([value])
 }
 
 /// Target channel of sale snapshot to sell.
@@ -1331,6 +1408,7 @@ model shopping_sale_snapshot_channels {
     to_categories shopping_sale_snapshot_channel_categories[]
 
     @@unique([shopping_sale_snapshot_id, shopping_channel_id])
+    @@index([shopping_channel_id])
 }
 
 /// Category classification info of sale snapshot.
@@ -1456,6 +1534,8 @@ model shopping_sale_snapshot_units {
     /// List of stocks.
     stocks                         shopping_sale_snapshot_unit_stocks[]
     shopping_cart_commodity_stocks shopping_cart_commodity_stocks[]
+
+    @@unique([shopping_sale_snapshot_id, name])
 }
 
 /// Individual option information on units for sale.
@@ -1747,7 +1827,7 @@ model shopping_sale_snapshot_unit_stock_choices {
 /// the supplementation of the inventory quantity of the belonged 
 /// {@link shopping_sale_snapshot_unit_stocks stock}.
 ///
-/// @namespace Sales
+/// @describe Sales
 /// @author Samchon
 model shopping_sale_snapshot_unit_stock_supplements {
     //----
@@ -1838,6 +1918,8 @@ model shopping_carts {
 
     /// List of commodities containing sale snapshot.
     commodities shopping_cart_commodities[]
+
+    @@index([shopping_customer_id, actor_type, created_at, deleted_at])
 }
 
 /// Item in a shopping cart.
@@ -1862,6 +1944,7 @@ model shopping_carts {
 ///
 /// 
 /// @namespace Carts
+/// @erd Orders
 /// @author Samchon
 model shopping_cart_commodities {
     //----
@@ -1901,6 +1984,8 @@ model shopping_cart_commodities {
     /// cart commodity. This variable can be computed by referencing 
     /// {@link Orders order} related tables, but just denormalized for the
     /// performance reason.
+    ///
+    /// @hidden
     published Boolean
 
     //----
@@ -1942,6 +2027,7 @@ model shopping_cart_commodities {
 /// {@link shopping_cart_commodities.volume} value of the parent entity.
 ///
 /// @namespace Carts
+/// @erd Orders
 /// @author Samchon
 model shopping_cart_commodity_stocks {
     //----
@@ -2159,6 +2245,7 @@ model shopping_orders {
     ticket_payments shopping_coupon_ticket_payments[]
 
     @@index([shopping_customer_id, created_at])
+    @@index([created_at])
 }
 
 /// Information about the individual goods that make up your order.
@@ -2215,6 +2302,7 @@ model shopping_order_goods {
     /// but denormalized for performance reason.
     ///
     /// @format uuid
+    /// @hidden
     shopping_seller_id String @db.Uuid
 
     /// Volume count.
@@ -2257,7 +2345,7 @@ model shopping_order_goods {
     delivery_pieces shopping_delivery_pieces[]
     reviews         shopping_sale_snapshot_reviews[]
 
-    @@index([shopping_order_id])
+    @@unique([shopping_order_id, shopping_cart_commodity_id])
     @@index([shopping_cart_commodity_id])
     @@index([shopping_seller_id])
 }
@@ -2364,6 +2452,9 @@ model shopping_deliveries {
     /// Invoice code if exists.
     invoice_code String? @db.VarChar
 
+    /// Creation time of record.
+    created_at DateTime @db.Timestamptz
+
     //----
     // RELATIONS
     //----
@@ -2373,8 +2464,9 @@ model shopping_deliveries {
     // Considering principles, it must be UK. 
     // However, some seller takes a mistake, so it can't be.
 
-    @@index([shopping_seller_customer_id])
+    @@index([shopping_seller_customer_id, created_at])
     @@index([invoice_code])
+    @@index([created_at])
 }
 
 /// Which stocks are delivered.
@@ -2423,6 +2515,10 @@ model shopping_delivery_pieces {
     delivery             shopping_deliveries            @relation(fields: [shopping_delivery_id], references: [id], onDelete: Cascade)
     good                 shopping_order_goods           @relation(fields: [shopping_order_good_id], references: [id], onDelete: Cascade)
     cart_commodity_stock shopping_cart_commodity_stocks @relation(fields: [shopping_cart_commodity_stock_id], references: [id], onDelete: Cascade)
+
+    @@index([shopping_delivery_id])
+    @@index([shopping_order_good_id])
+    @@index([shopping_cart_commodity_stock_id])
 }
 
 /// Journey of delivery.
@@ -2468,6 +2564,8 @@ model shopping_delivery_journeys {
     //----
     /// Belonged delivery.
     delivery shopping_deliveries @relation(fields: [shopping_delivery_id], references: [id], onDelete: Cascade)
+
+    @@index([shopping_delivery_id])
 }
 
 //-----------------------------------------------------------
@@ -2662,7 +2760,7 @@ model shopping_coupons {
     /// Histories of tickets issued to customers.
     tickets shopping_coupon_tickets[]
 
-    @@index([shopping_customer_id])
+    @@index([shopping_customer_id, actor_type])
     @@index([name])
     @@index([created_at])
     @@index([opened_at])
@@ -2988,9 +3086,8 @@ model shopping_coupon_tickets {
     payment shopping_coupon_ticket_payments?
 
     @@unique([shopping_coupon_disposable_id])
-    @@index([shopping_customer_id])
-    @@index([shopping_coupon_id])
-    @@index([shopping_coupon_disposable_id])
+    @@index([shopping_customer_id, created_at])
+    @@index([shopping_coupon_id, created_at])
 }
 
 /// Discount coupon ticket payment details.
@@ -3154,6 +3251,7 @@ model shopping_deposits {
 
     @@unique([code])
     @@index([source])
+    @@index([created_at])
 }
 
 /// Deposit income/outcome details of customers (citizens).
@@ -3214,6 +3312,11 @@ model shopping_deposit_histories {
     //----
     deposit shopping_deposits @relation(fields: [shopping_deposit_id], references: [id])
     citizen shopping_citizens @relation(fields: [shopping_citizen_id], references: [id])
+
+    @@index([shopping_deposit_id, created_at, cancelled_at])
+    @@index([shopping_deposit_id, source_id, created_at, cancelled_at])
+    @@index([shopping_citizen_id, created_at, cancelled_at])
+    @@index([created_at, cancelled_at])
 }
 
 /// Deposit deposit.
@@ -3261,6 +3364,9 @@ model shopping_deposit_charges {
     //----
     customer shopping_customers                 @relation(fields: [shopping_customer_id], references: [id])
     publish  shopping_deposit_charge_publishes?
+
+    @@index([shopping_customer_id, created_at, deleted_at])
+    @@index([created_at, deleted_at])
 }
 
 /// Payment progress information for deposits.
@@ -3372,6 +3478,8 @@ model shopping_mileages {
     histories shopping_mileage_histories[]
 
     @@unique([code])
+    @@index([source])
+    @@index([created_at])
 }
 
 /// Mileagea income/outcome details of customers (citizens).
@@ -3432,6 +3540,11 @@ model shopping_mileage_histories {
     //----
     mileage shopping_mileages @relation(fields: [shopping_mileage_id], references: [id])
     citizen shopping_citizens @relation(fields: [shopping_citizen_id], references: [id])
+
+    @@index([shopping_mileage_id, created_at, cancelled_at])
+    @@index([shopping_mileage_id, source_id, created_at, cancelled_at])
+    @@index([shopping_citizen_id, created_at, cancelled_at])
+    @@index([created_at, cancelled_at])
 }
 
 //-----------------------------------------------------------
@@ -3469,6 +3582,13 @@ model shopping_sale_snapshot_inquiries {
     /// @format uuid
     id String @id @db.Uuid
 
+    /// Belonged sale's {@link shopping_sales.id}
+    ///
+    /// Duplicated property for fast sorting.
+    ///
+    /// @hidden
+    shopping_sale_id String @db.Uuid
+
     /// Belonged snapshot's {@link shopping_sale_snapshots.id}
     ///
     /// @format uuid
@@ -3485,6 +3605,13 @@ model shopping_sale_snapshot_inquiries {
     /// - `review`
     type String @db.VarChar
 
+    /// Creation time of record.
+    ///
+    /// Duplicated property for fast sorting.
+    ///
+    /// @hidden
+    created_at DateTime @db.Timestamptz
+
     /// The first time when the seller read the inquiry.
     read_by_seller_at DateTime? @db.Timestamptz
 
@@ -3492,12 +3619,16 @@ model shopping_sale_snapshot_inquiries {
     // RELATIONS
     //----
     base     bbs_articles            @relation(fields: [id], references: [id], onDelete: Cascade)
+    sale     shopping_sales          @relation(fields: [shopping_sale_id], references: [id], onDelete: Cascade)
     snapshot shopping_sale_snapshots @relation(fields: [shopping_sale_snapshot_id], references: [id], onDelete: Cascade)
     customer shopping_customers      @relation(fields: [shopping_customer_id], references: [id], onDelete: Cascade)
 
     of_question shopping_sale_snapshot_questions?
     of_review   shopping_sale_snapshot_reviews?
     answer      shopping_sale_snapshot_inquiry_answers?
+
+    @@index([shopping_sale_snapshot_id])
+    @@index([shopping_customer_id])
 }
 
 /// Question about sale snapshot.
