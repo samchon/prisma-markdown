@@ -1,6 +1,6 @@
 {
   "name": "prisma-markdown",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Prisma Markdown documents generator including ERD diagrams and comment descriptions",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",

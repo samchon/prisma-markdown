@@ -16,10 +16,16 @@ export namespace MarkdownWriter {
         );
         findImplicits(modelList);
 
-        // @NAMESPACE
         for (const model of modelList) {
-            const tags: string[] = takeTags("namespace")(model);
-            if (tags.length === 0) {
+            const namespaces: string[] = takeTags("namespace")(model);
+            const describes: string[] = takeTags("describe")(model);
+            const erdList: string[] = takeTags("erd")(model);
+
+            if (
+                namespaces.length === 0 &&
+                describes.length === 0 &&
+                erdList.length === 0
+            ) {
                 const basic = MapUtil.take(dict)("default", () => ({
                     name: "default",
                     descriptions: new Set(),
@@ -27,35 +33,35 @@ export namespace MarkdownWriter {
                 }));
                 basic.descriptions.add(model);
                 basic.diagrams.add(model);
-            } else
-                for (const name of tags) {
-                    const section = MapUtil.take(dict)(name, () => ({
-                        name,
-                        descriptions: new Set(),
-                        diagrams: new Set(),
-                    }));
-                    section.descriptions.add(model);
-                    section.diagrams.add(model);
-                }
+                continue;
+            }
+
+            for (const name of namespaces) {
+                const section = MapUtil.take(dict)(name, () => ({
+                    name,
+                    descriptions: new Set(),
+                    diagrams: new Set(),
+                }));
+                section.descriptions.add(model);
+                section.diagrams.add(model);
+            }
+            for (const name of describes) {
+                const section = MapUtil.take(dict)(name, () => ({
+                    name,
+                    descriptions: new Set(),
+                    diagrams: new Set(),
+                }));
+                section.descriptions.add(model);
+            }
+            for (const erd of erdList) {
+                const section = MapUtil.take(dict)(erd, () => ({
+                    name: erd,
+                    descriptions: new Set(),
+                    diagrams: new Set(),
+                }));
+                section.diagrams.add(model);
+            }
         }
-
-        // @DESCRIBE
-        for (const model of modelList)
-            for (const name of takeTags("describe")(model))
-                MapUtil.take(dict)(name, () => ({
-                    name,
-                    descriptions: new Set(),
-                    diagrams: new Set(),
-                })).descriptions.add(model);
-
-        // @ERD
-        for (const model of modelList)
-            for (const name of takeTags("erd")(model))
-                MapUtil.take(dict)(name, () => ({
-                    name,
-                    descriptions: new Set(),
-                    diagrams: new Set(),
-                })).diagrams.add(model);
 
         const title: string =
             typeof config?.title === "string"
