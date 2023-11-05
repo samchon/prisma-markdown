@@ -16,53 +16,79 @@ export namespace MarkdownWriter {
         );
         findImplicits(modelList);
 
+        const emplace = (name: string) =>
+            MapUtil.take(dict)(name, () => ({
+                name,
+                descriptions: new Set(),
+                diagrams: new Set(),
+            }));
+
+        // TOP NAMESPACE
         for (const model of modelList) {
             const namespaces: string[] = takeTags("namespace")(model);
-            const describes: string[] = takeTags("describe")(model);
-            const erdList: string[] = takeTags("erd")(model);
+            if (namespaces.length === 0) continue;
 
-            if (
-                namespaces.length === 0 &&
-                describes.length === 0 &&
-                erdList.length === 0
-            ) {
-                const basic = MapUtil.take(dict)("default", () => ({
-                    name: "default",
-                    descriptions: new Set(),
-                    diagrams: new Set(),
-                }));
-                basic.descriptions.add(model);
-                basic.diagrams.add(model);
-                continue;
-            }
+            const top: string = namespaces[0];
+            const chapter: IChapter = emplace(top);
+            chapter.descriptions.add(model);
+            chapter.diagrams.add(model);
+        }
 
-            for (const name of namespaces) {
-                const section = MapUtil.take(dict)(name, () => ({
-                    name,
-                    descriptions: new Set(),
-                    diagrams: new Set(),
-                }));
+        // REMAINING NAMESPACES
+        for (const model of modelList) {
+            const namespaces: string[] = takeTags("namespace")(model);
+            for (const name of namespaces.slice(1)) {
+                const section = emplace(name);
                 section.descriptions.add(model);
-                section.diagrams.add(model);
-            }
-            for (const name of describes) {
-                const section = MapUtil.take(dict)(name, () => ({
-                    name,
-                    descriptions: new Set(),
-                    diagrams: new Set(),
-                }));
-                section.descriptions.add(model);
-            }
-            for (const erd of erdList) {
-                const section = MapUtil.take(dict)(erd, () => ({
-                    name: erd,
-                    descriptions: new Set(),
-                    diagrams: new Set(),
-                }));
                 section.diagrams.add(model);
             }
         }
 
+        // DESCRIPTIONS
+        for (const model of modelList) {
+            const describes: string[] = takeTags("describe")(model);
+            for (const name of describes) {
+                const chapter: IChapter = MapUtil.take(dict)(name, () => ({
+                    name,
+                    descriptions: new Set(),
+                    diagrams: new Set(),
+                }));
+                chapter.descriptions.add(model);
+            }
+        }
+
+        // ERD ONLY
+        for (const model of modelList) {
+            const erdList: string[] = takeTags("erd")(model);
+            for (const erd of erdList) {
+                const chapter: IChapter = MapUtil.take(dict)(erd, () => ({
+                    name: erd,
+                    descriptions: new Set(),
+                    diagrams: new Set(),
+                }));
+                chapter.diagrams.add(model);
+            }
+        }
+
+        // DEFAULTS
+        for (const model of modelList) {
+            const keywords: string[] = [
+                ...takeTags("namespace")(model),
+                ...takeTags("describe")(model),
+                ...takeTags("erd")(model),
+            ];
+            if (keywords.length !== 0) continue;
+
+            const basic: IChapter = MapUtil.take(dict)("default", () => ({
+                name: "default",
+                descriptions: new Set(),
+                diagrams: new Set(),
+            }));
+            basic.descriptions.add(model);
+            basic.diagrams.add(model);
+        }
+
+        // DO WRITE
         const title: string =
             typeof config?.title === "string"
                 ? config.title
