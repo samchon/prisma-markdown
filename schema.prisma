@@ -1026,7 +1026,7 @@ model shopping_sellers {
     deleted_at DateTime? @db.Timestamptz
 
     //----
-    // RELATIONSHIPS
+    // RELATIONS
     //----
     member                           shopping_members                   @relation(fields: [shopping_member_id], references: [id], onDelete: Cascade)
     shopping_order_goods             shopping_order_goods[]
@@ -1223,9 +1223,11 @@ model shopping_sales {
     //----
     // RELATIONS
     //----
-    section        shopping_sections         @relation(fields: [shopping_section_id], references: [id], onDelete: Cascade)
-    sellerCustomer shopping_customers        @relation(fields: [shopping_seller_customer_id], references: [id], onDelete: Cascade)
-    snapshots      shopping_sale_snapshots[]
+    section        shopping_sections  @relation(fields: [shopping_section_id], references: [id], onDelete: Cascade)
+    sellerCustomer shopping_customers @relation(fields: [shopping_seller_customer_id], references: [id], onDelete: Cascade)
+
+    /// @minItems 1
+    snapshots shopping_sale_snapshots[]
 
     inquiries                      shopping_sale_snapshot_inquiries[]
     shopping_coupon_sale_criterias shopping_coupon_sale_criterias[]
@@ -1280,8 +1282,10 @@ model shopping_sale_snapshots {
 
     content     shopping_sale_snapshot_contents?
     to_channels shopping_sale_snapshot_channels[]
-    units       shopping_sale_snapshot_units[]
-    tags        shopping_sale_snapshot_tags[]
+
+    /// @minItems 1
+    units shopping_sale_snapshot_units[]
+    tags  shopping_sale_snapshot_tags[]
 
     shopping_cart_commodities        shopping_cart_commodities[]
     shopping_sale_snapshot_inquiries shopping_sale_snapshot_inquiries[]
@@ -1542,6 +1546,8 @@ model shopping_sale_snapshot_units {
     options shopping_sale_snapshot_unit_options[]
 
     /// List of stocks.
+    ///
+    /// @minItems 1
     stocks                         shopping_sale_snapshot_unit_stocks[]
     shopping_cart_commodity_stocks shopping_cart_commodity_stocks[]
 
@@ -2008,6 +2014,8 @@ model shopping_cart_commodities {
     snapshot shopping_sale_snapshots @relation(fields: [shopping_sale_snapshot_id], references: [id], onDelete: Cascade)
 
     /// List of wrapper of final stocks.
+    ///
+    /// @minItems 1
     stocks shopping_cart_commodity_stocks[]
 
     /// List of order goods for purchase.
@@ -2249,6 +2257,8 @@ model shopping_orders {
     publish shopping_order_publishes?
 
     /// List of goods to purchase.
+    ///
+    /// @minItems 1
     goods shopping_order_goods[]
 
     /// List of payed tickets for discount
@@ -2471,10 +2481,12 @@ model shopping_deliveries {
     //----
     sellerCustomer shopping_customers           @relation(fields: [shopping_seller_customer_id], references: [id], onDelete: Cascade)
     journeys       shopping_delivery_journeys[]
-    pieces         shopping_delivery_pieces[]
+
+    /// @minItems 1
+    pieces shopping_delivery_pieces[]
+
     // Considering principles, it must be UK. 
     // However, some seller takes a mistake, so it can't be.
-
     @@index([shopping_seller_customer_id, created_at])
     @@index([invoice_code])
     @@index([created_at])

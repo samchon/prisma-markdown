@@ -49,13 +49,13 @@ erDiagram
     String B FK
 }
 "bbs_article_snapshots" }|--|| "bbs_articles" : article
-"bbs_article_comments" }|--|| "bbs_articles" : article
+"bbs_article_comments" }o--|| "bbs_articles" : article
 "bbs_article_comments" }o--o| "bbs_article_comments" : parent
 "bbs_article_comment_snapshots" }|--|| "bbs_article_comments" : comment
-"_attachment_filesTobbs_article_snapshots" }|--|| "attachment_files" : attachment_files
-"_attachment_filesTobbs_article_snapshots" }|--|| "bbs_article_snapshots" : bbs_article_snapshots
-"_attachment_filesTobbs_article_comment_snapshots" }|--|| "attachment_files" : attachment_files
-"_attachment_filesTobbs_article_comment_snapshots" }|--|| "bbs_article_comment_snapshots" : bbs_article_comment_snapshots
+"_attachment_filesTobbs_article_snapshots" }o--|| "attachment_files" : attachment_files
+"_attachment_filesTobbs_article_snapshots" }o--|| "bbs_article_snapshots" : bbs_article_snapshots
+"_attachment_filesTobbs_article_comment_snapshots" }o--|| "attachment_files" : attachment_files
+"_attachment_filesTobbs_article_comment_snapshots" }o--|| "bbs_article_comment_snapshots" : bbs_article_comment_snapshots
 ```
 
 ### `bbs_articles`

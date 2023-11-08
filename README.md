@@ -58,6 +58,7 @@ Also, if you use `@erd <name>` instead of `@namespace <name>`, target model woul
   - `@erd <name>`: Only ERD
   - `@describe <name>`: Only markdown content
   - `@hidden`: Neither ERD nor markdown content
+  - `@minItems 1`: Mandatory relationship when 1: **N** (`||---|{`)
 
 ```prisma
 /// Both description and ERD on Actors chatper.
@@ -67,7 +68,14 @@ Also, if you use `@erd <name>` instead of `@namespace <name>`, target model woul
 /// @namespace Actors
 /// @erd Articles
 /// @erd Orders
-model shopping_customers {}
+model shopping_customers {
+  /// The tag "minItems 1" means mandatory relationship `||---|{`.
+  ///
+  /// Otherwise, no tag means optional relationship `||---o{`.
+  ///
+  /// @minItems 1
+  login_histories shopping_customer_login_histories[]
+}
 
 /// Only description on Actors chapter.
 ///
