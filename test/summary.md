@@ -52,13 +52,13 @@ erDiagram
     Int sequence
 }
 "bbs_article_snapshots" }|--|| "bbs_articles" : article
-"bbs_article_snapshot_files" }|--|| "bbs_article_snapshots" : snapshot
-"bbs_article_snapshot_files" }|--|| "attachment_files" : file
-"bbs_article_comments" }|--|| "bbs_articles" : article
+"bbs_article_snapshot_files" }o--|| "bbs_article_snapshots" : snapshot
+"bbs_article_snapshot_files" }o--|| "attachment_files" : file
+"bbs_article_comments" }o--|| "bbs_articles" : article
 "bbs_article_comments" }o--o| "bbs_article_comments" : parent
 "bbs_article_comment_snapshots" }|--|| "bbs_article_comments" : comment
-"bbs_article_comment_snapshot_files" }|--|| "bbs_article_comment_snapshots" : snapshot
-"bbs_article_comment_snapshot_files" }|--|| "attachment_files" : file
+"bbs_article_comment_snapshot_files" }o--|| "bbs_article_comment_snapshots" : snapshot
+"bbs_article_comment_snapshot_files" }o--|| "attachment_files" : file
 ```
 
 ### `attachment_files`

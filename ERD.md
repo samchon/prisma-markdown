@@ -61,13 +61,13 @@ erDiagram
     Int sequence
 }
 "bbs_article_snapshots" }|--|| "bbs_articles" : article
-"bbs_article_snapshot_files" }|--|| "bbs_article_snapshots" : snapshot
-"bbs_article_snapshot_files" }|--|| "attachment_files" : file
-"bbs_article_comments" }|--|| "bbs_articles" : article
+"bbs_article_snapshot_files" }o--|| "bbs_article_snapshots" : snapshot
+"bbs_article_snapshot_files" }o--|| "attachment_files" : file
+"bbs_article_comments" }o--|| "bbs_articles" : article
 "bbs_article_comments" }o--o| "bbs_article_comments" : parent
 "bbs_article_comment_snapshots" }|--|| "bbs_article_comments" : comment
-"bbs_article_comment_snapshot_files" }|--|| "bbs_article_comment_snapshots" : snapshot
-"bbs_article_comment_snapshot_files" }|--|| "attachment_files" : file
+"bbs_article_comment_snapshot_files" }o--|| "bbs_article_comment_snapshots" : snapshot
+"bbs_article_comment_snapshot_files" }o--|| "attachment_files" : file
 ```
 
 ### `attachment_files`
@@ -284,14 +284,14 @@ erDiagram
     String shopping_sale_snapshot_channel_id FK
     String shopping_channel_category_id FK
 }
-"shopping_channel_categories" }|--|| "shopping_channels" : channel
+"shopping_channel_categories" }o--|| "shopping_channels" : channel
 "shopping_channel_categories" }o--o| "shopping_channel_categories" : parent
-"shopping_sales" }|--|| "shopping_sections" : section
+"shopping_sales" }o--|| "shopping_sections" : section
 "shopping_sale_snapshots" }|--|| "shopping_sales" : sale
-"shopping_sale_snapshot_channels" }|--|| "shopping_sale_snapshots" : snapshot
-"shopping_sale_snapshot_channels" }|--|| "shopping_channels" : channel
-"shopping_sale_snapshot_channel_categories" }|--|| "shopping_sale_snapshot_channels" : to_channel
-"shopping_sale_snapshot_channel_categories" }|--|| "shopping_channel_categories" : category
+"shopping_sale_snapshot_channels" }o--|| "shopping_sale_snapshots" : snapshot
+"shopping_sale_snapshot_channels" }o--|| "shopping_channels" : channel
+"shopping_sale_snapshot_channel_categories" }o--|| "shopping_sale_snapshot_channels" : to_channel
+"shopping_sale_snapshot_channel_categories" }o--|| "shopping_channel_categories" : category
 ```
 
 ### `shopping_channels`
@@ -460,7 +460,7 @@ erDiagram
 "shopping_customers" }o--|| "shopping_external_users" : external_user
 "shopping_customers" }o--|| "shopping_citizens" : citizen
 "shopping_members" }o--|| "shopping_citizens" : citizen
-"shopping_member_emails" }|--|| "shopping_members" : member
+"shopping_member_emails" }o--|| "shopping_members" : member
 "shopping_sellers" |o--|| "shopping_members" : member
 "shopping_administrators" |o--|| "shopping_members" : member
 ```
@@ -807,19 +807,19 @@ erDiagram
     DateTime updated_at
     DateTime deleted_at "nullable"
 }
-"shopping_sales" }|--|| "shopping_sections" : section
+"shopping_sales" }o--|| "shopping_sections" : section
 "shopping_sale_snapshots" }|--|| "shopping_sales" : sale
-"shopping_sale_snapshot_channels" }|--|| "shopping_sale_snapshots" : snapshot
-"shopping_sale_snapshot_channels" }|--|| "shopping_channels" : channel
-"shopping_sale_snapshot_channel_categories" }|--|| "shopping_sale_snapshot_channels" : to_channel
-"shopping_sale_snapshot_channel_categories" }|--|| "shopping_channel_categories" : category
+"shopping_sale_snapshot_channels" }o--|| "shopping_sale_snapshots" : snapshot
+"shopping_sale_snapshot_channels" }o--|| "shopping_channels" : channel
+"shopping_sale_snapshot_channel_categories" }o--|| "shopping_sale_snapshot_channels" : to_channel
+"shopping_sale_snapshot_channel_categories" }o--|| "shopping_channel_categories" : category
 "shopping_sale_snapshot_units" }|--|| "shopping_sale_snapshots" : snapshot
-"shopping_sale_snapshot_unit_options" }|--|| "shopping_sale_snapshot_units" : unit
-"shopping_sale_snapshot_unit_option_candidates" }|--|| "shopping_sale_snapshot_unit_options" : option
+"shopping_sale_snapshot_unit_options" }o--|| "shopping_sale_snapshot_units" : unit
+"shopping_sale_snapshot_unit_option_candidates" }o--|| "shopping_sale_snapshot_unit_options" : option
 "shopping_sale_snapshot_unit_stocks" }|--|| "shopping_sale_snapshot_units" : unit
-"shopping_sale_snapshot_unit_stock_choices" }|--|| "shopping_sale_snapshot_unit_stocks" : stock
-"shopping_sale_snapshot_unit_stock_choices" }|--|| "shopping_sale_snapshot_unit_option_candidates" : candidate
-"shopping_channel_categories" }|--|| "shopping_channels" : channel
+"shopping_sale_snapshot_unit_stock_choices" }o--|| "shopping_sale_snapshot_unit_stocks" : stock
+"shopping_sale_snapshot_unit_stock_choices" }o--|| "shopping_sale_snapshot_unit_option_candidates" : candidate
+"shopping_channel_categories" }o--|| "shopping_channels" : channel
 "shopping_channel_categories" }o--o| "shopping_channel_categories" : parent
 ```
 
@@ -1256,17 +1256,17 @@ erDiagram
     Int quantity
     Int sequence
 }
-"shopping_cart_commodities" }|--|| "shopping_carts" : cart
-"shopping_cart_commodities" }|--|| "shopping_sale_snapshots" : snapshot
+"shopping_cart_commodities" }o--|| "shopping_carts" : cart
+"shopping_cart_commodities" }o--|| "shopping_sale_snapshots" : snapshot
 "shopping_cart_commodity_stocks" }|--|| "shopping_cart_commodities" : commodity
-"shopping_cart_commodity_stocks" }|--|| "shopping_sale_snapshot_units" : unit
-"shopping_cart_commodity_stocks" }|--|| "shopping_sale_snapshot_unit_stocks" : stock
-"shopping_cart_commodity_stock_choices" }|--|| "shopping_cart_commodity_stocks" : stock
-"shopping_cart_commodity_stock_choices" }|--|| "shopping_sale_snapshot_unit_options" : option
+"shopping_cart_commodity_stocks" }o--|| "shopping_sale_snapshot_units" : unit
+"shopping_cart_commodity_stocks" }o--|| "shopping_sale_snapshot_unit_stocks" : stock
+"shopping_cart_commodity_stock_choices" }o--|| "shopping_cart_commodity_stocks" : stock
+"shopping_cart_commodity_stock_choices" }o--|| "shopping_sale_snapshot_unit_options" : option
 "shopping_cart_commodity_stock_choices" }o--|| "shopping_sale_snapshot_unit_option_candidates" : candidate
 "shopping_sale_snapshot_units" }|--|| "shopping_sale_snapshots" : snapshot
-"shopping_sale_snapshot_unit_options" }|--|| "shopping_sale_snapshot_units" : unit
-"shopping_sale_snapshot_unit_option_candidates" }|--|| "shopping_sale_snapshot_unit_options" : option
+"shopping_sale_snapshot_unit_options" }o--|| "shopping_sale_snapshot_units" : unit
+"shopping_sale_snapshot_unit_option_candidates" }o--|| "shopping_sale_snapshot_unit_options" : option
 "shopping_sale_snapshot_unit_stocks" }|--|| "shopping_sale_snapshot_units" : unit
 ```
 
@@ -1482,12 +1482,12 @@ erDiagram
 }
 "shopping_orders" }o--|| "shopping_addresses" : address
 "shopping_order_goods" }|--|| "shopping_orders" : order
-"shopping_order_goods" }|--|| "shopping_cart_commodities" : commodity
+"shopping_order_goods" }o--|| "shopping_cart_commodities" : commodity
 "shopping_order_publishes" |o--|| "shopping_orders" : order
 "shopping_delivery_pieces" }|--|| "shopping_deliveries" : delivery
-"shopping_delivery_pieces" }|--|| "shopping_order_goods" : good
-"shopping_delivery_pieces" }|--|| "shopping_cart_commodity_stocks" : cart_commodity_stock
-"shopping_delivery_journeys" }|--|| "shopping_deliveries" : delivery
+"shopping_delivery_pieces" }o--|| "shopping_order_goods" : good
+"shopping_delivery_pieces" }o--|| "shopping_cart_commodity_stocks" : cart_commodity_stock
+"shopping_delivery_journeys" }o--|| "shopping_deliveries" : delivery
 "shopping_cart_commodity_stocks" }|--|| "shopping_cart_commodities" : commodity
 ```
 
@@ -1773,16 +1773,16 @@ erDiagram
     DateTime created_at
     DateTime expired_at "nullable"
 }
-"shopping_coupon_criterias" }|--|| "shopping_coupons" : coupon
+"shopping_coupon_criterias" }o--|| "shopping_coupons" : coupon
 "shopping_coupon_section_criterias" |o--|| "shopping_coupon_criterias" : base
 "shopping_coupon_channel_criterias" |o--|| "shopping_coupon_criterias" : base
 "shopping_coupon_seller_criterias" |o--|| "shopping_coupon_criterias" : base
 "shopping_coupon_sale_criterias" |o--|| "shopping_coupon_criterias" : base
 "shopping_coupon_funnel_criterias" |o--|| "shopping_coupon_criterias" : base
-"shopping_coupon_tickets" }|--|| "shopping_coupons" : coupon
+"shopping_coupon_tickets" }o--|| "shopping_coupons" : coupon
 "shopping_coupon_tickets" |o--|| "shopping_coupon_disposables" : disposable
 "shopping_coupon_ticket_payments" |o--|| "shopping_coupon_tickets" : ticket
-"shopping_coupon_disposables" }|--|| "shopping_coupons" : coupon
+"shopping_coupon_disposables" }o--|| "shopping_coupons" : coupon
 ```
 
 ### `shopping_coupons`
@@ -2192,12 +2192,12 @@ erDiagram
     DateTime created_at
     DateTime deleted_at "nullable"
 }
-"shopping_deposit_histories" }|--|| "shopping_deposits" : deposit
-"shopping_deposit_histories" }|--|| "shopping_citizens" : citizen
-"shopping_deposit_charges" }|--|| "shopping_customers" : customer
+"shopping_deposit_histories" }o--|| "shopping_deposits" : deposit
+"shopping_deposit_histories" }o--|| "shopping_citizens" : citizen
+"shopping_deposit_charges" }o--|| "shopping_customers" : customer
 "shopping_deposit_charge_publishes" |o--|| "shopping_deposit_charges" : charge
-"shopping_mileage_histories" }|--|| "shopping_mileages" : mileage
-"shopping_mileage_histories" }|--|| "shopping_citizens" : citizen
+"shopping_mileage_histories" }o--|| "shopping_mileages" : mileage
+"shopping_mileage_histories" }o--|| "shopping_citizens" : citizen
 "shopping_customers" }o--|| "shopping_citizens" : citizen
 ```
 
@@ -2421,16 +2421,16 @@ erDiagram
     String shopping_sale_id FK
     DateTime created_at
 }
-"shopping_sale_snapshot_inquiries" ||--|| "bbs_articles" : base
-"shopping_sale_snapshot_inquiries" }|--|| "shopping_sale_snapshots" : snapshot
+"shopping_sale_snapshot_inquiries" |o--|| "bbs_articles" : base
+"shopping_sale_snapshot_inquiries" }o--|| "shopping_sale_snapshots" : snapshot
 "shopping_sale_snapshot_questions" |o--|| "shopping_sale_snapshot_inquiries" : base
 "shopping_sale_snapshot_reviews" |o--|| "shopping_sale_snapshot_inquiries" : base
-"shopping_sale_snapshot_review_snapshots" ||--|| "bbs_article_snapshots" : base
-"shopping_sale_snapshot_inquiry_answers" ||--|| "bbs_articles" : base
+"shopping_sale_snapshot_review_snapshots" |o--|| "bbs_article_snapshots" : base
+"shopping_sale_snapshot_inquiry_answers" |o--|| "bbs_articles" : base
 "shopping_sale_snapshot_inquiry_answers" |o--|| "shopping_sale_snapshot_inquiries" : inquiry
-"shopping_sale_snapshot_inquiry_comments" ||--|| "bbs_article_comments" : base
+"shopping_sale_snapshot_inquiry_comments" |o--|| "bbs_article_comments" : base
 "bbs_article_snapshots" }|--|| "bbs_articles" : article
-"bbs_article_comments" }|--|| "bbs_articles" : article
+"bbs_article_comments" }o--|| "bbs_articles" : article
 "bbs_article_comments" }o--o| "bbs_article_comments" : parent
 ```
 

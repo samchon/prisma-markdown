@@ -1,0 +1,1074 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("POSTGRES_URL")
+}
+
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["views"]
+}
+
+generator markdown {
+    provider = "node ./lib/executable/markdown"
+    title    = "Virtual Drive System"
+    output   = "./drive.md"
+}
+
+//-----------------------------------------------------------
+// ARTICLES
+//-----------------------------------------------------------
+/// Attachment File.
+///
+/// Every attachment files that are managed in this drive mall system.
+///
+/// For reference, it is possible to omit one of file name or extension like 
+/// `.gitignore` or `README` case, but not possible to omit both of them,
+///
+/// @namespace Articles
+/// @author Samchon
+model attachment_files {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// File name, except extension.
+    ///
+    /// Possible to omit like `.gitignore` case.
+    ///
+    /// @minLength 1
+    /// @maxLength 255
+    name String? @db.VarChar
+
+    //-----------------------------------------------------------
+    // ARTICLES
+    //-----------------------------------------------------------
+
+    /// Extension.
+    ///
+    /// Possible to omit like `README` case.
+    ///
+    /// @minLength 1
+    /// @maxLength 8
+    extension String? @db.VarChar
+
+    /// URL path of the real file.
+    ///
+    /// @format url
+    url String @db.VarChar
+
+    /// Creation time of record.
+    created_at DateTime @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    bbs_article_snapshot_files          bbs_article_snapshot_files[]
+    bbs_article_comment_snapshots_files bbs_article_comment_snapshot_files[]
+}
+
+/// Article entity.
+/// 
+/// `bbs_articles` is a super-type entity of all kinds of articles in the 
+/// current drive mall system, literally shaping individual articles of 
+/// the bulletin board.
+///
+/// And, as you can see, the elements that must inevitably exist in the 
+/// article, such as the title or the body, do not exist in the `bbs_articles`, 
+/// but exist in the subsidiary entity, {@link bbs_article_snapshots}, as a 
+/// 1: N relationship, which is because a new snapshot record is published 
+/// every time the article is modified.
+///
+/// The reason why a new snapshot record is published every time the article 
+/// is modified is to preserve the evidence. Due to the nature of e-community, 
+/// there is always a threat of dispute among the participants. And it can 
+/// happen that disputes arise through articles or comments, and to prevent 
+/// such things as modifying existing articles to manipulate the situation, 
+/// the article is designed in this structure.
+///
+/// In other words, to keep evidence, and prevent fraud.
+///
+/// @namespace Articles
+/// @author Samchon
+model bbs_articles {
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Creation time of article.
+    created_at DateTime @db.Timestamptz
+
+    /// Deletion time of article.
+    ///
+    /// To keep evidence, do not delete the article, but just mark it as 
+    /// deleted.
+    deleted_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    /// List of snapshots.
+    ///
+    /// It is created for the first time when an article is created, and is
+    /// accumulated every time the article is modified.
+    ///
+    /// @minItems 1
+    snapshots bbs_article_snapshots[]
+
+    /// List of comments.
+    comments                bbs_article_comments[]
+    drive_repository_issues drive_repository_issues[]
+
+    @@index([created_at])
+}
+
+/// Snapshot of article.
+///
+/// `bbs_article_snapshots` is a snapshot entity that contains the contents of
+/// the article, as mentioned in {@link bbs_articles}, the contents of the 
+/// article are separated from the article record to keep evidence and prevent 
+/// fraud.
+///
+/// @namespace Articles
+/// @author Samchon
+model bbs_article_snapshots {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belong article's {@link bbs_articles.id}
+    ///
+    /// @format uuid
+    bbs_article_id String @db.Uuid
+
+    /// Format of body.
+    ///
+    /// Same meaning with extension like `html`, `md`, `txt`.
+    format String @db.VarChar
+
+    /// Title of article.
+    title String @db.VarChar
+
+    /// Content body of article.
+    body String
+
+    /// Creation time of record.
+    ///
+    /// It means creation time or update time or article.
+    created_at DateTime @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    /// Belong article info.
+    article bbs_articles @relation(fields: [bbs_article_id], references: [id], onDelete: Cascade)
+
+    /// List of wrappers of attachment files.
+    to_files bbs_article_snapshot_files[]
+
+    @@index([bbs_article_id, created_at])
+}
+
+/// Attachment file of article snapshot.
+///
+/// `bbs_article_snapshot_files` is an entity that shapes the attached files of
+/// the article snapshot.
+///
+/// `bbs_article_snapshot_files` is a typical pair relationship table to 
+/// resolve the M: N relationship between {@link bbs_article_snapshots} and
+/// {@link attachment_files} tables. Also, to ensure the order of the attached
+/// files, it has an additional `sequence` attribute, which we will continue to
+/// see in this documents.
+///
+/// @namespace Articles
+/// @author Samchon
+model bbs_article_snapshot_files {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged snapshot's {@link bbs_article_snapshots.id}
+    ///
+    /// @format uuid
+    bbs_article_snapshot_id String @db.Uuid
+
+    /// Belonged file's {@link attachment_files.id}
+    ///
+    /// @format uuid
+    attachment_file_id String @db.Uuid
+
+    /// Sequence of attachment file in the snapshot.
+    ///
+    /// @format int
+    sequence Int @db.Integer
+
+    //----
+    // RELATIONS
+    //----
+    /// Belonged article.
+    snapshot bbs_article_snapshots @relation(fields: [bbs_article_snapshot_id], references: [id], onDelete: Cascade)
+
+    /// Belonged file.
+    file attachment_files @relation(fields: [attachment_file_id], references: [id], onDelete: Cascade)
+
+    @@index([bbs_article_snapshot_id])
+    @@index([attachment_file_id])
+}
+
+/// Comment written on an article.
+///
+/// `bbs_article_comments` is an entity that shapes the comments written on an
+/// article.
+///
+/// And for this comment, as in the previous relationship between 
+/// {@link bbs_articles} and {@link bbs_article_snapshots}, the content body 
+/// of the comment is stored in the sub {@link bbs_article_comment_snapshots} 
+/// table for evidentialism, and a new snapshot record is issued every time 
+/// the comment is modified.
+///
+/// Also, `bbs_article_comments} is expressing the relationship of the 
+/// hierarchical reply structure through the `parent_id` attribute.
+///
+/// @namespace Articles
+/// @author Samchon
+model bbs_article_comments {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged article's {@link bbs_articles.id}
+    /// 
+    /// @format uuid
+    bbs_article_id String @db.Uuid
+
+    /// Parent comment's {@link bbs_article_comments.id}
+    ///
+    /// Used to express the hierarchical reply structure.
+    ///
+    /// @format uuid
+    parent_id String? @db.Uuid
+
+    /// Creation time of comment.
+    created_at DateTime @db.Timestamptz
+
+    /// Deletion time of comment.
+    ///
+    /// Do not allow to delete the comment, but just mark it as deleted, 
+    /// to keep evidence.
+    deleted_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    /// Belonged article.
+    article bbs_articles @relation(fields: [bbs_article_id], references: [id], onDelete: Cascade)
+
+    /// Parent comment.
+    ///
+    /// Only when reply case.
+    parent bbs_article_comments? @relation("bbs_article_comments_reply", fields: [parent_id], references: [id], onDelete: Cascade)
+
+    /// List of children comments.
+    ///
+    /// Reply comments of current.
+    children bbs_article_comments[] @relation("bbs_article_comments_reply")
+
+    /// List of snapshots.
+    ///
+    /// It is created for the first time when a comment is created, and is
+    /// accumulated every time the comment is modified.
+    ///
+    /// @minItems 1
+    snapshots                       bbs_article_comment_snapshots[]
+    drive_repository_issue_comments drive_repository_issue_comments[]
+
+    @@index([bbs_article_id, parent_id, created_at])
+}
+
+/// Snapshot of comment.
+///
+/// `bbs_article_comment_snapshots` is a snapshot entity that contains the 
+/// contents of the comment.
+///
+/// As mentioned in {@link bbs_article_comments}, designed to keep evidence 
+/// and prevent fraud.
+///
+/// @namespace Articles
+/// @author Samchon
+model bbs_article_comment_snapshots {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged article's {@link bbs_article_comments.id}
+    ///
+    /// @format uuid
+    bbs_article_comment_id String @db.Uuid
+
+    /// Format of content body.
+    ///
+    /// Same meaning with extension like `html`, `md`, `txt`.
+    format String @db.VarChar
+
+    /// Content body of comment.
+    body String
+
+    /// Creation time of record.
+    ///
+    /// It means creation time or update time or comment.
+    created_at DateTime @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    /// Belong comment info.
+    comment bbs_article_comments @relation(fields: [bbs_article_comment_id], references: [id], onDelete: Cascade)
+
+    /// List of wrappers of attachment files.
+    files bbs_article_comment_snapshot_files[]
+
+    @@index([bbs_article_comment_id, created_at])
+}
+
+/// Attachment file of comment snapshot.
+/// 
+/// `bbs_article_comment_snapshot_files` is an entity resolving the M:N 
+/// relationship between {@link bbs_article_comment_snapshots} and 
+/// {@link attachment_files} tables.
+/// 
+/// @namespace Articles
+/// @author Samchon
+model bbs_article_comment_snapshot_files {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged snapshot's {@link bbs_article_comment_snapshots.id}
+    ///
+    /// @format uuid
+    bbs_article_comment_snapshot_id String @db.Uuid
+
+    /// Belonged file's {@link attachment_files.id}
+    ///
+    /// @format uuid
+    attachment_file_id String @db.Uuid
+
+    /// Sequence order.
+    ///
+    /// Sequence order of the attached file in the belonged snapshot.
+    ///
+    /// @type int
+    sequence Int @db.Integer
+
+    //----
+    // RELATIONS
+    //----
+    /// Belonged article.
+    snapshot bbs_article_comment_snapshots @relation(fields: [bbs_article_comment_snapshot_id], references: [id], onDelete: Cascade)
+
+    /// Belonged file.
+    file attachment_files @relation(fields: [attachment_file_id], references: [id], onDelete: Cascade)
+
+    @@index([bbs_article_comment_snapshot_id])
+    @@index([attachment_file_id])
+}
+
+//-----------------------------------------------------------
+// ACTORS
+//-----------------------------------------------------------
+/// @namespace Actors
+/// @author Samchon
+model drive_customers {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged member's {@link drive_members.id}
+    ///
+    /// @format uuid
+    drive_member_id String? @db.Uuid /// @format uuid
+
+    /// Belonged external service user's {@link drive_external_users.id}
+    ///
+    /// @format uuid
+    drive_external_user_id String? @db.Uuid /// @format uuid
+
+    /// Belonged citizen's {@link drive_citizens.id}
+    ///
+    /// @format uuid
+    drive_citizen_id String? @db.Uuid /// @format uuid
+
+    /// Connection URL.
+    ///
+    /// {@link window.location.href}
+    ///
+    /// @format url
+    href String @db.VarChar /// @format url
+
+    /// Referrer URL.
+    ///
+    /// {@link window.document.referrer}
+    ///
+    /// @format url
+    referrer String @db.VarChar /// @format url
+
+    /// IP address,
+    ///
+    /// @pattern ((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$))
+    ip String @db.VarChar
+
+    /// Creation time of record.
+    ///
+    /// It means the time when the customer connected to the drive mall.
+    created_at DateTime @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    member                                       drive_members?                                 @relation(fields: [drive_member_id], references: [id], onDelete: Cascade)
+    external_user                                drive_external_users?                          @relation(fields: [drive_external_user_id], references: [id], onDelete: Cascade)
+    citizen                                      drive_citizens?                                @relation(fields: [drive_citizen_id], references: [id], onDelete: Cascade)
+    drive_enterprise_employee_appointments       drive_enterprise_employee_appointments[]
+    drive_enterprise_team_companion_appointments drive_enterprise_team_companion_appointments[]
+    drive_repositories                           drive_repositories[]
+    drive_repository_buckets                     drive_repository_buckets[]
+    drive_repository_accesses                    drive_repository_accesses[]
+    drive_repository_issues                      drive_repository_issues[]
+    drive_repository_issue_comments              drive_repository_issue_comments[]
+
+    @@index([drive_member_id])
+    @@index([drive_external_user_id])
+    @@index([drive_citizen_id])
+}
+
+/// @namespace Actors
+/// @author Samchon
+model drive_external_users {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Identifier code of the external service.
+    ///
+    /// It can be same with {@link drive_channels.code} in common.
+    application String @db.VarChar
+
+    /// Identifier key of external user from the external system.
+    uid String @db.VarChar
+
+    /// Nickname of external user in the external system.
+    nickname String @db.VarChar
+
+    /// Additional information about external user from the external system.
+    data String?
+
+    /// Password of external user from the external system.
+    ///
+    /// This is a password issued to the user by an external service, and is 
+    /// by no means the actual user password. However, for customers who 
+    /// entered the same application and code as the current external system 
+    /// user, this is to determine whether to view this as a correct external 
+    /// system user or a violation.
+    password String @db.VarChar
+
+    /// Creation time of record.
+    ///
+    /// Another word, first time when the external user connected.
+    created_at DateTime
+
+    //----
+    // RELATIONS
+    //----
+    drive_customers drive_customers[]
+}
+
+/// @namespace Actors
+/// @author Samchon
+model drive_citizens {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Mobile phone number.
+    ///
+    /// @pattern ^[0-9]*$
+    mobile String @db.VarChar
+
+    /// Real name, or equivalent name identifiable.
+    name String @db.VarChar
+
+    /// Creation time of record.
+    ///
+    /// In other words, the 1st time of citizen activation.
+    created_at DateTime @db.Timestamptz
+
+    /// Deletion time of record.
+    deleted_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    drive_customers drive_customers[]
+    drive_members   drive_members[]
+}
+
+/// @namespace Actors
+/// @author Samchon
+model drive_members {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged account's {@link drive_accounts.id}
+    ///
+    /// @format uuid
+    drive_account_id String? @db.Uuid
+
+    /// Belonged citizen's {@link drive_citizens.id}
+    ///
+    /// @format uuid
+    drive_citizen_id String? @db.Uuid
+
+    /// Nickname.
+    nickname String @db.VarChar
+
+    /// Password for log-in.
+    password String @db.VarChar
+
+    /// Creation time of record.
+    ///
+    /// In other words, the joining time.
+    created_at DateTime @db.Timestamptz
+
+    /// Update time of record.
+    updated_at DateTime @db.Timestamptz
+
+    /// Deletion time of record.
+    withdrawn_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    account                    drive_accounts?              @relation(fields: [drive_account_id], references: [id], onDelete: Cascade)
+    citizen                    drive_citizens?              @relation(fields: [drive_citizen_id], references: [id], onDelete: Cascade)
+    drive_customers            drive_customers[]
+    drive_member_emails        drive_member_emails[]
+    drive_enterprise_employees drive_enterprise_employees[]
+}
+
+/// @namespace Actors
+/// @author Samchon
+model drive_member_emails {
+    //----
+    // COLUMNS
+    //----
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged member's {@link drive_members.id}
+    /// 
+    /// @format uuid
+    drive_member_id String @db.Uuid
+
+    /// Email address.
+    ///
+    /// @format email
+    value String @db.VarChar
+
+    /// Creation time of record.
+    created_at DateTime @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    member drive_members @relation(fields: [drive_member_id], references: [id], onDelete: Cascade)
+}
+
+/// @namespace Actors
+/// @author Samchon
+model drive_accounts {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Identifer code of the account.
+    code String @db.VarChar
+
+    /// Creation time of record.
+    created_at DateTime @db.Timestamptz
+
+    /// Deletion time of record.
+    deleted_at                DateTime?                   @db.Timestamptz
+    drive_members             drive_members[]
+    drive_enterprises         drive_enterprises[]
+    drive_repositories        drive_repositories[]
+    drive_repository_accesses drive_repository_accesses[]
+
+    //----
+    // RELATIONS
+    //----
+    @@unique([code])
+    @@index([created_at])
+}
+
+/// @namespace Actors
+/// @author Samchon
+model drive_enterprises {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    /// Belonged account's {@link drive_accounts.id}
+    ///
+    /// @format uuid
+    drive_account_id String @db.Uuid
+
+    name String @db.VarChar
+
+    created_at DateTime @db.Timestamptz
+
+    updated_at DateTime @db.Timestamptz
+
+    deleted_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    account                    drive_accounts               @relation(fields: [drive_account_id], references: [id], onDelete: Cascade)
+    drive_enterprise_employees drive_enterprise_employees[]
+    drive_enterprise_teams     drive_enterprise_teams[]
+}
+
+/// @namespace Actors
+/// @author Samchon
+model drive_enterprise_employees {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    drive_enterprise_id String @db.Uuid
+
+    drive_member_id String @db.Uuid
+
+    role String @db.VarChar
+
+    created_at DateTime @db.Timestamptz
+
+    updated_at DateTime @db.Timestamptz
+
+    deleted_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    enterprise                             drive_enterprises                        @relation(fields: [drive_enterprise_id], references: [id], onDelete: Cascade)
+    member                                 drive_members                            @relation(fields: [drive_member_id], references: [id], onDelete: Cascade)
+    drive_enterprise_employee_appointments drive_enterprise_employee_appointments[]
+    drive_enterprise_team_companions       drive_enterprise_team_companions[]
+}
+
+/// @namespace Actors
+/// @author Samchon
+model drive_enterprise_employee_appointments {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    drive_enterprise_employee_id String @db.Uuid
+
+    drive_customer_id String @db.Uuid
+
+    role String @db.VarChar
+
+    created_at DateTime @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    employee drive_enterprise_employees @relation(fields: [drive_enterprise_employee_id], references: [id], onDelete: Cascade)
+    customer drive_customers            @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
+}
+
+/// @namespace Actors
+/// @author Samchon
+model drive_enterprise_teams {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    drive_enterprise_id String @db.Uuid
+
+    name String @db.VarChar
+
+    created_at DateTime @db.Timestamptz
+
+    updated_at DateTime @db.Timestamptz
+
+    deleted_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    enterprise                       drive_enterprises                  @relation(fields: [drive_enterprise_id], references: [id], onDelete: Cascade)
+    drive_enterprise_team_companions drive_enterprise_team_companions[]
+    drive_repository_accesses        drive_repository_accesses[]
+}
+
+/// @namespace Actors
+/// @author Samchon
+model drive_enterprise_team_companions {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    drive_enterprise_team_id String @db.Uuid
+
+    drive_enterprise_employee_id String @db.Uuid
+
+    role String @db.VarChar
+
+    created_at DateTime @db.Timestamptz
+
+    updated_at DateTime @db.Timestamptz
+
+    deleted_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    team                                         drive_enterprise_teams                         @relation(fields: [drive_enterprise_team_id], references: [id], onDelete: Cascade)
+    employee                                     drive_enterprise_employees                     @relation(fields: [drive_enterprise_employee_id], references: [id], onDelete: Cascade)
+    drive_enterprise_team_companion_appointments drive_enterprise_team_companion_appointments[]
+}
+
+/// @namespace Actors
+/// @author Samchon
+model drive_enterprise_team_companion_appointments {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    drive_enterprise_team_companion_id String @db.Uuid
+
+    drive_customer_id String @db.Uuid
+
+    role String @db.VarChar
+
+    created_at DateTime @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    companion drive_enterprise_team_companions @relation(fields: [drive_enterprise_team_companion_id], references: [id], onDelete: Cascade)
+    customer  drive_customers                  @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
+}
+
+//-----------------------------------------------------------
+// REPOSITORY
+//-----------------------------------------------------------
+/// @namespace Repositories
+/// @author Samchon
+model drive_repositories {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    drive_account_id String @db.Uuid
+
+    drive_customer_id String @db.Uuid
+
+    code String @db.VarChar
+
+    created_at DateTime @db.Timestamptz
+
+    updated_at DateTime @db.Timestamptz
+
+    deleted_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    account                   drive_accounts              @relation(fields: [drive_account_id], references: [id], onDelete: Cascade)
+    customer                  drive_customers             @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
+    drive_repository_buckets  drive_repository_buckets[]
+    drive_repository_accesses drive_repository_accesses[]
+    drive_repository_tags     drive_repository_tags[]
+    drive_repository_issues   drive_repository_issues[]
+}
+
+/// @namespace Repositories
+/// @author Samchon
+model drive_repository_buckets {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    drive_repository_id String @db.Uuid
+
+    drive_repository_folder_id String? @db.Uuid
+
+    drive_customer_id String @db.Uuid
+
+    type String @db.VarChar
+
+    name String @db.VarChar(255)
+
+    extension String? @db.VarChar(8)
+
+    created_at DateTime @db.Timestamptz
+
+    updated_at DateTime @db.Timestamptz
+
+    deleted_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    repository drive_repositories        @relation(fields: [drive_repository_id], references: [id], onDelete: Cascade)
+    folder     drive_repository_folders? @relation("rel_drive_repository_bucket_parent", fields: [drive_repository_folder_id], references: [id], onDelete: Cascade)
+    customer   drive_customers           @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
+
+    of_folder   drive_repository_folders?   @relation("rel_drive_repository_folders_base")
+    of_file     drive_repository_files?
+    of_shortcut drive_repository_shortcuts? @relation("rel_drive_repository_shortcuts_base")
+
+    shortcuts drive_repository_shortcuts[] @relation("rel_drive_repository_shortcuts_target")
+}
+
+/// @namespace Repositories
+/// @author Samchon
+model drive_repository_folders {
+    //----
+    // COLUMNS
+    //----
+    /// PK + FK.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    //----
+    // RELATIONS
+    //----
+    base     drive_repository_buckets   @relation("rel_drive_repository_folders_base", fields: [id], references: [id], onDelete: Cascade)
+    children drive_repository_buckets[] @relation("rel_drive_repository_bucket_parent")
+}
+
+/// @namespace Repositories
+/// @author Samchon
+model drive_repository_files {
+    //----
+    // COLUMNS
+    //----
+    /// PK + FK.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    url String @db.VarChar
+
+    //----
+    // RELATIONS
+    //----
+    base drive_repository_buckets @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+/// @namespace Repositories
+/// @author Samchon
+model drive_repository_shortcuts {
+    //----
+    // COLUMNS
+    //----
+    /// PK + FK.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    drive_repository_bucket_id String @db.Uuid
+
+    //----
+    // RELATIONS
+    //----
+    base   drive_repository_buckets @relation("rel_drive_repository_shortcuts_base", fields: [id], references: [id], onDelete: Cascade)
+    target drive_repository_buckets @relation("rel_drive_repository_shortcuts_target", fields: [drive_repository_bucket_id], references: [id], onDelete: Cascade)
+}
+
+/// @namespace Repositories
+/// @author Samchon
+model drive_repository_accesses {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    drive_repository_id String @db.Uuid
+
+    drive_customer_id String @db.Uuid
+
+    drive_account_id String? @db.Uuid
+
+    drive_enterprise_team_id String? @db.Uuid
+
+    role String @db.VarChar
+
+    created_at DateTime @db.Timestamptz
+
+    updated_at DateTime @db.Timestamptz
+
+    deleted_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
+    repository drive_repositories      @relation(fields: [drive_repository_id], references: [id], onDelete: Cascade)
+    customer   drive_customers         @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
+    account    drive_accounts?         @relation(fields: [drive_account_id], references: [id], onDelete: Cascade)
+    team       drive_enterprise_teams? @relation(fields: [drive_enterprise_team_id], references: [id], onDelete: Cascade)
+}
+
+/// @namespace Repositories
+/// @author Samchon
+model drive_repository_tags {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    drive_repository_id String @db.Uuid
+
+    value String @db.VarChar
+
+    sequence Int @db.Integer
+
+    //----
+    // RELATIONS
+    //----
+    repository drive_repositories @relation(fields: [drive_repository_id], references: [id], onDelete: Cascade)
+}
+
+//-----------------------------------------------------------
+// ISSUES
+//-----------------------------------------------------------
+/// @namespace Issues
+/// @author Samchon
+model drive_repository_issues {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    drive_repository_id String @db.Uuid
+
+    drive_customer_id String @db.Uuid
+
+    //----
+    // RELATIONS
+    //----
+    base       bbs_articles       @relation(fields: [id], references: [id], onDelete: Cascade)
+    repository drive_repositories @relation(fields: [drive_repository_id], references: [id], onDelete: Cascade)
+    customer   drive_customers    @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
+}
+
+/// @namespace Issues
+/// @author Samchon
+model drive_repository_issue_comments {
+    //----
+    // COLUMNS
+    //----
+    /// Primary Key.
+    ///
+    /// @format uuid
+    id String @id @db.Uuid
+
+    drive_customer_id String @db.Uuid
+
+    //----
+    // RELATIONS
+    //----
+    base     bbs_article_comments @relation(fields: [id], references: [id], onDelete: Cascade)
+    customer drive_customers      @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
+}

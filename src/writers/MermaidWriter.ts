@@ -1,4 +1,5 @@
 import { DMMF } from "@prisma/generator-helper";
+import { PrismaUtil } from "../utils/PrismaUtil";
 
 export namespace MermaidWriter {
     export const write = (chapter: DMMF.Model[]) =>
@@ -80,7 +81,9 @@ export namespace MermaidWriter {
                             ),
                     ))
                     ? "o"
-                    : "|",
+                    : isMandatoryMany({ model: props.model, field, target })
+                    ? "|"
+                    : "o",
                 "--",
                 props.model === target ? "o" : "|",
                 "|",
@@ -93,4 +96,23 @@ export namespace MermaidWriter {
                 field.name,
             ].join(" ");
         };
+
+    const isMandatoryMany = (props: {
+        target: DMMF.Model;
+        model: DMMF.Model;
+        field: DMMF.Field;
+    }): boolean => {
+        const opposite = props.target.fields.find(
+            (f) =>
+                f.relationName === props.field.relationName &&
+                f.type === props.model.name,
+        );
+        if (opposite === undefined) return false;
+
+        const values: string[] = PrismaUtil.tagValues("minItems")(opposite);
+        if (values.length === 0) return false;
+
+        const numeric: number = Number(values[0]);
+        return !isNaN(numeric) && numeric >= 1;
+    };
 }
