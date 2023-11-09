@@ -568,7 +568,7 @@ attribute url.
 **Properties**
   - `id`: PK + FK.
   - `extension`: Extension of file.
-  - `url`: 
+  - `url`: URL address of the file.
 
 ### `drive_repository_shortcuts`
 Shortcut icon.
