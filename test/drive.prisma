@@ -15,391 +15,34 @@ generator markdown {
 }
 
 //-----------------------------------------------------------
-// ARTICLES
-//-----------------------------------------------------------
-/// Attachment File.
-///
-/// Every attachment files that are managed in this drive mall system.
-///
-/// For reference, it is possible to omit one of file name or extension like 
-/// `.gitignore` or `README` case, but not possible to omit both of them,
-///
-/// @namespace Articles
-/// @author Samchon
-model attachment_files {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
-
-    /// File name, except extension.
-    ///
-    /// Possible to omit like `.gitignore` case.
-    ///
-    /// @minLength 1
-    /// @maxLength 255
-    name String? @db.VarChar
-
-    //-----------------------------------------------------------
-    // ARTICLES
-    //-----------------------------------------------------------
-
-    /// Extension.
-    ///
-    /// Possible to omit like `README` case.
-    ///
-    /// @minLength 1
-    /// @maxLength 8
-    extension String? @db.VarChar
-
-    /// URL path of the real file.
-    ///
-    /// @format url
-    url String @db.VarChar
-
-    /// Creation time of record.
-    created_at DateTime @db.Timestamptz
-
-    //----
-    // RELATIONS
-    //----
-    bbs_article_snapshot_files          bbs_article_snapshot_files[]
-    bbs_article_comment_snapshots_files bbs_article_comment_snapshot_files[]
-}
-
-/// Article entity.
-/// 
-/// `bbs_articles` is a super-type entity of all kinds of articles in the 
-/// current drive mall system, literally shaping individual articles of 
-/// the bulletin board.
-///
-/// And, as you can see, the elements that must inevitably exist in the 
-/// article, such as the title or the body, do not exist in the `bbs_articles`, 
-/// but exist in the subsidiary entity, {@link bbs_article_snapshots}, as a 
-/// 1: N relationship, which is because a new snapshot record is published 
-/// every time the article is modified.
-///
-/// The reason why a new snapshot record is published every time the article 
-/// is modified is to preserve the evidence. Due to the nature of e-community, 
-/// there is always a threat of dispute among the participants. And it can 
-/// happen that disputes arise through articles or comments, and to prevent 
-/// such things as modifying existing articles to manipulate the situation, 
-/// the article is designed in this structure.
-///
-/// In other words, to keep evidence, and prevent fraud.
-///
-/// @namespace Articles
-/// @author Samchon
-model bbs_articles {
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
-
-    /// Creation time of article.
-    created_at DateTime @db.Timestamptz
-
-    /// Deletion time of article.
-    ///
-    /// To keep evidence, do not delete the article, but just mark it as 
-    /// deleted.
-    deleted_at DateTime? @db.Timestamptz
-
-    //----
-    // RELATIONS
-    //----
-    /// List of snapshots.
-    ///
-    /// It is created for the first time when an article is created, and is
-    /// accumulated every time the article is modified.
-    ///
-    /// @minItems 1
-    snapshots bbs_article_snapshots[]
-
-    /// List of comments.
-    comments                bbs_article_comments[]
-    drive_repository_issues drive_repository_issues[]
-
-    @@index([created_at])
-}
-
-/// Snapshot of article.
-///
-/// `bbs_article_snapshots` is a snapshot entity that contains the contents of
-/// the article, as mentioned in {@link bbs_articles}, the contents of the 
-/// article are separated from the article record to keep evidence and prevent 
-/// fraud.
-///
-/// @namespace Articles
-/// @author Samchon
-model bbs_article_snapshots {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
-
-    /// Belong article's {@link bbs_articles.id}
-    ///
-    /// @format uuid
-    bbs_article_id String @db.Uuid
-
-    /// Format of body.
-    ///
-    /// Same meaning with extension like `html`, `md`, `txt`.
-    format String @db.VarChar
-
-    /// Title of article.
-    title String @db.VarChar
-
-    /// Content body of article.
-    body String
-
-    /// Creation time of record.
-    ///
-    /// It means creation time or update time or article.
-    created_at DateTime @db.Timestamptz
-
-    //----
-    // RELATIONS
-    //----
-    /// Belong article info.
-    article bbs_articles @relation(fields: [bbs_article_id], references: [id], onDelete: Cascade)
-
-    /// List of wrappers of attachment files.
-    to_files bbs_article_snapshot_files[]
-
-    @@index([bbs_article_id, created_at])
-}
-
-/// Attachment file of article snapshot.
-///
-/// `bbs_article_snapshot_files` is an entity that shapes the attached files of
-/// the article snapshot.
-///
-/// `bbs_article_snapshot_files` is a typical pair relationship table to 
-/// resolve the M: N relationship between {@link bbs_article_snapshots} and
-/// {@link attachment_files} tables. Also, to ensure the order of the attached
-/// files, it has an additional `sequence` attribute, which we will continue to
-/// see in this documents.
-///
-/// @namespace Articles
-/// @author Samchon
-model bbs_article_snapshot_files {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
-
-    /// Belonged snapshot's {@link bbs_article_snapshots.id}
-    ///
-    /// @format uuid
-    bbs_article_snapshot_id String @db.Uuid
-
-    /// Belonged file's {@link attachment_files.id}
-    ///
-    /// @format uuid
-    attachment_file_id String @db.Uuid
-
-    /// Sequence of attachment file in the snapshot.
-    ///
-    /// @format int
-    sequence Int @db.Integer
-
-    //----
-    // RELATIONS
-    //----
-    /// Belonged article.
-    snapshot bbs_article_snapshots @relation(fields: [bbs_article_snapshot_id], references: [id], onDelete: Cascade)
-
-    /// Belonged file.
-    file attachment_files @relation(fields: [attachment_file_id], references: [id], onDelete: Cascade)
-
-    @@index([bbs_article_snapshot_id])
-    @@index([attachment_file_id])
-}
-
-/// Comment written on an article.
-///
-/// `bbs_article_comments` is an entity that shapes the comments written on an
-/// article.
-///
-/// And for this comment, as in the previous relationship between 
-/// {@link bbs_articles} and {@link bbs_article_snapshots}, the content body 
-/// of the comment is stored in the sub {@link bbs_article_comment_snapshots} 
-/// table for evidentialism, and a new snapshot record is issued every time 
-/// the comment is modified.
-///
-/// Also, `bbs_article_comments} is expressing the relationship of the 
-/// hierarchical reply structure through the `parent_id` attribute.
-///
-/// @namespace Articles
-/// @author Samchon
-model bbs_article_comments {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
-
-    /// Belonged article's {@link bbs_articles.id}
-    /// 
-    /// @format uuid
-    bbs_article_id String @db.Uuid
-
-    /// Parent comment's {@link bbs_article_comments.id}
-    ///
-    /// Used to express the hierarchical reply structure.
-    ///
-    /// @format uuid
-    parent_id String? @db.Uuid
-
-    /// Creation time of comment.
-    created_at DateTime @db.Timestamptz
-
-    /// Deletion time of comment.
-    ///
-    /// Do not allow to delete the comment, but just mark it as deleted, 
-    /// to keep evidence.
-    deleted_at DateTime? @db.Timestamptz
-
-    //----
-    // RELATIONS
-    //----
-    /// Belonged article.
-    article bbs_articles @relation(fields: [bbs_article_id], references: [id], onDelete: Cascade)
-
-    /// Parent comment.
-    ///
-    /// Only when reply case.
-    parent bbs_article_comments? @relation("bbs_article_comments_reply", fields: [parent_id], references: [id], onDelete: Cascade)
-
-    /// List of children comments.
-    ///
-    /// Reply comments of current.
-    children bbs_article_comments[] @relation("bbs_article_comments_reply")
-
-    /// List of snapshots.
-    ///
-    /// It is created for the first time when a comment is created, and is
-    /// accumulated every time the comment is modified.
-    ///
-    /// @minItems 1
-    snapshots                       bbs_article_comment_snapshots[]
-    drive_repository_issue_comments drive_repository_issue_comments[]
-
-    @@index([bbs_article_id, parent_id, created_at])
-}
-
-/// Snapshot of comment.
-///
-/// `bbs_article_comment_snapshots` is a snapshot entity that contains the 
-/// contents of the comment.
-///
-/// As mentioned in {@link bbs_article_comments}, designed to keep evidence 
-/// and prevent fraud.
-///
-/// @namespace Articles
-/// @author Samchon
-model bbs_article_comment_snapshots {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
-
-    /// Belonged article's {@link bbs_article_comments.id}
-    ///
-    /// @format uuid
-    bbs_article_comment_id String @db.Uuid
-
-    /// Format of content body.
-    ///
-    /// Same meaning with extension like `html`, `md`, `txt`.
-    format String @db.VarChar
-
-    /// Content body of comment.
-    body String
-
-    /// Creation time of record.
-    ///
-    /// It means creation time or update time or comment.
-    created_at DateTime @db.Timestamptz
-
-    //----
-    // RELATIONS
-    //----
-    /// Belong comment info.
-    comment bbs_article_comments @relation(fields: [bbs_article_comment_id], references: [id], onDelete: Cascade)
-
-    /// List of wrappers of attachment files.
-    files bbs_article_comment_snapshot_files[]
-
-    @@index([bbs_article_comment_id, created_at])
-}
-
-/// Attachment file of comment snapshot.
-/// 
-/// `bbs_article_comment_snapshot_files` is an entity resolving the M:N 
-/// relationship between {@link bbs_article_comment_snapshots} and 
-/// {@link attachment_files} tables.
-/// 
-/// @namespace Articles
-/// @author Samchon
-model bbs_article_comment_snapshot_files {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
-
-    /// Belonged snapshot's {@link bbs_article_comment_snapshots.id}
-    ///
-    /// @format uuid
-    bbs_article_comment_snapshot_id String @db.Uuid
-
-    /// Belonged file's {@link attachment_files.id}
-    ///
-    /// @format uuid
-    attachment_file_id String @db.Uuid
-
-    /// Sequence order.
-    ///
-    /// Sequence order of the attached file in the belonged snapshot.
-    ///
-    /// @type int
-    sequence Int @db.Integer
-
-    //----
-    // RELATIONS
-    //----
-    /// Belonged article.
-    snapshot bbs_article_comment_snapshots @relation(fields: [bbs_article_comment_snapshot_id], references: [id], onDelete: Cascade)
-
-    /// Belonged file.
-    file attachment_files @relation(fields: [attachment_file_id], references: [id], onDelete: Cascade)
-
-    @@index([bbs_article_comment_snapshot_id])
-    @@index([attachment_file_id])
-}
-
-//-----------------------------------------------------------
 // ACTORS
 //-----------------------------------------------------------
+/// Customer information, but not a person but a **connection** basis.
+///
+/// `drive_customers` is an entity that literally embodies the information 
+/// of those who participated in the drive system as customers. By the way, 
+/// the `drive_customers` does not mean a person, but a **connection** basis.
+/// Therefore, even if the same person connects to the drive system multiple,
+/// multiple records are created in `drive_customers`.
+/// 
+/// The first purpose of this is to track the customer's inflow path in detail, 
+/// and it is for cases where the same person enters as a non-member, reads a 
+/// {@link drive_repository_files repository file} in advance, and registers/logs 
+/// in at the moment for modification. It is the second. Lastly, it is to 
+/// accurately track the activities that a person performs at the drive system 
+/// in various ways like below.
+///
+/// - Same person comes from an {@link drive_external_users external service}
+/// - Same person creates multiple {@link drive_members accounts}
+/// - Same person makes a download with only {@link drive_citizens real name authentication}
+/// 
+/// Therefore, `drive_customers` can have multiple records with the same 
+/// {@link drive_citizens}, {@link drive_members}, and {@link drive_external_users}. 
+/// Additionally, if a customer signs up for membership after verifying their real 
+/// name or signs up for our service after being a user of an external service, 
+/// all related records are changed at once. Therefore, identification and tracking 
+/// of customers can be done very systematically.
+///
 /// @namespace Actors
 /// @author Samchon
 model drive_customers {
@@ -447,7 +90,7 @@ model drive_customers {
 
     /// Creation time of record.
     ///
-    /// It means the time when the customer connected to the drive mall.
+    /// It means the time when the customer connected to the drive system.
     created_at DateTime @db.Timestamptz
 
     //----
@@ -461,14 +104,37 @@ model drive_customers {
     drive_repositories                           drive_repositories[]
     drive_repository_buckets                     drive_repository_buckets[]
     drive_repository_accesses                    drive_repository_accesses[]
-    drive_repository_issues                      drive_repository_issues[]
-    drive_repository_issue_comments              drive_repository_issue_comments[]
 
     @@index([drive_member_id])
     @@index([drive_external_user_id])
     @@index([drive_citizen_id])
 }
 
+/// External user information.
+/// 
+/// `drive_external_users` is an entity dsigned for when this system needs 
+/// to connect with external services and welcome their users as customers of 
+/// this service.
+/// 
+/// For reference, customers who connect from an external service must have 
+/// this record, and the external service user is identified through the two 
+/// attributes `application` and `uid`. If a customer connected from an 
+/// external service completes {@link drive_citizens real-name authentication} 
+/// from this service, each time the external service user reconnects to this 
+/// service and issues a new {@link drive_customers customer} authentication 
+/// token, {@link drive_citizens real-name authentication} begins with 
+/// completed.
+/// 
+/// And `password` is the password issued to the user by the external service 
+/// system (the so-called permanent user authentication token), and is never 
+/// the actual user password. However, for customers who entered the same 
+/// `application` and `uid` as the current external system user, this is to 
+/// determine whether to view this as a correct external system user or a 
+/// violation.
+/// 
+/// In addition, additional information received from external services can 
+/// be recorded in the `data` field in JSON format.
+///
 /// @namespace Actors
 /// @author Samchon
 model drive_external_users {
@@ -514,6 +180,20 @@ model drive_external_users {
     drive_customers drive_customers[]
 }
 
+/// Citizen verification information.
+/// 
+/// `drive_citizens` is an entity that records the user's real name and 
+/// mobile input information.
+/// 
+/// For reference, in South Korea, real name authentication is required for 
+/// {@link drive_enterprise_employees employeed} people, so the `name` attribute 
+/// is important. However, the situation is different overseas, so in reality, 
+/// `mobile` attributes are the most important, and identification of individual 
+/// users is also done based on this mobile.
+/// 
+/// Of course, real name and mobile phone authentication information are 
+/// encrypted and stored.
+///
 /// @namespace Actors
 /// @author Samchon
 model drive_citizens {
@@ -548,6 +228,17 @@ model drive_citizens {
     drive_members   drive_members[]
 }
 
+/// Member Account.
+/// 
+/// `drive_members` is an entity that symbolizes the case when a user 
+/// signs up as a member of this system. 
+///
+/// For reference, it is possible to travel other public 
+/// {@link drive_repositories repositories} without joining membership. Otherwise, 
+/// if you want to create your own repository or participate into some 
+/// {@link drive_enterprises enterprise} as an 
+/// {@link drive_enterprise_employees employee}, you must join as a member.
+///
 /// @namespace Actors
 /// @author Samchon
 model drive_members {
@@ -596,6 +287,12 @@ model drive_members {
     drive_enterprise_employees drive_enterprise_employees[]
 }
 
+/// Email address of member.
+///
+/// This system allows multiple email addresses to be registered for one
+/// {@link drive_members member}. If you don't have to plan such multiple
+/// email addresses, just use only one.
+///
 /// @namespace Actors
 /// @author Samchon
 model drive_member_emails {
@@ -624,6 +321,26 @@ model drive_member_emails {
     member drive_members @relation(fields: [drive_member_id], references: [id], onDelete: Cascade)
 }
 
+/// Account entity.
+/// 
+/// `drive_accounts` is an entity that represents the accounts of the drive 
+/// system. An account is a subject unit with a unique identifier code and can 
+/// own storage, etc. For example, if the address of a specific repository on 
+/// GitHub is https://github.com/samchon/typia, "samchon" is the account 
+/// identifier and the owner of the repository called "typia".
+/// 
+/// And the account referred to here does not necessarily refer to a person. This 
+/// is because the account holder may be a {@link drive_members member}, but it 
+/// may also be an {@link drive_enterprises enterprise}. For example, in the case 
+/// of https://github.com/Microsoft/TypeScript, the account owner is not a person, 
+/// but Microsoft, an enterprise.
+/// 
+/// In addition, an account can change its owner. And when changing ownership, it 
+/// is also possible for the entity to change from an individual to an enterprise. 
+/// For example, this may be the case when an account or repository that started 
+/// as an individual becomes successful and is promoted to an enterprise in the 
+/// future.
+///
 /// @namespace Actors
 /// @author Samchon
 model drive_accounts {
@@ -642,19 +359,33 @@ model drive_accounts {
     created_at DateTime @db.Timestamptz
 
     /// Deletion time of record.
-    deleted_at                DateTime?                   @db.Timestamptz
+    deleted_at DateTime? @db.Timestamptz
+
+    //----
+    // RELATIONS
+    //----
     drive_members             drive_members[]
     drive_enterprises         drive_enterprises[]
     drive_repositories        drive_repositories[]
     drive_repository_accesses drive_repository_accesses[]
 
-    //----
-    // RELATIONS
-    //----
     @@unique([code])
     @@index([created_at])
 }
 
+/// Enterprise, a enterprise entity.
+/// 
+/// drive_enterprises is an entity that symbolizes an enterprise, and literally 
+/// refers to the subjects participating in the drive system on a enterprise basis. 
+/// And in the case of enterprise, unlike {@link drive_members member}, it must 
+/// have an {@link drive_accounts account}.
+/// 
+/// Enterprises also have as sub-entities {@link drive_enterprise_employees employees} 
+/// and {@link drive_enterprise_teams teams} composed of them. And among these, 
+/// a team can have its {@link drive_enterprise_team_companions companions} 
+/// collectively have the same {@link drive_repository_accesses access rights} to 
+/// enterprise {@link drive_repositories repositories}.
+///
 /// @namespace Actors
 /// @author Samchon
 model drive_enterprises {
@@ -671,12 +402,16 @@ model drive_enterprises {
     /// @format uuid
     drive_account_id String @db.Uuid
 
+    /// Representative name of the enterprise.
     name String @db.VarChar
 
+    /// Creation time of record.
     created_at DateTime @db.Timestamptz
 
+    /// Update time of record.
     updated_at DateTime @db.Timestamptz
 
+    /// Deletion time of record.
     deleted_at DateTime? @db.Timestamptz
 
     //----
@@ -687,6 +422,20 @@ model drive_enterprises {
     drive_enterprise_teams     drive_enterprise_teams[]
 }
 
+/// Employee entity within a enterprise.
+/// 
+/// `drive_enterprise_employees` is an entity that represents employees belonging 
+/// to an {@link drive_enterprises enterprise}. Employees work as part of each 
+/// {@link drive_enterprise_teams team} within the enterprise, and are granted 
+/// {@link drive_repository_accesses accessibility} on a team-by-team basis from 
+/// the enterprise's repository.
+/// 
+/// Please note that only those who have registered as {@link drive_members members} 
+/// of this drive system can be 
+/// {@link drive_enterprise_employee_appointments appointed} as employees, and it 
+/// is possible for one person to belong to multiple enterprises as an employee at 
+/// the same time.
+///
 /// @namespace Actors
 /// @author Samchon
 model drive_enterprise_employees {
@@ -698,16 +447,26 @@ model drive_enterprise_employees {
     /// @format uuid
     id String @id @db.Uuid
 
+    /// Belonged enterprise's {@link drive_enterprises.id}
+    ///
+    /// @format uuid
     drive_enterprise_id String @db.Uuid
 
+    /// Belonged member's {@link drive_members.id}
+    ///
+    /// @format uuid
     drive_member_id String @db.Uuid
 
+    /// Role of employee.
     role String @db.VarChar
 
+    /// Creation time of record.
     created_at DateTime @db.Timestamptz
 
+    /// Update time of record.
     updated_at DateTime @db.Timestamptz
 
+    /// Deletion time of record.
     deleted_at DateTime? @db.Timestamptz
 
     //----
@@ -719,6 +478,17 @@ model drive_enterprise_employees {
     drive_enterprise_team_companions       drive_enterprise_team_companions[]
 }
 
+/// Employee Appointment Information.
+/// 
+/// `drive_enterprise_employee_appointments` is an entity that embodies the history 
+/// of appointment and position change information of 
+/// {@link drive_enterprise_employees employees} within the 
+/// {@link drive_enterprises enterprise}.
+/// 
+/// Therefore, this entity record is created once when a enterprise appoints 
+/// an employee, and is accumulated each time the employee changes his or her 
+/// position thereafter.
+///
 /// @namespace Actors
 /// @author Samchon
 model drive_enterprise_employee_appointments {
@@ -730,12 +500,20 @@ model drive_enterprise_employee_appointments {
     /// @format uuid
     id String @id @db.Uuid
 
+    /// Belonged employee's {@link drive_enterprise_employees.id}
+    ///
+    /// @format uuid
     drive_enterprise_employee_id String @db.Uuid
 
+    /// Creator customer's {@link drive_customers.id}
+    ///
+    /// @format uuid
     drive_customer_id String @db.Uuid
 
+    /// Role of employee at that time.
     role String @db.VarChar
 
+    /// Creation time of record.
     created_at DateTime @db.Timestamptz
 
     //----
@@ -745,6 +523,15 @@ model drive_enterprise_employee_appointments {
     customer drive_customers            @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
 }
 
+/// Team information within the enterprise.
+/// 
+/// `drive_enterprise_teams` is an entity that embodies a team within an 
+/// {@link drive_enterprises enterprise}. A team has 
+/// {@link drive_enterprise_employees employees} as 
+/// {@link drive_enterprise_team_companions companions}, and each team can operate 
+/// by receiving {@link drive_repository_accesses permission} from the enterprise's 
+/// {@link drive_repositories repository}.
+///
 /// @namespace Actors
 /// @author Samchon
 model drive_enterprise_teams {
@@ -756,14 +543,24 @@ model drive_enterprise_teams {
     /// @format uuid
     id String @id @db.Uuid
 
+    /// Belonged enterprise's {@link drive_enterprises.id}
+    ///
+    /// @format uuid
     drive_enterprise_id String @db.Uuid
 
+    /// Identifier code of the team.
+    code String @db.VarChar
+
+    /// Representative name of the team.
     name String @db.VarChar
 
+    /// Creation time of record.
     created_at DateTime @db.Timestamptz
 
+    /// Update time of record.
     updated_at DateTime @db.Timestamptz
 
+    /// Deletion time of record.
     deleted_at DateTime? @db.Timestamptz
 
     //----
@@ -774,6 +571,19 @@ model drive_enterprise_teams {
     drive_repository_accesses        drive_repository_accesses[]
 }
 
+/// Information about companion of teams within the enterprise.
+/// 
+/// `drive_enterprise_team_companions` is an entity that represents which 
+/// {@link drive_enterprise_employees employees} are participating as companion in 
+/// each {@link drive_enterprise_teams team} that makes up the enterprise.
+/// 
+/// For reference, employees participate as companion of a team and are assigned 
+/// some kind of role, which may be different from their original position. 
+/// Additionally, it is possible for employees to belong to multiple teams at the 
+/// same time. This is similar to how it was possible for one member to be 
+/// {@link drive_enterprise_employee_appointments appointed} as an employee at 
+/// multiple enterprises at the same time.
+///
 /// @namespace Actors
 /// @author Samchon
 model drive_enterprise_team_companions {
@@ -785,16 +595,26 @@ model drive_enterprise_team_companions {
     /// @format uuid
     id String @id @db.Uuid
 
+    /// Belonged team's {@link drive_enterprise_teams.id}
+    ///
+    /// @format uuid
     drive_enterprise_team_id String @db.Uuid
 
+    /// Belonged employee's {@link drive_enterprise_employees.id}
+    ///
+    /// @format uuid
     drive_enterprise_employee_id String @db.Uuid
 
+    /// Role in the team.
     role String @db.VarChar
 
+    /// Creation time of record.
     created_at DateTime @db.Timestamptz
 
+    /// Update time of record.
     updated_at DateTime @db.Timestamptz
 
+    /// Deletion time of record.
     deleted_at DateTime? @db.Timestamptz
 
     //----
@@ -805,6 +625,17 @@ model drive_enterprise_team_companions {
     drive_enterprise_team_companion_appointments drive_enterprise_team_companion_appointments[]
 }
 
+/// Appointment information for team companions within the enterprise.
+/// 
+/// `drive_enterprise_team_companion_appointments` is an entity that embodies 
+/// the history of appointment and role change information of 
+/// {@link drive_enterprise_team_companions team companion} within the 
+/// {@link drive_enterprises enterprise}.
+/// 
+/// Therefore, this entity record is first created when the team appoints a 
+/// companion, and is accumulated each time the companion changes roles 
+/// thereafter.
+///
 /// @namespace Actors
 /// @author Samchon
 model drive_enterprise_team_companion_appointments {
@@ -816,12 +647,20 @@ model drive_enterprise_team_companion_appointments {
     /// @format uuid
     id String @id @db.Uuid
 
+    /// Belonged team companion's {@link drive_enterprise_team_companions.id}
+    ///
+    /// @format uuid
     drive_enterprise_team_companion_id String @db.Uuid
 
+    /// Creator customer's {@link drive_customers.id}
+    ///
+    /// @format uuid
     drive_customer_id String @db.Uuid
 
+    /// Role of team companion at that time.
     role String @db.VarChar
 
+    /// Creation time of record.
     created_at DateTime @db.Timestamptz
 
     //----
@@ -834,6 +673,19 @@ model drive_enterprise_team_companion_appointments {
 //-----------------------------------------------------------
 // REPOSITORY
 //-----------------------------------------------------------
+/// Repository storing buckets.
+/// 
+/// `drive_repositories` is an entity that represents individual repositories 
+/// within the drive system, and is similar to the Google Drive in online services. 
+/// And physically, it is a concept that can be compared to a Disk Drive.
+/// 
+/// And the repository belongs to a specific {@link drive_accounts account}, and 
+/// the account owner who owns each repository may be a 
+/// {@link drive_members member} or an {@link drive_enterprises enterprise}. In 
+/// addition, the account owner who created the repository can use the repository 
+/// with fellow members or {@link drive_enterprise_teams team} companion through 
+/// controlling {@link drive_repository_accesses access rights} to the repository.
+///
 /// @namespace Repositories
 /// @author Samchon
 model drive_repositories {
@@ -845,16 +697,26 @@ model drive_repositories {
     /// @format uuid
     id String @id @db.Uuid
 
+    /// Belonged account's {@link drive_accounts.id}
+    ///
+    /// @format uuid
     drive_account_id String @db.Uuid
 
+    /// Creator customer's {@link drive_customers.id}
+    ///
+    /// @format uuid
     drive_customer_id String @db.Uuid
 
+    /// Identifier code of repository.
     code String @db.VarChar
 
+    /// Creation time of record.
     created_at DateTime @db.Timestamptz
 
+    /// Update time of record.
     updated_at DateTime @db.Timestamptz
 
+    /// Deletion time of record.
     deleted_at DateTime? @db.Timestamptz
 
     //----
@@ -865,9 +727,17 @@ model drive_repositories {
     drive_repository_buckets  drive_repository_buckets[]
     drive_repository_accesses drive_repository_accesses[]
     drive_repository_tags     drive_repository_tags[]
-    drive_repository_issues   drive_repository_issues[]
 }
 
+/// Bucket information within the repository.
+/// 
+/// `drive_repository_buckets` symbolizes buckets that exist in the 
+/// {@link drive_repositories repository}, and corresponds to the supertype 
+/// entities of {@link drive_repository_folders folders}, 
+/// {@link  drive_repository_files files}, and 
+/// {@link drive_repository_shortcuts shortcut icons}, respectively. In other 
+//// words, it is a table that stores common information about files and folders.
+///
 /// @namespace Repositories
 /// @author Samchon
 model drive_repository_buckets {
@@ -879,22 +749,42 @@ model drive_repository_buckets {
     /// @format uuid
     id String @id @db.Uuid
 
+    /// Belonged repository's {@link drive_repositories.id}
+    ///
+    /// @format uuid
     drive_repository_id String @db.Uuid
 
+    /// Belonged folder's {@link drive_repository_folders.id}
+    ///
+    /// @format uuid
     drive_repository_folder_id String? @db.Uuid
 
+    /// Creator customer's {@link drive_customers.id}
+    ///
+    /// @format uuid
     drive_customer_id String @db.Uuid
 
+    /// Type of bucket.
+    ///
+    /// Discriminator of the supertype entity.
+    ///
+    /// - directory
+    /// - file
+    /// -shortcut
     type String @db.VarChar
 
+    /// Name of the bucket.
+    ///
+    /// @maxLength 255
     name String @db.VarChar(255)
 
-    extension String? @db.VarChar(8)
-
+    /// Creation time of record.
     created_at DateTime @db.Timestamptz
 
+    /// Update time of record.
     updated_at DateTime @db.Timestamptz
 
+    /// Deletion time of record.
     deleted_at DateTime? @db.Timestamptz
 
     //----
@@ -911,6 +801,11 @@ model drive_repository_buckets {
     shortcuts drive_repository_shortcuts[] @relation("rel_drive_repository_shortcuts_target")
 }
 
+/// Folder (directory).
+/// 
+/// `drive_repository_folders` is an entity that represents a folder in the 
+/// {@link drive_repositories repository}.
+///
 /// @namespace Repositories
 /// @author Samchon
 model drive_repository_folders {
@@ -929,6 +824,14 @@ model drive_repository_folders {
     children drive_repository_buckets[] @relation("rel_drive_repository_bucket_parent")
 }
 
+/// File.
+/// 
+/// `drive_repository_files` is an entity that represents files in the 
+/// {@link drive_repositories repository}.
+/// 
+/// And the location where the file is physically stored is recorded in the 
+/// attribute url.
+///
 /// @namespace Repositories
 /// @author Samchon
 model drive_repository_files {
@@ -940,6 +843,11 @@ model drive_repository_files {
     /// @format uuid
     id String @id @db.Uuid
 
+    /// Extension of file.
+    ///
+    /// @maxLength 8
+    extension String? @db.VarChar(8)
+
     url String @db.VarChar
 
     //----
@@ -948,6 +856,15 @@ model drive_repository_files {
     base drive_repository_buckets @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
+/// Shortcut icon.
+/// 
+/// `drive_repository_shortcuts` is an entity that symbolizes a shortcut icon in 
+/// the {@link drive_repositories repository} and has a reference function for 
+/// other {@link drive_repository_buckets buckets} in the repository.
+/// 
+/// A concept that is exactly the same as a shortcut icon in Windows and 
+/// a symbolic link in Linux.
+///
 /// @namespace Repositories
 /// @author Samchon
 model drive_repository_shortcuts {
@@ -959,6 +876,9 @@ model drive_repository_shortcuts {
     /// @format uuid
     id String @id @db.Uuid
 
+    /// Target bucket's {@link drive_repository_buckets.id}
+    ///
+    /// This shortcut references the target bucket.
     drive_repository_bucket_id String @db.Uuid
 
     //----
@@ -968,6 +888,18 @@ model drive_repository_shortcuts {
     target drive_repository_buckets @relation("rel_drive_repository_shortcuts_target", fields: [drive_repository_bucket_id], references: [id], onDelete: Cascade)
 }
 
+/// Storage access control.
+/// 
+/// `drive_repository_accesses` is an entity that embodies the access authority 
+/// control of the {@link drive_repositories repository}, and is an entity that 
+/// is recorded when the {@link drive_accounts account} owner distributes the 
+/// authority of the repository to other {@link drive_members members} or an 
+/// {@link drive_enterprise_teams enterprise team}.
+/// 
+/// For reference, the account owner who created the repository is also recorded 
+/// in access permission control. In other words, as soon as the account owner 
+/// creates the repository, one table record is created and started.
+///
 /// @namespace Repositories
 /// @author Samchon
 model drive_repository_accesses {
@@ -979,20 +911,32 @@ model drive_repository_accesses {
     /// @format uuid
     id String @id @db.Uuid
 
+    /// Belonged repository's {@link drive_repositories.id}
+    ///
+    /// @format uuid
     drive_repository_id String @db.Uuid
 
+    /// Creator customer's {@link drive_customers.id}
+    ///
+    /// @format uuid
     drive_customer_id String @db.Uuid
 
+    /// Target account's {@link drive_members.id}
     drive_account_id String? @db.Uuid
 
+    /// Target enterprise team's {@link drive_enterprise_teams.id}
     drive_enterprise_team_id String? @db.Uuid
 
+    /// Role of access permission.
     role String @db.VarChar
 
+    /// Creation time of record.
     created_at DateTime @db.Timestamptz
 
+    /// Update time of record.
     updated_at DateTime @db.Timestamptz
 
+    /// Deletion time of record.
     deleted_at DateTime? @db.Timestamptz
 
     //----
@@ -1004,6 +948,8 @@ model drive_repository_accesses {
     team       drive_enterprise_teams? @relation(fields: [drive_enterprise_team_id], references: [id], onDelete: Cascade)
 }
 
+/// Search tag of repository.
+///
 /// @namespace Repositories
 /// @author Samchon
 model drive_repository_tags {
@@ -1015,60 +961,19 @@ model drive_repository_tags {
     /// @format uuid
     id String @id @db.Uuid
 
+    /// Belonged repository's {@link drive_repositories.id}
     drive_repository_id String @db.Uuid
 
+    /// Search tag value.
     value String @db.VarChar
 
+    /// Creation time of record.
     sequence Int @db.Integer
 
+    created_at DateTime @db.Timestamptz
+
     //----
     // RELATIONS
     //----
     repository drive_repositories @relation(fields: [drive_repository_id], references: [id], onDelete: Cascade)
-}
-
-//-----------------------------------------------------------
-// ISSUES
-//-----------------------------------------------------------
-/// @namespace Issues
-/// @author Samchon
-model drive_repository_issues {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
-
-    drive_repository_id String @db.Uuid
-
-    drive_customer_id String @db.Uuid
-
-    //----
-    // RELATIONS
-    //----
-    base       bbs_articles       @relation(fields: [id], references: [id], onDelete: Cascade)
-    repository drive_repositories @relation(fields: [drive_repository_id], references: [id], onDelete: Cascade)
-    customer   drive_customers    @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
-}
-
-/// @namespace Issues
-/// @author Samchon
-model drive_repository_issue_comments {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
-
-    drive_customer_id String @db.Uuid
-
-    //----
-    // RELATIONS
-    //----
-    base     bbs_article_comments @relation(fields: [id], references: [id], onDelete: Cascade)
-    customer drive_customers      @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
 }

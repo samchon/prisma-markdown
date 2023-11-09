@@ -600,21 +600,6 @@ Member Account.
 `shopping_members` is an entity that symbolizes the case when a user 
 signs up as a member of this system.
 
-In addition, `shopping_members` itself is a supertype entity, forming 
-and managing subtypes for various types of members. However, 
-[shopping_customers](#shopping_customers) are an exception, and due to the nature of 
-their records being created on a per-connection basis, they are not 
-divided into separate subtype entities when they sign up for membership.
-
-For reference, `shopping_members` allows multiple subtypes. Therefore, 
-it is also possible for a [citizen](#shopping_citizens) to be sometimes 
-a [customer](#shopping_customers), sometimes a 
-[seller](#shopping_sellers), sometimes an 
-[administrator](#shopping_administrators), and so on. 
-
-Of course, this is according to system theory, and it is unclear what 
-the planning will be like.
-
 **Properties**
   - `id`: Primary Key.
   - `shopping_channel_id`: Belonged channel's [shopping_channels.id](#shopping_channels)
