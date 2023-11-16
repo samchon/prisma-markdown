@@ -716,7 +716,7 @@ model shopping_customers {
 
 /// External user information.
 /// 
-/// `shopping_external_users` is an entity dsigned for when this system needs 
+/// `shopping_external_users` is an entity designed for when this system needs 
 /// to connect with external services and welcome their users as customers of 
 /// this service.
 /// 
@@ -1007,7 +1007,7 @@ model shopping_sellers {
 
     /// Withdrawal time.
     ///
-    /// It can be different with {@link shopping_members.deleted_at}.
+    /// It can be different with {@link shopping_members.withdrawn_at}.
     deleted_at DateTime? @db.Timestamptz
 
     //----
@@ -1057,7 +1057,7 @@ model shopping_administrators {
     /// Deletion time of record.
     ///
     /// Withdrawal time from administrator, and can be different with
-    /// {@link shopping_members.deleted_at}.
+    /// {@link shopping_members.withdrawn_at}.
     deleted_at DateTime? @db.Timestamptz
 
     //----

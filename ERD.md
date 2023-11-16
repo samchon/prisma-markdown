@@ -518,7 +518,7 @@ very systematically.
 ### `shopping_external_users`
 External user information.
 
-`shopping_external_users` is an entity dsigned for when this system needs 
+`shopping_external_users` is an entity designed for when this system needs 
 to connect with external services and welcome their users as customers of 
 this service.
 
@@ -654,7 +654,7 @@ do the [real-name authentication](#shopping_citizens), too.
   - `deleted_at`
     > Withdrawal time.
     > 
-    > It can be different with [shopping_members.deleted_at](#shopping_members).
+    > It can be different with [shopping_members.withdrawn_at](#shopping_members).
 
 ### `shopping_administrators`
 Administrator account.
@@ -679,7 +679,7 @@ do the [real-name authentication](#shopping_citizens), too.
     > Deletion time of record.
     > 
     > Withdrawal time from administrator, and can be different with
-    > [shopping_members.deleted_at](#shopping_members).
+    > [shopping_members.withdrawn_at](#shopping_members).
 
 ### `shopping_addresses`
 The address information.
