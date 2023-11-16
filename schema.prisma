@@ -1366,7 +1366,7 @@ model shopping_sale_snapshot_tags {
 /// Target channel of sale snapshot to sell.
 /// 
 /// `shopping_sale_snapshot_channels` is an entity that expresses through 
-/// which {@link shopping_channels channel} a listing 
+/// which {@link shopping_channels channel} listing 
 /// {@link shopping_sale_snapshots snapshot} is sold, and is designed to 
 /// resolve the M:N relationship between two tables.
 /// 

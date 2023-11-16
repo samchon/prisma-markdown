@@ -889,7 +889,7 @@ x | [shopping_carts](#shopping_carts) | [shopping_orders](#shopping_orders)
 Target channel of sale snapshot to sell.
 
 `shopping_sale_snapshot_channels` is an entity that expresses through 
-which [channel](#shopping_channels) a listing 
+which [channel](#shopping_channels) listing 
 [snapshot](#shopping_sale_snapshots) is sold, and is designed to 
 resolve the M:N relationship between two tables.
 
