@@ -857,7 +857,7 @@ the performance in each case.
     > The time when seller suspended the sale in some reason.
     > 
     > [Customers](#shopping_customers) can't see the sale in list and 
-    > detail page. It seems almost ssame with soft deletion, but there're 
+    > detail page. It seems almost same with soft deletion, but there're 
     > some differences. 
     > 
     > At 1st, seller and [administrator](#shopping_administrators) can
