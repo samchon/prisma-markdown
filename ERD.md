@@ -518,7 +518,7 @@ very systematically.
 ### `shopping_external_users`
 External user information.
 
-`shopping_external_users` is an entity dsigned for when this system needs 
+`shopping_external_users` is an entity designed for when this system needs 
 to connect with external services and welcome their users as customers of 
 this service.
 
