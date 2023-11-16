@@ -654,7 +654,7 @@ do the [real-name authentication](#shopping_citizens), too.
   - `deleted_at`
     > Withdrawal time.
     > 
-    > It can be different with [shopping_members.deleted_at](#shopping_members).
+    > It can be different with [shopping_members.withdrawn_at](#shopping_members).
 
 ### `shopping_administrators`
 Administrator account.
