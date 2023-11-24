@@ -92,3 +92,17 @@ model shopping_sale_reviews {}
 /// @hidden
 model shopping_sale_hits {}
 ```
+
+![Mandatory Relationship](https://github.com/samchon/prisma-markdown/assets/13158709/b382cf64-5047-4a00-b77f-7c3427010090)
+
+Additionally, when defining 1: N relationship, you can specify the N position to be whether optional or mandatory. If you want to configure the N position to be mandatory, just write the `@minItems 1` comment tag. Otherwise the N position is optional, you don't need to do anything.
+
+```prisma
+model shopping_sale_units {
+    /// @minItems 1
+    stocks shopping_sale_snapshot_unit_stocks[];
+    options shopping_sale_snapshot_unit_options[]; // optional
+}
+model shopping_sale_snapshot_unit_stocks {}
+model shopping_sale_snapshot_unit_options {}
+```
