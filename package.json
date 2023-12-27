@@ -1,6 +1,6 @@
 {
   "name": "prisma-markdown",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Prisma Markdown documents generator including ERD diagrams and comment descriptions",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -32,16 +32,20 @@
   },
   "homepage": "https://github.com/samchon/prisma-markdown",
   "devDependencies": {
+    "@prisma/client": "^5.0.0",
     "@types/node": "^20.6.0",
     "prettier": "^3.0.3",
-    "prisma": "^5.2.0",
+    "prisma": "^5.0.0",
     "rimraf": "^5.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@prisma/client": "^5.2.0",
-    "@prisma/generator-helper": "^5.2.0"
+    "@prisma/generator-helper": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@prisma/client": ">= 5.0.0",
+    "prisma": ">= 5.0.0"
   },
   "files": [
     "lib",
