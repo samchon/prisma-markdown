@@ -50,7 +50,7 @@ npx prisma generate
 ## Comment Tags
 If your database has over hundreds of models, none of automatic ERD generators can express them perfect. In that case, `prisma-markdown` recommends you to separate hundreds of models to multiple paginated diagrams by using `/// @namepsace <name>` comments.
 
-When you write `/// @namepsace <name>` comment on models, they would be separated to proper sections of markdown document. For reference, you can assign multiple `@namepsace`s to a model, and if you do not assign any `@namepsace` to a model, it would be assigned to `default` tag.
+When you write `/// @namespace <name>` comment on models, they would be separated to proper sections of markdown document. For reference, you can assign multiple `@namespace`s to a model, and if you do not assign any `@namespace` to a model, it would be assigned to `default` tag.
 
 Also, if you use `@erd <name>` instead of `@namespace <name>`, target model would be expressed only at ERD. It would not be appeared to the markdown content section. Otherwise, `@describe <name>` tag will show the model only at markdown content section, not at ERD.
 
