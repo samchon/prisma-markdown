@@ -1,17 +1,17 @@
 datasource db {
-    provider = "postgresql"
-    url      = env("POSTGRES_URL")
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
 }
 
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["views"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["views"]
 }
 
 generator markdown {
-    provider = "node ./lib/executable/markdown"
-    title    = "Implicit M: N relationships"
-    output   = "./implicit.md"
+  provider = "node ./lib/executable/markdown"
+  title    = "Implicit M: N relationships"
+  output   = "./implicit.md"
 }
 
 //-----------------------------------------------------------
@@ -41,35 +41,35 @@ generator markdown {
 /// @namespace Articles
 /// @author Samchon
 model bbs_articles {
-    /// @format uuid
-    id String @id @db.Uuid
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Creation time of article.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of article.
+  created_at DateTime @db.Timestamptz
 
-    /// Deletion time of article.
-    ///
-    /// To keep evidence, do not delete the article, but just mark it as 
-    /// deleted.
-    deleted_at DateTime? @db.Timestamptz
+  /// Deletion time of article.
+  ///
+  /// To keep evidence, do not delete the article, but just mark it as 
+  /// deleted.
+  deleted_at DateTime? @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    /// List of snapshots.
-    ///
-    /// It is created for the first time when an article is created, and is
-    /// accumulated every time the article is modified.
-    ///
-    /// @minItems 1
-    snapshots bbs_article_snapshots[]
+  //----
+  // RELATIONS
+  //----
+  /// List of snapshots.
+  ///
+  /// It is created for the first time when an article is created, and is
+  /// accumulated every time the article is modified.
+  ///
+  /// @minItems 1
+  snapshots bbs_article_snapshots[]
 
-    /// List of comments.
-    comments bbs_article_comments[]
+  /// List of comments.
+  comments bbs_article_comments[]
 
-    mv_last mv_bbs_article_last_snapshots?
+  mv_last mv_bbs_article_last_snapshots?
 
-    @@index([created_at])
+  @@index([created_at])
 }
 
 /// Snapshot of article.
@@ -82,45 +82,45 @@ model bbs_articles {
 /// @namespace Articles
 /// @author Samchon
 model bbs_article_snapshots {
-    //----
-    // COLUMNS
-    //----
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Belong article's {@link bbs_articles.id}
-    ///
-    /// @format uuid
-    bbs_article_id String @db.Uuid
+  /// Belong article's {@link bbs_articles.id}
+  ///
+  /// @format uuid
+  bbs_article_id String @db.Uuid
 
-    /// Format of body.
-    ///
-    /// Same meaning with extension like `html`, `md`, `txt`.
-    format String @db.VarChar
+  /// Format of body.
+  ///
+  /// Same meaning with extension like `html`, `md`, `txt`.
+  format String @db.VarChar
 
-    /// Title of article.
-    title String @db.VarChar
+  /// Title of article.
+  title String @db.VarChar
 
-    /// Content body of article.
-    body String
+  /// Content body of article.
+  body String
 
-    /// Creation time of record.
-    ///
-    /// It means creation time or update time or article.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of record.
+  ///
+  /// It means creation time or update time or article.
+  created_at DateTime @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    /// Belong article info.
-    article bbs_articles @relation(fields: [bbs_article_id], references: [id], onDelete: Cascade)
+  //----
+  // RELATIONS
+  //----
+  /// Belong article info.
+  article bbs_articles @relation(fields: [bbs_article_id], references: [id], onDelete: Cascade)
 
-    /// List of wrappers of attachment files.
-    files attachment_files[]
+  /// List of wrappers of attachment files.
+  files attachment_files[]
 
-    mv_last mv_bbs_article_last_snapshots?
+  mv_last mv_bbs_article_last_snapshots?
 
-    @@index([bbs_article_id, created_at])
+  @@index([bbs_article_id, created_at])
 }
 
 /// Attachment File.
@@ -133,43 +133,43 @@ model bbs_article_snapshots {
 /// @namespace Articles
 /// @author Samchon
 model attachment_files {
-    //----
-    // COLUMNS
-    //----
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// File name, except extension.
-    ///
-    /// Possible to omit like `.gitignore` case.
-    ///
-    /// @minLength 1
-    /// @maxLength 255
-    name String? @db.VarChar
+  /// File name, except extension.
+  ///
+  /// Possible to omit like `.gitignore` case.
+  ///
+  /// @minLength 1
+  /// @maxLength 255
+  name String? @db.VarChar
 
-    /// Extension.
-    ///
-    /// Possible to omit like `README` case.
-    ///
-    /// @minLength 1
-    /// @maxLength 8
-    extension String? @db.VarChar
+  /// Extension.
+  ///
+  /// Possible to omit like `README` case.
+  ///
+  /// @minLength 1
+  /// @maxLength 8
+  extension String? @db.VarChar
 
-    /// URL path of the real file.
-    ///
-    /// @format url
-    url String @db.VarChar
+  /// URL path of the real file.
+  ///
+  /// @format url
+  url String @db.VarChar
 
-    /// Creation time of file.
-    ///
-    /// @format date-time
-    created_at DateTime @db.Timestamptz
+  /// Creation time of file.
+  ///
+  /// @format date-time
+  created_at DateTime @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    bbs_article_snapshots         bbs_article_snapshots[]
-    bbs_article_comment_snapshots bbs_article_comment_snapshots[]
+  //----
+  // RELATIONS
+  //----
+  bbs_article_snapshots         bbs_article_snapshots[]
+  bbs_article_comment_snapshots bbs_article_comment_snapshots[]
 }
 
 /// Comment written on an article.
@@ -189,58 +189,58 @@ model attachment_files {
 /// @namespace Articles
 /// @author Samchon
 model bbs_article_comments {
-    //----
-    // COLUMNS
-    //----
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Belonged article's {@link bbs_articles.id}
-    /// 
-    /// @format uuid
-    bbs_article_id String @db.Uuid
+  /// Belonged article's {@link bbs_articles.id}
+  /// 
+  /// @format uuid
+  bbs_article_id String @db.Uuid
 
-    /// Parent comment's {@link bbs_article_comments.id}
-    ///
-    /// Used to express the hierarchical reply structure.
-    ///
-    /// @format uuid
-    parent_id String? @db.Uuid
+  /// Parent comment's {@link bbs_article_comments.id}
+  ///
+  /// Used to express the hierarchical reply structure.
+  ///
+  /// @format uuid
+  parent_id String? @db.Uuid
 
-    /// Creation time of comment.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of comment.
+  created_at DateTime @db.Timestamptz
 
-    /// Deletion time of comment.
-    ///
-    /// Do not allow to delete the comment, but just mark it as deleted, 
-    /// to keep evidence.
-    deleted_at DateTime? @db.Timestamptz
+  /// Deletion time of comment.
+  ///
+  /// Do not allow to delete the comment, but just mark it as deleted, 
+  /// to keep evidence.
+  deleted_at DateTime? @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    /// Belonged article.
-    article bbs_articles @relation(fields: [bbs_article_id], references: [id], onDelete: Cascade)
+  //----
+  // RELATIONS
+  //----
+  /// Belonged article.
+  article bbs_articles @relation(fields: [bbs_article_id], references: [id], onDelete: Cascade)
 
-    /// Parent comment.
-    ///
-    /// Only when reply case.
-    parent bbs_article_comments? @relation("bbs_article_comments_reply", fields: [parent_id], references: [id], onDelete: Cascade)
+  /// Parent comment.
+  ///
+  /// Only when reply case.
+  parent bbs_article_comments? @relation("bbs_article_comments_reply", fields: [parent_id], references: [id], onDelete: Cascade)
 
-    /// List of children comments.
-    ///
-    /// Reply comments of current.
-    children bbs_article_comments[] @relation("bbs_article_comments_reply")
+  /// List of children comments.
+  ///
+  /// Reply comments of current.
+  children bbs_article_comments[] @relation("bbs_article_comments_reply")
 
-    /// List of snapshots.
-    ///
-    /// It is created for the first time when a comment is created, and is
-    /// accumulated every time the comment is modified.
-    ///
-    /// @minItems 1
-    snapshots bbs_article_comment_snapshots[]
+  /// List of snapshots.
+  ///
+  /// It is created for the first time when a comment is created, and is
+  /// accumulated every time the comment is modified.
+  ///
+  /// @minItems 1
+  snapshots bbs_article_comment_snapshots[]
 
-    @@index([bbs_article_id, parent_id, created_at])
+  @@index([bbs_article_id, parent_id, created_at])
 }
 
 /// Snapshot of comment.
@@ -254,50 +254,50 @@ model bbs_article_comments {
 /// @namespace Articles
 /// @author Samchon
 model bbs_article_comment_snapshots {
-    //----
-    // COLUMNS
-    //----
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Belonged article's {@link bbs_article_comments.id}
-    ///
-    /// @format uuid
-    bbs_article_comment_id String @db.Uuid
+  /// Belonged article's {@link bbs_article_comments.id}
+  ///
+  /// @format uuid
+  bbs_article_comment_id String @db.Uuid
 
-    /// Format of content body.
-    ///
-    /// Same meaning with extension like `html`, `md`, `txt`.
-    format String @db.VarChar
+  /// Format of content body.
+  ///
+  /// Same meaning with extension like `html`, `md`, `txt`.
+  format String @db.VarChar
 
-    /// Content body of comment.
-    body String
+  /// Content body of comment.
+  body String
 
-    /// Creation time of record.
-    ///
-    /// It means creation time or update time or comment.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of record.
+  ///
+  /// It means creation time or update time or comment.
+  created_at DateTime @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    /// Belong comment info.
-    comment bbs_article_comments @relation(fields: [bbs_article_comment_id], references: [id], onDelete: Cascade)
+  //----
+  // RELATIONS
+  //----
+  /// Belong comment info.
+  comment bbs_article_comments @relation(fields: [bbs_article_comment_id], references: [id], onDelete: Cascade)
 
-    /// List of wrappers of attachment files.
-    files attachment_files[]
+  /// List of wrappers of attachment files.
+  files attachment_files[]
 
-    @@index([bbs_article_comment_id, created_at])
+  @@index([bbs_article_comment_id, created_at])
 }
 
 /// @hidden
 /// @author Samchon
 model mv_bbs_article_last_snapshots {
-    bbs_article_id          String @id @db.Uuid
-    bbs_article_snapshot_id String @db.Uuid
+  bbs_article_id          String @id @db.Uuid
+  bbs_article_snapshot_id String @db.Uuid
 
-    article  bbs_articles          @relation(fields: [bbs_article_id], references: [id], onDelete: Cascade)
-    snapshot bbs_article_snapshots @relation(fields: [bbs_article_snapshot_id], references: [id], onDelete: Cascade)
+  article  bbs_articles          @relation(fields: [bbs_article_id], references: [id], onDelete: Cascade)
+  snapshot bbs_article_snapshots @relation(fields: [bbs_article_snapshot_id], references: [id], onDelete: Cascade)
 
-    @@unique([bbs_article_snapshot_id])
+  @@unique([bbs_article_snapshot_id])
 }

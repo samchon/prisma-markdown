@@ -1,17 +1,17 @@
 datasource db {
-    provider = "postgresql"
-    url      = env("POSTGRES_URL")
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
 }
 
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["views"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["views"]
 }
 
 generator markdown {
-    provider = "node ./lib/executable/markdown"
-    title    = "Virtual Drive System"
-    output   = "./drive.md"
+  provider = "node ./lib/executable/markdown"
+  title    = "Virtual Drive System"
+  output   = "./drive.md"
 }
 
 //-----------------------------------------------------------
@@ -46,68 +46,68 @@ generator markdown {
 /// @namespace Actors
 /// @author Samchon
 model drive_customers {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Belonged member's {@link drive_members.id}
-    ///
-    /// @format uuid
-    drive_member_id String? @db.Uuid /// @format uuid
+  /// Belonged member's {@link drive_members.id}
+  ///
+  /// @format uuid
+  drive_member_id String? @db.Uuid /// @format uuid
 
-    /// Belonged external service user's {@link drive_external_users.id}
-    ///
-    /// @format uuid
-    drive_external_user_id String? @db.Uuid /// @format uuid
+  /// Belonged external service user's {@link drive_external_users.id}
+  ///
+  /// @format uuid
+  drive_external_user_id String? @db.Uuid /// @format uuid
 
-    /// Belonged citizen's {@link drive_citizens.id}
-    ///
-    /// @format uuid
-    drive_citizen_id String? @db.Uuid /// @format uuid
+  /// Belonged citizen's {@link drive_citizens.id}
+  ///
+  /// @format uuid
+  drive_citizen_id String? @db.Uuid /// @format uuid
 
-    /// Connection URL.
-    ///
-    /// {@link window.location.href}
-    ///
-    /// @format url
-    href String @db.VarChar /// @format url
+  /// Connection URL.
+  ///
+  /// {@link window.location.href}
+  ///
+  /// @format url
+  href String @db.VarChar /// @format url
 
-    /// Referrer URL.
-    ///
-    /// {@link window.document.referrer}
-    ///
-    /// @format url
-    referrer String @db.VarChar /// @format url
+  /// Referrer URL.
+  ///
+  /// {@link window.document.referrer}
+  ///
+  /// @format url
+  referrer String @db.VarChar /// @format url
 
-    /// IP address,
-    ///
-    /// @pattern ((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$))
-    ip String @db.VarChar
+  /// IP address,
+  ///
+  /// @pattern ((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$))
+  ip String @db.VarChar
 
-    /// Creation time of record.
-    ///
-    /// It means the time when the customer connected to the drive system.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of record.
+  ///
+  /// It means the time when the customer connected to the drive system.
+  created_at DateTime @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    member                                       drive_members?                                 @relation(fields: [drive_member_id], references: [id], onDelete: Cascade)
-    external_user                                drive_external_users?                          @relation(fields: [drive_external_user_id], references: [id], onDelete: Cascade)
-    citizen                                      drive_citizens?                                @relation(fields: [drive_citizen_id], references: [id], onDelete: Cascade)
-    drive_enterprise_employee_appointments       drive_enterprise_employee_appointments[]
-    drive_enterprise_team_companion_appointments drive_enterprise_team_companion_appointments[]
-    drive_repositories                           drive_repositories[]
-    drive_repository_buckets                     drive_repository_buckets[]
-    drive_repository_accesses                    drive_repository_accesses[]
+  //----
+  // RELATIONS
+  //----
+  member                                       drive_members?                                 @relation(fields: [drive_member_id], references: [id], onDelete: Cascade)
+  external_user                                drive_external_users?                          @relation(fields: [drive_external_user_id], references: [id], onDelete: Cascade)
+  citizen                                      drive_citizens?                                @relation(fields: [drive_citizen_id], references: [id], onDelete: Cascade)
+  drive_enterprise_employee_appointments       drive_enterprise_employee_appointments[]
+  drive_enterprise_team_companion_appointments drive_enterprise_team_companion_appointments[]
+  drive_repositories                           drive_repositories[]
+  drive_repository_buckets                     drive_repository_buckets[]
+  drive_repository_accesses                    drive_repository_accesses[]
 
-    @@index([drive_member_id])
-    @@index([drive_external_user_id])
-    @@index([drive_citizen_id])
+  @@index([drive_member_id])
+  @@index([drive_external_user_id])
+  @@index([drive_citizen_id])
 }
 
 /// External user information.
@@ -138,46 +138,46 @@ model drive_customers {
 /// @namespace Actors
 /// @author Samchon
 model drive_external_users {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Identifier code of the external service.
-    ///
-    /// It can be same with {@link drive_channels.code} in common.
-    application String @db.VarChar
+  /// Identifier code of the external service.
+  ///
+  /// It can be same with {@link drive_channels.code} in common.
+  application String @db.VarChar
 
-    /// Identifier key of external user from the external system.
-    uid String @db.VarChar
+  /// Identifier key of external user from the external system.
+  uid String @db.VarChar
 
-    /// Nickname of external user in the external system.
-    nickname String @db.VarChar
+  /// Nickname of external user in the external system.
+  nickname String @db.VarChar
 
-    /// Additional information about external user from the external system.
-    data String?
+  /// Additional information about external user from the external system.
+  data String?
 
-    /// Password of external user from the external system.
-    ///
-    /// This is a password issued to the user by an external service, and is 
-    /// by no means the actual user password. However, for customers who 
-    /// entered the same application and code as the current external system 
-    /// user, this is to determine whether to view this as a correct external 
-    /// system user or a violation.
-    password String @db.VarChar
+  /// Password of external user from the external system.
+  ///
+  /// This is a password issued to the user by an external service, and is 
+  /// by no means the actual user password. However, for customers who 
+  /// entered the same application and code as the current external system 
+  /// user, this is to determine whether to view this as a correct external 
+  /// system user or a violation.
+  password String @db.VarChar
 
-    /// Creation time of record.
-    ///
-    /// Another word, first time when the external user connected.
-    created_at DateTime
+  /// Creation time of record.
+  ///
+  /// Another word, first time when the external user connected.
+  created_at DateTime
 
-    //----
-    // RELATIONS
-    //----
-    drive_customers drive_customers[]
+  //----
+  // RELATIONS
+  //----
+  drive_customers drive_customers[]
 }
 
 /// Citizen verification information.
@@ -197,35 +197,35 @@ model drive_external_users {
 /// @namespace Actors
 /// @author Samchon
 model drive_citizens {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Mobile phone number.
-    ///
-    /// @pattern ^[0-9]*$
-    mobile String @db.VarChar
+  /// Mobile phone number.
+  ///
+  /// @pattern ^[0-9]*$
+  mobile String @db.VarChar
 
-    /// Real name, or equivalent name identifiable.
-    name String @db.VarChar
+  /// Real name, or equivalent name identifiable.
+  name String @db.VarChar
 
-    /// Creation time of record.
-    ///
-    /// In other words, the 1st time of citizen activation.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of record.
+  ///
+  /// In other words, the 1st time of citizen activation.
+  created_at DateTime @db.Timestamptz
 
-    /// Deletion time of record.
-    deleted_at DateTime? @db.Timestamptz
+  /// Deletion time of record.
+  deleted_at DateTime? @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    drive_customers drive_customers[]
-    drive_members   drive_members[]
+  //----
+  // RELATIONS
+  //----
+  drive_customers drive_customers[]
+  drive_members   drive_members[]
 }
 
 /// Member Account.
@@ -242,49 +242,49 @@ model drive_citizens {
 /// @namespace Actors
 /// @author Samchon
 model drive_members {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Belonged account's {@link drive_accounts.id}
-    ///
-    /// @format uuid
-    drive_account_id String? @db.Uuid
+  /// Belonged account's {@link drive_accounts.id}
+  ///
+  /// @format uuid
+  drive_account_id String? @db.Uuid
 
-    /// Belonged citizen's {@link drive_citizens.id}
-    ///
-    /// @format uuid
-    drive_citizen_id String? @db.Uuid
+  /// Belonged citizen's {@link drive_citizens.id}
+  ///
+  /// @format uuid
+  drive_citizen_id String? @db.Uuid
 
-    /// Nickname.
-    nickname String @db.VarChar
+  /// Nickname.
+  nickname String @db.VarChar
 
-    /// Password for log-in.
-    password String @db.VarChar
+  /// Password for log-in.
+  password String @db.VarChar
 
-    /// Creation time of record.
-    ///
-    /// In other words, the joining time.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of record.
+  ///
+  /// In other words, the joining time.
+  created_at DateTime @db.Timestamptz
 
-    /// Update time of record.
-    updated_at DateTime @db.Timestamptz
+  /// Update time of record.
+  updated_at DateTime @db.Timestamptz
 
-    /// Deletion time of record.
-    withdrawn_at DateTime? @db.Timestamptz
+  /// Deletion time of record.
+  withdrawn_at DateTime? @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    account                    drive_accounts?              @relation(fields: [drive_account_id], references: [id], onDelete: Cascade)
-    citizen                    drive_citizens?              @relation(fields: [drive_citizen_id], references: [id], onDelete: Cascade)
-    drive_customers            drive_customers[]
-    drive_member_emails        drive_member_emails[]
-    drive_enterprise_employees drive_enterprise_employees[]
+  //----
+  // RELATIONS
+  //----
+  account                    drive_accounts?              @relation(fields: [drive_account_id], references: [id], onDelete: Cascade)
+  citizen                    drive_citizens?              @relation(fields: [drive_citizen_id], references: [id], onDelete: Cascade)
+  drive_customers            drive_customers[]
+  drive_member_emails        drive_member_emails[]
+  drive_enterprise_employees drive_enterprise_employees[]
 }
 
 /// Email address of member.
@@ -296,29 +296,29 @@ model drive_members {
 /// @namespace Actors
 /// @author Samchon
 model drive_member_emails {
-    //----
-    // COLUMNS
-    //----
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Belonged member's {@link drive_members.id}
-    /// 
-    /// @format uuid
-    drive_member_id String @db.Uuid
+  /// Belonged member's {@link drive_members.id}
+  /// 
+  /// @format uuid
+  drive_member_id String @db.Uuid
 
-    /// Email address.
-    ///
-    /// @format email
-    value String @db.VarChar
+  /// Email address.
+  ///
+  /// @format email
+  value String @db.VarChar
 
-    /// Creation time of record.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of record.
+  created_at DateTime @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    member drive_members @relation(fields: [drive_member_id], references: [id], onDelete: Cascade)
+  //----
+  // RELATIONS
+  //----
+  member drive_members @relation(fields: [drive_member_id], references: [id], onDelete: Cascade)
 }
 
 /// Account entity.
@@ -344,33 +344,33 @@ model drive_member_emails {
 /// @namespace Actors
 /// @author Samchon
 model drive_accounts {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Identifer code of the account.
-    code String @db.VarChar
+  /// Identifer code of the account.
+  code String @db.VarChar
 
-    /// Creation time of record.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of record.
+  created_at DateTime @db.Timestamptz
 
-    /// Deletion time of record.
-    deleted_at DateTime? @db.Timestamptz
+  /// Deletion time of record.
+  deleted_at DateTime? @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    drive_members             drive_members[]
-    drive_enterprises         drive_enterprises[]
-    drive_repositories        drive_repositories[]
-    drive_repository_accesses drive_repository_accesses[]
+  //----
+  // RELATIONS
+  //----
+  drive_members             drive_members[]
+  drive_enterprises         drive_enterprises[]
+  drive_repositories        drive_repositories[]
+  drive_repository_accesses drive_repository_accesses[]
 
-    @@unique([code])
-    @@index([created_at])
+  @@unique([code])
+  @@index([created_at])
 }
 
 /// Enterprise, a enterprise entity.
@@ -389,37 +389,37 @@ model drive_accounts {
 /// @namespace Actors
 /// @author Samchon
 model drive_enterprises {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Belonged account's {@link drive_accounts.id}
-    ///
-    /// @format uuid
-    drive_account_id String @db.Uuid
+  /// Belonged account's {@link drive_accounts.id}
+  ///
+  /// @format uuid
+  drive_account_id String @db.Uuid
 
-    /// Representative name of the enterprise.
-    name String @db.VarChar
+  /// Representative name of the enterprise.
+  name String @db.VarChar
 
-    /// Creation time of record.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of record.
+  created_at DateTime @db.Timestamptz
 
-    /// Update time of record.
-    updated_at DateTime @db.Timestamptz
+  /// Update time of record.
+  updated_at DateTime @db.Timestamptz
 
-    /// Deletion time of record.
-    deleted_at DateTime? @db.Timestamptz
+  /// Deletion time of record.
+  deleted_at DateTime? @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    account                    drive_accounts               @relation(fields: [drive_account_id], references: [id], onDelete: Cascade)
-    drive_enterprise_employees drive_enterprise_employees[]
-    drive_enterprise_teams     drive_enterprise_teams[]
+  //----
+  // RELATIONS
+  //----
+  account                    drive_accounts               @relation(fields: [drive_account_id], references: [id], onDelete: Cascade)
+  drive_enterprise_employees drive_enterprise_employees[]
+  drive_enterprise_teams     drive_enterprise_teams[]
 }
 
 /// Employee entity within a enterprise.
@@ -439,43 +439,43 @@ model drive_enterprises {
 /// @namespace Actors
 /// @author Samchon
 model drive_enterprise_employees {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Belonged enterprise's {@link drive_enterprises.id}
-    ///
-    /// @format uuid
-    drive_enterprise_id String @db.Uuid
+  /// Belonged enterprise's {@link drive_enterprises.id}
+  ///
+  /// @format uuid
+  drive_enterprise_id String @db.Uuid
 
-    /// Belonged member's {@link drive_members.id}
-    ///
-    /// @format uuid
-    drive_member_id String @db.Uuid
+  /// Belonged member's {@link drive_members.id}
+  ///
+  /// @format uuid
+  drive_member_id String @db.Uuid
 
-    /// Role of employee.
-    role String @db.VarChar
+  /// Role of employee.
+  role String @db.VarChar
 
-    /// Creation time of record.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of record.
+  created_at DateTime @db.Timestamptz
 
-    /// Update time of record.
-    updated_at DateTime @db.Timestamptz
+  /// Update time of record.
+  updated_at DateTime @db.Timestamptz
 
-    /// Deletion time of record.
-    deleted_at DateTime? @db.Timestamptz
+  /// Deletion time of record.
+  deleted_at DateTime? @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    enterprise                             drive_enterprises                        @relation(fields: [drive_enterprise_id], references: [id], onDelete: Cascade)
-    member                                 drive_members                            @relation(fields: [drive_member_id], references: [id], onDelete: Cascade)
-    drive_enterprise_employee_appointments drive_enterprise_employee_appointments[]
-    drive_enterprise_team_companions       drive_enterprise_team_companions[]
+  //----
+  // RELATIONS
+  //----
+  enterprise                             drive_enterprises                        @relation(fields: [drive_enterprise_id], references: [id], onDelete: Cascade)
+  member                                 drive_members                            @relation(fields: [drive_member_id], references: [id], onDelete: Cascade)
+  drive_enterprise_employee_appointments drive_enterprise_employee_appointments[]
+  drive_enterprise_team_companions       drive_enterprise_team_companions[]
 }
 
 /// Employee Appointment Information.
@@ -492,35 +492,35 @@ model drive_enterprise_employees {
 /// @namespace Actors
 /// @author Samchon
 model drive_enterprise_employee_appointments {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Belonged employee's {@link drive_enterprise_employees.id}
-    ///
-    /// @format uuid
-    drive_enterprise_employee_id String @db.Uuid
+  /// Belonged employee's {@link drive_enterprise_employees.id}
+  ///
+  /// @format uuid
+  drive_enterprise_employee_id String @db.Uuid
 
-    /// Creator customer's {@link drive_customers.id}
-    ///
-    /// @format uuid
-    drive_customer_id String @db.Uuid
+  /// Creator customer's {@link drive_customers.id}
+  ///
+  /// @format uuid
+  drive_customer_id String @db.Uuid
 
-    /// Role of employee at that time.
-    role String @db.VarChar
+  /// Role of employee at that time.
+  role String @db.VarChar
 
-    /// Creation time of record.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of record.
+  created_at DateTime @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    employee drive_enterprise_employees @relation(fields: [drive_enterprise_employee_id], references: [id], onDelete: Cascade)
-    customer drive_customers            @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
+  //----
+  // RELATIONS
+  //----
+  employee drive_enterprise_employees @relation(fields: [drive_enterprise_employee_id], references: [id], onDelete: Cascade)
+  customer drive_customers            @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
 }
 
 /// Team information within the enterprise.
@@ -535,40 +535,40 @@ model drive_enterprise_employee_appointments {
 /// @namespace Actors
 /// @author Samchon
 model drive_enterprise_teams {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Belonged enterprise's {@link drive_enterprises.id}
-    ///
-    /// @format uuid
-    drive_enterprise_id String @db.Uuid
+  /// Belonged enterprise's {@link drive_enterprises.id}
+  ///
+  /// @format uuid
+  drive_enterprise_id String @db.Uuid
 
-    /// Identifier code of the team.
-    code String @db.VarChar
+  /// Identifier code of the team.
+  code String @db.VarChar
 
-    /// Representative name of the team.
-    name String @db.VarChar
+  /// Representative name of the team.
+  name String @db.VarChar
 
-    /// Creation time of record.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of record.
+  created_at DateTime @db.Timestamptz
 
-    /// Update time of record.
-    updated_at DateTime @db.Timestamptz
+  /// Update time of record.
+  updated_at DateTime @db.Timestamptz
 
-    /// Deletion time of record.
-    deleted_at DateTime? @db.Timestamptz
+  /// Deletion time of record.
+  deleted_at DateTime? @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    enterprise                       drive_enterprises                  @relation(fields: [drive_enterprise_id], references: [id], onDelete: Cascade)
-    drive_enterprise_team_companions drive_enterprise_team_companions[]
-    drive_repository_accesses        drive_repository_accesses[]
+  //----
+  // RELATIONS
+  //----
+  enterprise                       drive_enterprises                  @relation(fields: [drive_enterprise_id], references: [id], onDelete: Cascade)
+  drive_enterprise_team_companions drive_enterprise_team_companions[]
+  drive_repository_accesses        drive_repository_accesses[]
 }
 
 /// Information about companion of teams within the enterprise.
@@ -587,42 +587,42 @@ model drive_enterprise_teams {
 /// @namespace Actors
 /// @author Samchon
 model drive_enterprise_team_companions {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Belonged team's {@link drive_enterprise_teams.id}
-    ///
-    /// @format uuid
-    drive_enterprise_team_id String @db.Uuid
+  /// Belonged team's {@link drive_enterprise_teams.id}
+  ///
+  /// @format uuid
+  drive_enterprise_team_id String @db.Uuid
 
-    /// Belonged employee's {@link drive_enterprise_employees.id}
-    ///
-    /// @format uuid
-    drive_enterprise_employee_id String @db.Uuid
+  /// Belonged employee's {@link drive_enterprise_employees.id}
+  ///
+  /// @format uuid
+  drive_enterprise_employee_id String @db.Uuid
 
-    /// Role in the team.
-    role String @db.VarChar
+  /// Role in the team.
+  role String @db.VarChar
 
-    /// Creation time of record.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of record.
+  created_at DateTime @db.Timestamptz
 
-    /// Update time of record.
-    updated_at DateTime @db.Timestamptz
+  /// Update time of record.
+  updated_at DateTime @db.Timestamptz
 
-    /// Deletion time of record.
-    deleted_at DateTime? @db.Timestamptz
+  /// Deletion time of record.
+  deleted_at DateTime? @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    team                                         drive_enterprise_teams                         @relation(fields: [drive_enterprise_team_id], references: [id], onDelete: Cascade)
-    employee                                     drive_enterprise_employees                     @relation(fields: [drive_enterprise_employee_id], references: [id], onDelete: Cascade)
-    drive_enterprise_team_companion_appointments drive_enterprise_team_companion_appointments[]
+  //----
+  // RELATIONS
+  //----
+  team                                         drive_enterprise_teams                         @relation(fields: [drive_enterprise_team_id], references: [id], onDelete: Cascade)
+  employee                                     drive_enterprise_employees                     @relation(fields: [drive_enterprise_employee_id], references: [id], onDelete: Cascade)
+  drive_enterprise_team_companion_appointments drive_enterprise_team_companion_appointments[]
 }
 
 /// Appointment information for team companions within the enterprise.
@@ -639,35 +639,35 @@ model drive_enterprise_team_companions {
 /// @namespace Actors
 /// @author Samchon
 model drive_enterprise_team_companion_appointments {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Belonged team companion's {@link drive_enterprise_team_companions.id}
-    ///
-    /// @format uuid
-    drive_enterprise_team_companion_id String @db.Uuid
+  /// Belonged team companion's {@link drive_enterprise_team_companions.id}
+  ///
+  /// @format uuid
+  drive_enterprise_team_companion_id String @db.Uuid
 
-    /// Creator customer's {@link drive_customers.id}
-    ///
-    /// @format uuid
-    drive_customer_id String @db.Uuid
+  /// Creator customer's {@link drive_customers.id}
+  ///
+  /// @format uuid
+  drive_customer_id String @db.Uuid
 
-    /// Role of team companion at that time.
-    role String @db.VarChar
+  /// Role of team companion at that time.
+  role String @db.VarChar
 
-    /// Creation time of record.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of record.
+  created_at DateTime @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    companion drive_enterprise_team_companions @relation(fields: [drive_enterprise_team_companion_id], references: [id], onDelete: Cascade)
-    customer  drive_customers                  @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
+  //----
+  // RELATIONS
+  //----
+  companion drive_enterprise_team_companions @relation(fields: [drive_enterprise_team_companion_id], references: [id], onDelete: Cascade)
+  customer  drive_customers                  @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
 }
 
 //-----------------------------------------------------------
@@ -689,44 +689,44 @@ model drive_enterprise_team_companion_appointments {
 /// @namespace Repositories
 /// @author Samchon
 model drive_repositories {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Belonged account's {@link drive_accounts.id}
-    ///
-    /// @format uuid
-    drive_account_id String @db.Uuid
+  /// Belonged account's {@link drive_accounts.id}
+  ///
+  /// @format uuid
+  drive_account_id String @db.Uuid
 
-    /// Creator customer's {@link drive_customers.id}
-    ///
-    /// @format uuid
-    drive_customer_id String @db.Uuid
+  /// Creator customer's {@link drive_customers.id}
+  ///
+  /// @format uuid
+  drive_customer_id String @db.Uuid
 
-    /// Identifier code of repository.
-    code String @db.VarChar
+  /// Identifier code of repository.
+  code String @db.VarChar
 
-    /// Creation time of record.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of record.
+  created_at DateTime @db.Timestamptz
 
-    /// Update time of record.
-    updated_at DateTime @db.Timestamptz
+  /// Update time of record.
+  updated_at DateTime @db.Timestamptz
 
-    /// Deletion time of record.
-    deleted_at DateTime? @db.Timestamptz
+  /// Deletion time of record.
+  deleted_at DateTime? @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    account                   drive_accounts              @relation(fields: [drive_account_id], references: [id], onDelete: Cascade)
-    customer                  drive_customers             @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
-    drive_repository_buckets  drive_repository_buckets[]
-    drive_repository_accesses drive_repository_accesses[]
-    drive_repository_tags     drive_repository_tags[]
+  //----
+  // RELATIONS
+  //----
+  account                   drive_accounts              @relation(fields: [drive_account_id], references: [id], onDelete: Cascade)
+  customer                  drive_customers             @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
+  drive_repository_buckets  drive_repository_buckets[]
+  drive_repository_accesses drive_repository_accesses[]
+  drive_repository_tags     drive_repository_tags[]
 }
 
 /// Bucket information within the repository.
@@ -741,64 +741,64 @@ model drive_repositories {
 /// @namespace Repositories
 /// @author Samchon
 model drive_repository_buckets {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Belonged repository's {@link drive_repositories.id}
-    ///
-    /// @format uuid
-    drive_repository_id String @db.Uuid
+  /// Belonged repository's {@link drive_repositories.id}
+  ///
+  /// @format uuid
+  drive_repository_id String @db.Uuid
 
-    /// Belonged folder's {@link drive_repository_folders.id}
-    ///
-    /// @format uuid
-    drive_repository_folder_id String? @db.Uuid
+  /// Belonged folder's {@link drive_repository_folders.id}
+  ///
+  /// @format uuid
+  drive_repository_folder_id String? @db.Uuid
 
-    /// Creator customer's {@link drive_customers.id}
-    ///
-    /// @format uuid
-    drive_customer_id String @db.Uuid
+  /// Creator customer's {@link drive_customers.id}
+  ///
+  /// @format uuid
+  drive_customer_id String @db.Uuid
 
-    /// Type of bucket.
-    ///
-    /// Discriminator of the supertype entity.
-    ///
-    /// - directory
-    /// - file
-    /// -shortcut
-    type String @db.VarChar
+  /// Type of bucket.
+  ///
+  /// Discriminator of the supertype entity.
+  ///
+  /// - directory
+  /// - file
+  /// -shortcut
+  type String @db.VarChar
 
-    /// Name of the bucket.
-    ///
-    /// @maxLength 255
-    name String @db.VarChar(255)
+  /// Name of the bucket.
+  ///
+  /// @maxLength 255
+  name String @db.VarChar(255)
 
-    /// Creation time of record.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of record.
+  created_at DateTime @db.Timestamptz
 
-    /// Update time of record.
-    updated_at DateTime @db.Timestamptz
+  /// Update time of record.
+  updated_at DateTime @db.Timestamptz
 
-    /// Deletion time of record.
-    deleted_at DateTime? @db.Timestamptz
+  /// Deletion time of record.
+  deleted_at DateTime? @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    repository drive_repositories        @relation(fields: [drive_repository_id], references: [id], onDelete: Cascade)
-    folder     drive_repository_folders? @relation("rel_drive_repository_bucket_parent", fields: [drive_repository_folder_id], references: [id], onDelete: Cascade)
-    customer   drive_customers           @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
+  //----
+  // RELATIONS
+  //----
+  repository drive_repositories        @relation(fields: [drive_repository_id], references: [id], onDelete: Cascade)
+  folder     drive_repository_folders? @relation("rel_drive_repository_bucket_parent", fields: [drive_repository_folder_id], references: [id], onDelete: Cascade)
+  customer   drive_customers           @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
 
-    of_folder   drive_repository_folders?   @relation("rel_drive_repository_folders_base")
-    of_file     drive_repository_files?
-    of_shortcut drive_repository_shortcuts? @relation("rel_drive_repository_shortcuts_base")
+  of_folder   drive_repository_folders?   @relation("rel_drive_repository_folders_base")
+  of_file     drive_repository_files?
+  of_shortcut drive_repository_shortcuts? @relation("rel_drive_repository_shortcuts_base")
 
-    shortcuts drive_repository_shortcuts[] @relation("rel_drive_repository_shortcuts_target")
+  shortcuts drive_repository_shortcuts[] @relation("rel_drive_repository_shortcuts_target")
 }
 
 /// Folder (directory).
@@ -809,19 +809,19 @@ model drive_repository_buckets {
 /// @namespace Repositories
 /// @author Samchon
 model drive_repository_folders {
-    //----
-    // COLUMNS
-    //----
-    /// PK + FK.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// PK + FK.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    //----
-    // RELATIONS
-    //----
-    base     drive_repository_buckets   @relation("rel_drive_repository_folders_base", fields: [id], references: [id], onDelete: Cascade)
-    children drive_repository_buckets[] @relation("rel_drive_repository_bucket_parent")
+  //----
+  // RELATIONS
+  //----
+  base     drive_repository_buckets   @relation("rel_drive_repository_folders_base", fields: [id], references: [id], onDelete: Cascade)
+  children drive_repository_buckets[] @relation("rel_drive_repository_bucket_parent")
 }
 
 /// File.
@@ -835,25 +835,25 @@ model drive_repository_folders {
 /// @namespace Repositories
 /// @author Samchon
 model drive_repository_files {
-    //----
-    // COLUMNS
-    //----
-    /// PK + FK.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// PK + FK.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Extension of file.
-    ///
-    /// @maxLength 8
-    extension String? @db.VarChar(8)
+  /// Extension of file.
+  ///
+  /// @maxLength 8
+  extension String? @db.VarChar(8)
 
-    url String @db.VarChar
+  url String @db.VarChar
 
-    //----
-    // RELATIONS
-    //----
-    base drive_repository_buckets @relation(fields: [id], references: [id], onDelete: Cascade)
+  //----
+  // RELATIONS
+  //----
+  base drive_repository_buckets @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 /// Shortcut icon.
@@ -868,24 +868,24 @@ model drive_repository_files {
 /// @namespace Repositories
 /// @author Samchon
 model drive_repository_shortcuts {
-    //----
-    // COLUMNS
-    //----
-    /// PK + FK.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// PK + FK.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Target bucket's {@link drive_repository_buckets.id}
-    ///
-    /// This shortcut references the target bucket.
-    drive_repository_bucket_id String @db.Uuid
+  /// Target bucket's {@link drive_repository_buckets.id}
+  ///
+  /// This shortcut references the target bucket.
+  drive_repository_bucket_id String @db.Uuid
 
-    //----
-    // RELATIONS
-    //----
-    base   drive_repository_buckets @relation("rel_drive_repository_shortcuts_base", fields: [id], references: [id], onDelete: Cascade)
-    target drive_repository_buckets @relation("rel_drive_repository_shortcuts_target", fields: [drive_repository_bucket_id], references: [id], onDelete: Cascade)
+  //----
+  // RELATIONS
+  //----
+  base   drive_repository_buckets @relation("rel_drive_repository_shortcuts_base", fields: [id], references: [id], onDelete: Cascade)
+  target drive_repository_buckets @relation("rel_drive_repository_shortcuts_target", fields: [drive_repository_bucket_id], references: [id], onDelete: Cascade)
 }
 
 /// Storage access control.
@@ -903,49 +903,49 @@ model drive_repository_shortcuts {
 /// @namespace Repositories
 /// @author Samchon
 model drive_repository_accesses {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Belonged repository's {@link drive_repositories.id}
-    ///
-    /// @format uuid
-    drive_repository_id String @db.Uuid
+  /// Belonged repository's {@link drive_repositories.id}
+  ///
+  /// @format uuid
+  drive_repository_id String @db.Uuid
 
-    /// Creator customer's {@link drive_customers.id}
-    ///
-    /// @format uuid
-    drive_customer_id String @db.Uuid
+  /// Creator customer's {@link drive_customers.id}
+  ///
+  /// @format uuid
+  drive_customer_id String @db.Uuid
 
-    /// Target account's {@link drive_members.id}
-    drive_account_id String? @db.Uuid
+  /// Target account's {@link drive_members.id}
+  drive_account_id String? @db.Uuid
 
-    /// Target enterprise team's {@link drive_enterprise_teams.id}
-    drive_enterprise_team_id String? @db.Uuid
+  /// Target enterprise team's {@link drive_enterprise_teams.id}
+  drive_enterprise_team_id String? @db.Uuid
 
-    /// Role of access permission.
-    role String @db.VarChar
+  /// Role of access permission.
+  role String @db.VarChar
 
-    /// Creation time of record.
-    created_at DateTime @db.Timestamptz
+  /// Creation time of record.
+  created_at DateTime @db.Timestamptz
 
-    /// Update time of record.
-    updated_at DateTime @db.Timestamptz
+  /// Update time of record.
+  updated_at DateTime @db.Timestamptz
 
-    /// Deletion time of record.
-    deleted_at DateTime? @db.Timestamptz
+  /// Deletion time of record.
+  deleted_at DateTime? @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    repository drive_repositories      @relation(fields: [drive_repository_id], references: [id], onDelete: Cascade)
-    customer   drive_customers         @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
-    account    drive_accounts?         @relation(fields: [drive_account_id], references: [id], onDelete: Cascade)
-    team       drive_enterprise_teams? @relation(fields: [drive_enterprise_team_id], references: [id], onDelete: Cascade)
+  //----
+  // RELATIONS
+  //----
+  repository drive_repositories      @relation(fields: [drive_repository_id], references: [id], onDelete: Cascade)
+  customer   drive_customers         @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
+  account    drive_accounts?         @relation(fields: [drive_account_id], references: [id], onDelete: Cascade)
+  team       drive_enterprise_teams? @relation(fields: [drive_enterprise_team_id], references: [id], onDelete: Cascade)
 }
 
 /// Search tag of repository.
@@ -953,27 +953,27 @@ model drive_repository_accesses {
 /// @namespace Repositories
 /// @author Samchon
 model drive_repository_tags {
-    //----
-    // COLUMNS
-    //----
-    /// Primary Key.
-    ///
-    /// @format uuid
-    id String @id @db.Uuid
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
 
-    /// Belonged repository's {@link drive_repositories.id}
-    drive_repository_id String @db.Uuid
+  /// Belonged repository's {@link drive_repositories.id}
+  drive_repository_id String @db.Uuid
 
-    /// Search tag value.
-    value String @db.VarChar
+  /// Search tag value.
+  value String @db.VarChar
 
-    /// Creation time of record.
-    sequence Int @db.Integer
+  /// Creation time of record.
+  sequence Int @db.Integer
 
-    created_at DateTime @db.Timestamptz
+  created_at DateTime @db.Timestamptz
 
-    //----
-    // RELATIONS
-    //----
-    repository drive_repositories @relation(fields: [drive_repository_id], references: [id], onDelete: Cascade)
+  //----
+  // RELATIONS
+  //----
+  repository drive_repositories @relation(fields: [drive_repository_id], references: [id], onDelete: Cascade)
 }
