@@ -69,23 +69,23 @@ export namespace MermaidWriter {
       const oneToOne: boolean = scalar.isId || scalar.isUnique;
       const arrow: string = [
         oneToOne ? "|" : "}",
-        !scalar.isRequired ||
-        (oneToOne &&
-          props.group.some(
-            (m) =>
-              m.name === field.type &&
-              m.fields.some(
-                (f) => f.relationName === field.relationName && !f.isRequired,
-              ),
-          ))
+        oneToOne &&
+        props.group.some(
+          (m) =>
+            m.name === field.type &&
+            m.fields.some(
+              (f) => f.relationName === field.relationName && !f.isRequired,
+            ),
+        )
           ? "o"
           : isMandatoryMany({ model: props.model, field, target })
             ? "|"
             : "o",
         "--",
-        props.model === target ? "o" : "|",
+        scalar.isRequired ? "|" : "o",
         "|",
       ].join("");
+
       return [
         JSON.stringify(props.model.dbName ?? props.model.name),
         arrow,

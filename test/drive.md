@@ -104,11 +104,11 @@ erDiagram
   String role
   DateTime created_at
 }
-"drive_customers" }o--|| "drive_members" : member
-"drive_customers" }o--|| "drive_external_users" : external_user
-"drive_customers" }o--|| "drive_citizens" : citizen
-"drive_members" }o--|| "drive_accounts" : account
-"drive_members" }o--|| "drive_citizens" : citizen
+"drive_customers" }o--o| "drive_members" : member
+"drive_customers" }o--o| "drive_external_users" : external_user
+"drive_customers" }o--o| "drive_citizens" : citizen
+"drive_members" }o--o| "drive_accounts" : account
+"drive_members" }o--o| "drive_citizens" : citizen
 "drive_member_emails" }o--|| "drive_members" : member
 "drive_enterprises" }o--|| "drive_accounts" : account
 "drive_enterprise_employees" }o--|| "drive_enterprises" : enterprise
@@ -487,7 +487,7 @@ erDiagram
   DateTime created_at
 }
 "drive_repository_buckets" }o--|| "drive_repositories" : repository
-"drive_repository_buckets" }o--|| "drive_repository_folders" : folder
+"drive_repository_buckets" }o--o| "drive_repository_folders" : folder
 "drive_repository_folders" |o--|| "drive_repository_buckets" : base
 "drive_repository_files" |o--|| "drive_repository_buckets" : base
 "drive_repository_shortcuts" |o--|| "drive_repository_buckets" : base

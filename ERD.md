@@ -455,12 +455,12 @@ erDiagram
   String special_note "nullable"
   DateTime created_at
 }
-"shopping_customers" }o--|| "shopping_members" : member
-"shopping_customers" }o--|| "shopping_external_users" : external_user
-"shopping_customers" }o--|| "shopping_citizens" : citizen
-"shopping_external_users" }o--|| "shopping_citizens" : citizen
-"shopping_members" }o--|| "shopping_citizens" : citizen
-"shopping_member_emails" }o--|| "shopping_members" : member
+"shopping_customers" }|--o| "shopping_members" : member
+"shopping_customers" }|--o| "shopping_external_users" : external_user
+"shopping_customers" }|--o| "shopping_citizens" : citizen
+"shopping_external_users" }o--o| "shopping_citizens" : citizen
+"shopping_members" }o--o| "shopping_citizens" : citizen
+"shopping_member_emails" }|--|| "shopping_members" : member
 "shopping_sellers" |o--|| "shopping_members" : member
 "shopping_administrators" |o--|| "shopping_members" : member
 ```
@@ -1281,7 +1281,7 @@ erDiagram
 "shopping_cart_commodity_stocks" }o--|| "shopping_sale_snapshot_unit_stocks" : stock
 "shopping_cart_commodity_stock_choices" }o--|| "shopping_cart_commodity_stocks" : stock
 "shopping_cart_commodity_stock_choices" }o--|| "shopping_sale_snapshot_unit_options" : option
-"shopping_cart_commodity_stock_choices" }o--|| "shopping_sale_snapshot_unit_option_candidates" : candidate
+"shopping_cart_commodity_stock_choices" }o--o| "shopping_sale_snapshot_unit_option_candidates" : candidate
 "shopping_sale_snapshot_units" }o--|| "shopping_sale_snapshots" : snapshot
 "shopping_sale_snapshot_unit_options" }o--|| "shopping_sale_snapshot_units" : unit
 "shopping_sale_snapshot_unit_option_candidates" }o--|| "shopping_sale_snapshot_unit_options" : option
@@ -1512,7 +1512,7 @@ erDiagram
   Int quantity
   Int sequence
 }
-"shopping_orders" }o--|| "shopping_addresses" : address
+"shopping_orders" }o--o| "shopping_addresses" : address
 "shopping_order_goods" }o--|| "shopping_orders" : order
 "shopping_order_goods" }o--|| "shopping_cart_commodities" : commodity
 "shopping_order_publishes" |o--|| "shopping_orders" : order
@@ -1836,7 +1836,7 @@ erDiagram
 "shopping_coupon_sale_criterias" |o--|| "shopping_coupon_criterias" : base
 "shopping_coupon_funnel_criterias" |o--|| "shopping_coupon_criterias" : base
 "shopping_coupon_tickets" }o--|| "shopping_coupons" : coupon
-"shopping_coupon_tickets" |o--|| "shopping_coupon_disposables" : disposable
+"shopping_coupon_tickets" |o--o| "shopping_coupon_disposables" : disposable
 "shopping_coupon_ticket_payments" |o--|| "shopping_coupon_tickets" : ticket
 "shopping_coupon_disposables" }o--|| "shopping_coupons" : coupon
 ```
@@ -2288,7 +2288,7 @@ erDiagram
 "shopping_mileage_donations" }o--|| "shopping_citizens" : citizen
 "shopping_mileage_histories" }o--|| "shopping_mileages" : mileage
 "shopping_mileage_histories" }o--|| "shopping_citizens" : citizen
-"shopping_customers" }o--|| "shopping_citizens" : citizen
+"shopping_customers" }|--o| "shopping_citizens" : citizen
 ```
 
 ### `shopping_deposits`

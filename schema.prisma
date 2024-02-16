@@ -798,9 +798,11 @@ model shopping_external_users {
   //----
   // RELATIONS
   //----
-  channel            shopping_channels    @relation(fields: [shopping_channel_id], references: [id], onDelete: Cascade)
-  citizen            shopping_citizens?   @relation(fields: [shopping_citizen_id], references: [id], onDelete: Cascade)
-  shopping_customers shopping_customers[]
+  channel shopping_channels  @relation(fields: [shopping_channel_id], references: [id], onDelete: Cascade)
+  citizen shopping_citizens? @relation(fields: [shopping_citizen_id], references: [id], onDelete: Cascade)
+
+  /// @minItems 1
+  customers shopping_customers[]
 
   @@unique([shopping_channel_id, application, uid])
   @@unique([shopping_channel_id, application, nickname])
@@ -866,6 +868,7 @@ model shopping_citizens {
   //----
   channel shopping_channels? @relation(fields: [shopping_channel_id], references: [id], onDelete: Cascade)
 
+  /// @minItems 1
   customers                  shopping_customers[]
   members                    shopping_members[]
   deposit_histories          shopping_deposit_histories[]
@@ -947,9 +950,13 @@ model shopping_members {
   citizen shopping_citizens? @relation(fields: [shopping_citizen_id], references: [id], onDelete: Cascade)
 
   /// List of customer records (connections).
+  ///
+  /// @minItems 1
   customers shopping_customers[]
 
   /// List of email addresses.
+  ///
+  /// @minItems 1
   emails shopping_member_emails[]
 
   of_seller shopping_sellers?
