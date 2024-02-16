@@ -244,7 +244,7 @@ export namespace MarkdownWriter {
         primaryKey: null,
         documentation: description.join("\n"),
       };
-      x.fields.push({
+      (x.fields as DMMF.Field[]).push({
         kind: "object",
         name,
         type: name,
@@ -256,7 +256,7 @@ export namespace MarkdownWriter {
         hasDefaultValue: false,
         relationToFields: ["A"],
       });
-      y.fields.push({
+      (y.fields as DMMF.Field[]).push({
         kind: "object",
         name,
         type: name,
