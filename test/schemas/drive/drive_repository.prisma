@@ -1,0 +1,307 @@
+//-----------------------------------------------------------
+// REPOSITORY
+//-----------------------------------------------------------
+/// Repository storing buckets.
+/// 
+/// `drive_repositories` is an entity that represents individual repositories 
+/// within the drive system, and is similar to the Google Drive in online services. 
+/// And physically, it is a concept that can be compared to a Disk Drive.
+/// 
+/// And the repository belongs to a specific {@link drive_accounts account}, and 
+/// the account owner who owns each repository may be a 
+/// {@link drive_members member} or an {@link drive_enterprises enterprise}. In 
+/// addition, the account owner who created the repository can use the repository 
+/// with fellow members or {@link drive_enterprise_teams team} companion through 
+/// controlling {@link drive_repository_accesses access rights} to the repository.
+///
+/// @namespace Repositories
+/// @author Samchon
+model drive_repositories {
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
+
+  /// Belonged account's {@link drive_accounts.id}
+  ///
+  /// @format uuid
+  drive_account_id String @db.Uuid
+
+  /// Creator customer's {@link drive_customers.id}
+  ///
+  /// @format uuid
+  drive_customer_id String @db.Uuid
+
+  /// Identifier code of repository.
+  code String @db.VarChar
+
+  /// Creation time of record.
+  created_at DateTime @db.Timestamptz
+
+  /// Update time of record.
+  updated_at DateTime @db.Timestamptz
+
+  /// Deletion time of record.
+  deleted_at DateTime? @db.Timestamptz
+
+  //----
+  // RELATIONS
+  //----
+  account                   drive_accounts              @relation(fields: [drive_account_id], references: [id], onDelete: Cascade)
+  customer                  drive_customers             @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
+  drive_repository_buckets  drive_repository_buckets[]
+  drive_repository_accesses drive_repository_accesses[]
+  drive_repository_tags     drive_repository_tags[]
+}
+
+/// Bucket information within the repository.
+/// 
+/// `drive_repository_buckets` symbolizes buckets that exist in the 
+/// {@link drive_repositories repository}, and corresponds to the supertype 
+/// entities of {@link drive_repository_folders folders}, 
+/// {@link  drive_repository_files files}, and 
+/// {@link drive_repository_shortcuts shortcut icons}, respectively. In other 
+//// words, it is a table that stores common information about files and folders.
+///
+/// @namespace Repositories
+/// @author Samchon
+model drive_repository_buckets {
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
+
+  /// Belonged repository's {@link drive_repositories.id}
+  ///
+  /// @format uuid
+  drive_repository_id String @db.Uuid
+
+  /// Belonged folder's {@link drive_repository_folders.id}
+  ///
+  /// @format uuid
+  drive_repository_folder_id String? @db.Uuid
+
+  /// Creator customer's {@link drive_customers.id}
+  ///
+  /// @format uuid
+  drive_customer_id String @db.Uuid
+
+  /// Type of bucket.
+  ///
+  /// Discriminator of the supertype entity.
+  ///
+  /// - directory
+  /// - file
+  /// -shortcut
+  type String @db.VarChar
+
+  /// Name of the bucket.
+  ///
+  /// @maxLength 255
+  name String @db.VarChar(255)
+
+  /// Creation time of record.
+  created_at DateTime @db.Timestamptz
+
+  /// Update time of record.
+  updated_at DateTime @db.Timestamptz
+
+  /// Deletion time of record.
+  deleted_at DateTime? @db.Timestamptz
+
+  //----
+  // RELATIONS
+  //----
+  repository drive_repositories        @relation(fields: [drive_repository_id], references: [id], onDelete: Cascade)
+  folder     drive_repository_folders? @relation("rel_drive_repository_bucket_parent", fields: [drive_repository_folder_id], references: [id], onDelete: Cascade)
+  customer   drive_customers           @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
+
+  of_folder   drive_repository_folders?   @relation("rel_drive_repository_folders_base")
+  of_file     drive_repository_files?
+  of_shortcut drive_repository_shortcuts? @relation("rel_drive_repository_shortcuts_base")
+
+  shortcuts drive_repository_shortcuts[] @relation("rel_drive_repository_shortcuts_target")
+}
+
+/// Folder (directory).
+/// 
+/// `drive_repository_folders` is an entity that represents a folder in the 
+/// {@link drive_repositories repository}.
+///
+/// @namespace Repositories
+/// @author Samchon
+model drive_repository_folders {
+  //----
+  // COLUMNS
+  //----
+  /// PK + FK.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
+
+  //----
+  // RELATIONS
+  //----
+  base     drive_repository_buckets   @relation("rel_drive_repository_folders_base", fields: [id], references: [id], onDelete: Cascade)
+  children drive_repository_buckets[] @relation("rel_drive_repository_bucket_parent")
+}
+
+/// File.
+/// 
+/// `drive_repository_files` is an entity that represents files in the 
+/// {@link drive_repositories repository}.
+/// 
+/// And the location where the file is physically stored is recorded in the 
+/// attribute url.
+///
+/// @namespace Repositories
+/// @author Samchon
+model drive_repository_files {
+  //----
+  // COLUMNS
+  //----
+  /// PK + FK.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
+
+  /// Extension of file.
+  ///
+  /// @maxLength 8
+  extension String? @db.VarChar(8)
+
+  url String @db.VarChar
+
+  //----
+  // RELATIONS
+  //----
+  base drive_repository_buckets @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+/// Shortcut icon.
+/// 
+/// `drive_repository_shortcuts` is an entity that symbolizes a shortcut icon in 
+/// the {@link drive_repositories repository} and has a reference function for 
+/// other {@link drive_repository_buckets buckets} in the repository.
+/// 
+/// A concept that is exactly the same as a shortcut icon in Windows and 
+/// a symbolic link in Linux.
+///
+/// @namespace Repositories
+/// @author Samchon
+model drive_repository_shortcuts {
+  //----
+  // COLUMNS
+  //----
+  /// PK + FK.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
+
+  /// Target bucket's {@link drive_repository_buckets.id}
+  ///
+  /// This shortcut references the target bucket.
+  drive_repository_bucket_id String @db.Uuid
+
+  //----
+  // RELATIONS
+  //----
+  base   drive_repository_buckets @relation("rel_drive_repository_shortcuts_base", fields: [id], references: [id], onDelete: Cascade)
+  target drive_repository_buckets @relation("rel_drive_repository_shortcuts_target", fields: [drive_repository_bucket_id], references: [id], onDelete: Cascade)
+}
+
+/// Storage access control.
+/// 
+/// `drive_repository_accesses` is an entity that embodies the access authority 
+/// control of the {@link drive_repositories repository}, and is an entity that 
+/// is recorded when the {@link drive_accounts account} owner distributes the 
+/// authority of the repository to other {@link drive_members members} or an 
+/// {@link drive_enterprise_teams enterprise team}.
+/// 
+/// For reference, the account owner who created the repository is also recorded 
+/// in access permission control. In other words, as soon as the account owner 
+/// creates the repository, one table record is created and started.
+///
+/// @namespace Repositories
+/// @author Samchon
+model drive_repository_accesses {
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
+
+  /// Belonged repository's {@link drive_repositories.id}
+  ///
+  /// @format uuid
+  drive_repository_id String @db.Uuid
+
+  /// Creator customer's {@link drive_customers.id}
+  ///
+  /// @format uuid
+  drive_customer_id String @db.Uuid
+
+  /// Target account's {@link drive_members.id}
+  drive_account_id String? @db.Uuid
+
+  /// Target enterprise team's {@link drive_enterprise_teams.id}
+  drive_enterprise_team_id String? @db.Uuid
+
+  /// Role of access permission.
+  role String @db.VarChar
+
+  /// Creation time of record.
+  created_at DateTime @db.Timestamptz
+
+  /// Update time of record.
+  updated_at DateTime @db.Timestamptz
+
+  /// Deletion time of record.
+  deleted_at DateTime? @db.Timestamptz
+
+  //----
+  // RELATIONS
+  //----
+  repository drive_repositories      @relation(fields: [drive_repository_id], references: [id], onDelete: Cascade)
+  customer   drive_customers         @relation(fields: [drive_customer_id], references: [id], onDelete: Cascade)
+  account    drive_accounts?         @relation(fields: [drive_account_id], references: [id], onDelete: Cascade)
+  team       drive_enterprise_teams? @relation(fields: [drive_enterprise_team_id], references: [id], onDelete: Cascade)
+}
+
+/// Search tag of repository.
+///
+/// @namespace Repositories
+/// @author Samchon
+model drive_repository_tags {
+  //----
+  // COLUMNS
+  //----
+  /// Primary Key.
+  ///
+  /// @format uuid
+  id String @id @db.Uuid
+
+  /// Belonged repository's {@link drive_repositories.id}
+  drive_repository_id String @db.Uuid
+
+  /// Search tag value.
+  value String @db.VarChar
+
+  /// Creation time of record.
+  sequence Int @db.Integer
+
+  created_at DateTime @db.Timestamptz
+
+  //----
+  // RELATIONS
+  //----
+  repository drive_repositories @relation(fields: [drive_repository_id], references: [id], onDelete: Cascade)
+}
