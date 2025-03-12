@@ -189,6 +189,7 @@ export namespace MarkdownWriter {
       const newbie: DMMF.Model = {
         name,
         dbName: null,
+        schema: null,
         fields: [
           {
             kind: "scalar",
