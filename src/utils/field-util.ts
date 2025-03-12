@@ -1,6 +1,5 @@
 import { DMMF } from "@prisma/generator-helper";
 import { PrismaUtil } from "../utils/PrismaUtil";
-import { stringify } from "querystring";
 
 /**
  * @pattern /[tsdnkr]/g
@@ -51,6 +50,7 @@ export interface IFieldData {
    * @memberof IFieldData
    */
   name: string;
+
   /**
    * format tag
    *
