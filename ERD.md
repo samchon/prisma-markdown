@@ -432,13 +432,13 @@ erDiagram
 }
 "shopping_sellers" {
   String id PK
-  String shopping_member_id FK
+  String shopping_member_id FK,UK
   DateTime created_at
   DateTime deleted_at "nullable"
 }
 "shopping_administrators" {
   String id PK
-  String shopping_member_id FK
+  String shopping_member_id FK,UK
   DateTime created_at
   DateTime deleted_at "nullable"
 }
@@ -1440,7 +1440,7 @@ erDiagram
 }
 "shopping_order_publishes" {
   String id PK
-  String shopping_order_id FK
+  String shopping_order_id FK,UK
   String shopping_address_id FK
   String password "nullable"
   DateTime created_at
@@ -1784,24 +1784,24 @@ erDiagram
   Int sequence
 }
 "shopping_coupon_section_criterias" {
-  String id PK
+  String id PK,FK
   String shopping_section_id FK
 }
 "shopping_coupon_channel_criterias" {
-  String id PK
+  String id PK,FK
   String shopping_channel_id FK
   String shopping_channel_category_id FK "nullable"
 }
 "shopping_coupon_seller_criterias" {
-  String id PK
+  String id PK,FK
   String shopping_seller_id FK
 }
 "shopping_coupon_sale_criterias" {
-  String id PK
+  String id PK,FK
   String shopping_sale_id FK
 }
 "shopping_coupon_funnel_criterias" {
-  String id PK
+  String id PK,FK
   String kind
   String key "nullable"
   String value
@@ -1810,13 +1810,13 @@ erDiagram
   String id PK
   String shopping_customer_id FK
   String shopping_coupon_id FK
-  String shopping_coupon_disposable_id FK "nullable"
+  String shopping_coupon_disposable_id FK,UK "nullable"
   DateTime created_at
   DateTime expired_at "nullable"
 }
 "shopping_coupon_ticket_payments" {
   String id PK
-  String shopping_coupon_ticket_id FK
+  String shopping_coupon_ticket_id FK,UK
   String shopping_order_id FK
   Int sequence
   DateTime created_at
@@ -2228,7 +2228,7 @@ erDiagram
 }
 "shopping_deposit_charge_publishes" {
   String id PK
-  String shopping_deposit_charge_id FK
+  String shopping_deposit_charge_id FK,UK
   String password "nullable"
   DateTime created_at
   DateTime paid_at "nullable"
@@ -2474,7 +2474,7 @@ outcome. The minus value must be expressed by multiplying the
 ```mermaid
 erDiagram
 "shopping_sale_snapshot_inquiries" {
-  String id PK
+  String id PK,FK
   String shopping_sale_snapshot_id FK
   String shopping_customer_id FK
   String type
@@ -2482,24 +2482,24 @@ erDiagram
   DateTime read_by_seller_at "nullable"
 }
 "shopping_sale_snapshot_questions" {
-  String id PK
+  String id PK,FK
   Boolean secret
 }
 "shopping_sale_snapshot_reviews" {
-  String id PK
+  String id PK,FK
   String shopping_order_good_id FK
 }
 "shopping_sale_snapshot_review_snapshots" {
-  String id PK
+  String id PK,FK
   Float score
 }
 "shopping_sale_snapshot_inquiry_answers" {
-  String id PK
-  String shopping_sale_snapshot_inquiry_id FK
+  String id PK,FK
+  String shopping_sale_snapshot_inquiry_id FK,UK
   String shopping_seller_customer_id FK
 }
 "shopping_sale_snapshot_inquiry_comments" {
-  String id PK
+  String id PK,FK
   String shopping_customer_id FK
   String actor_type
 }
@@ -2750,7 +2750,7 @@ erDiagram
   DateTime created_at
 }
 "shopping_sale_snapshot_inquiries" {
-  String id PK
+  String id PK,FK
   String shopping_sale_snapshot_id FK
   String shopping_customer_id FK
   String type

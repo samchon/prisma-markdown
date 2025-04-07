@@ -1,5 +1,6 @@
 import { DMMF } from "@prisma/generator-helper";
 import { PrismaUtil } from "../utils/PrismaUtil";
+import { FieldUtil } from "../utils/field-util";
 
 export namespace MermaidWriter {
   export const write = (chapter: DMMF.Model[]) =>
@@ -30,25 +31,23 @@ export namespace MermaidWriter {
 
   const writeField =
     (model: DMMF.Model) =>
-    (field: DMMF.Field): string =>
-      [
-        field.type, // type
-        field.dbName ?? field.name, // name
-        field.isId
-          ? "PK"
-          : model.fields.some(
-                (f) =>
-                  f.kind === "object" &&
-                  f.relationFromFields?.[0] === field.name,
-              )
-            ? "FK"
-            : field.isUnique
-              ? "UK"
-              : "", // constraint
-        field.isRequired ? "" : `"nullable"`, // nullable
+    (field: DMMF.Field): string => {
+      const isFK = model.fields.some(
+        (f) => f.kind === "object" && f.relationFromFields?.[0] === field.name,
+      );
+      const targetField = FieldUtil(field, isFK);
+
+      return [
+        targetField.data().size
+          ? targetField.format("t(s)")
+          : targetField.format("t"),
+        targetField.format("n"),
+        targetField.format("k"),
+        targetField.format("r"),
       ]
         .filter((str) => !!str.length)
         .join(" ");
+    };
 
   const writeRelationship =
     (props: { group: DMMF.Model[]; model: DMMF.Model }) =>

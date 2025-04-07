@@ -451,21 +451,21 @@ erDiagram
   String drive_repository_folder_id FK "nullable"
   String drive_customer_id FK
   String type
-  String name
+  String(255) name
   DateTime created_at
   DateTime updated_at
   DateTime deleted_at "nullable"
 }
 "drive_repository_folders" {
-  String id PK
+  String id PK,FK
 }
 "drive_repository_files" {
-  String id PK
-  String extension "nullable"
+  String id PK,FK
+  String(8) extension "nullable"
   String url
 }
 "drive_repository_shortcuts" {
-  String id PK
+  String id PK,FK
   String drive_repository_bucket_id FK
 }
 "drive_repository_accesses" {
