@@ -17,8 +17,8 @@
 erDiagram
 "attachment_files" {
   String id PK
-  String name
-  String extension "nullable"
+  String(255) name
+  String(8) extension "nullable"
   String url
   DateTime created_at
 }
