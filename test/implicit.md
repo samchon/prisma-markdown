@@ -83,7 +83,7 @@ the article is designed in this structure.
 
 In other words, to keep evidence, and prevent fraud.
 
-#### Properties
+**Properties**
 
 - `id`:
 - `created_at`: Creation time of article.
@@ -102,7 +102,7 @@ the article, as mentioned in [bbs_articles](#bbs_articles), the contents of the
 article are separated from the article record to keep evidence and prevent
 fraud.
 
-#### Properties
+**Properties**
 
 - `id`:
 - `bbs_article_id`: Belong article's [bbs_articles.id](#bbs_articles)
@@ -126,7 +126,7 @@ Every attachment files that are managed in current system.
 For reference, it is possible to omit one of file name or extension like
 `.gitignore` or `README` case, but not possible to omit both of them.
 
-#### Properties
+**Properties**
 
 - `id`:
 - `name`
@@ -156,7 +156,7 @@ the comment is modified.
 Also, `bbs_article_comments` is expressing the relationship of the
 hierarchical reply structure through the `parent_id` attribute.
 
-#### Properties
+**Properties**
 
 - `id`:
 - `bbs_article_id`: Belonged article's [bbs_articles.id](#bbs_articles)
@@ -181,7 +181,7 @@ contents of the comment.
 As mentioned in [bbs_article_comments](#bbs_article_comments), designed to keep evidence
 and prevent fraud.
 
-#### Properties
+**Properties**
 
 - `id`:
 - `bbs_article_comment_id`: Belonged article's [bbs_article_comments.id](#bbs_article_comments)
@@ -199,7 +199,7 @@ and prevent fraud.
 
 Pair relationship table between [attachment_files](#attachment_files) and [bbs_article_snapshots](#bbs_article_snapshots)
 
-#### Properties
+**Properties**
 
 - `A`:
 - `B`:
@@ -208,7 +208,7 @@ Pair relationship table between [attachment_files](#attachment_files) and [bbs_a
 
 Pair relationship table between [attachment_files](#attachment_files) and [bbs_article_comment_snapshots](#bbs_article_comment_snapshots)
 
-#### Properties
+**Properties**
 
 - `A`:
 - `B`:

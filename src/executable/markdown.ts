@@ -17,8 +17,8 @@ generatorHandler({
 
   onGenerate: async (options) => {
     const rawContent: string = MarkdownWriter.write(
-        options.dmmf.datamodel,
-        options.generator.config,
+      options.dmmf.datamodel,
+      options.generator.config,
     );
 
     // Lint/format le Markdown avec Prettier

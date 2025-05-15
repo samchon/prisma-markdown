@@ -1,15 +1,37 @@
 {
-  "author": "Jeongho Nam",
+  "name": "prisma-markdown",
+  "version": "2.0.0",
+  "description": "Prisma Markdown documents generator including ERD diagrams and comment descriptions",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "bin": {
     "prisma-markdown": "lib/executable/markdown.js"
   },
+  "scripts": {
+    "build": "rimraf lib && tsc",
+    "dev": "rimraf lib && tsc --watch",
+    "test": "ts-node test/index.ts",
+    "vitest:cov": "vitest run --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samchon/prisma-markdown"
+  },
+  "keywords": [
+    "prisma",
+    "markdown",
+    "erd",
+    "mermaid",
+    "description",
+    "document",
+    "generator"
+  ],
+  "author": "Jeongho Nam",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/samchon/prisma-markdown/issues"
   },
-  "dependencies": {
-    "@prisma/generator-helper": "^6.5.0"
-  },
-  "description": "Prisma Markdown documents generator including ERD diagrams and comment descriptions",
+  "homepage": "https://github.com/samchon/prisma-markdown",
   "devDependencies": {
     "@prisma/client": "^6.5.0",
     "@types/node": "^22.13.10",
@@ -21,39 +43,16 @@
     "typescript": "^5.8.2",
     "vitest": "^3.0.8"
   },
-  "files": [
-    "lib",
-    "src",
-    "README.md"
-  ],
-  "homepage": "https://github.com/samchon/prisma-markdown",
-  "keywords": [
-    "prisma",
-    "markdown",
-    "erd",
-    "mermaid",
-    "description",
-    "document",
-    "generator"
-  ],
-  "license": "MIT",
-  "main": "lib/index.js",
-  "name": "prisma-markdown",
-  "packageManager": "pnpm@10.10.0+sha512.d615db246fe70f25dcfea6d8d73dee782ce23e2245e3c4f6f888249fb568149318637dca73c2c5c8ef2a4ca0d5657fb9567188bfab47f566d1ee6ce987815c39",
+  "dependencies": {
+    "@prisma/generator-helper": "^6.5.0"
+  },
   "peerDependencies": {
     "@prisma/client": ">= 6.0.0",
     "prisma": ">= 6.0.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/samchon/prisma-markdown"
-  },
-  "scripts": {
-    "build": "rimraf lib && tsc",
-    "dev": "rimraf lib && tsc --watch",
-    "test": "ts-node test/index.ts",
-    "vitest:cov": "vitest run --coverage"
-  },
-  "typings": "lib/index.d.ts",
-  "version": "2.0.0"
+  "files": [
+    "lib",
+    "src",
+    "README.md"
+  ]
 }
