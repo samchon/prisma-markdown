@@ -8,7 +8,7 @@ export namespace DescriptionWriter {
       `### \`${model.dbName ?? model.name}\``,
       ...(description.length ? [description] : []),
       "",
-      "**Properties**",
+      "#### Properties",
       ...model.fields.filter((f) => f.kind !== "object").map(writeField),
     ].join("\n");
   };
