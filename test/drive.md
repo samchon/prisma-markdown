@@ -571,7 +571,7 @@ entities of [folders](#drive_repository_folders),
   >
   > - directory
   > - file
-  >   -shortcut
+  > - shortcut
 - `name`: Name of the bucket.
 - `created_at`: Creation time of record.
 - `updated_at`: Update time of record.

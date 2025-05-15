@@ -770,7 +770,7 @@ model drive_repository_buckets {
   ///
   /// - directory
   /// - file
-  /// -shortcut
+  /// - shortcut
   type String @db.VarChar
 
   /// Name of the bucket.

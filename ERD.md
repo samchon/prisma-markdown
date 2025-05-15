@@ -347,10 +347,10 @@ simultaneously classified in a [sale](#shopping_sales). Besides,
 `shopping_channel_categories` can be classified into multiple categories
 in a [sale](#shopping_sales) simultaneously.
 
-| Product | Section (corner) | Categories                           |
-| ------- | ---------------- | ------------------------------------ |
-| Beef    | Butcher corner   | Frozen food, Meat, **Favorite food** |
-| Grape   | Fruit corner     | Fresh food, **Favorite food**        |
+Product | Section (corner) | Categories
+--------|------------------|--------------------------------------
+Beef  | Butcher corner   | Frozen food, Meat, **Favorite food**
+Grape   | Fruit corner   | Fresh food, **Favorite food**
 
 In addition, as `shopping_channel_categories` has 1:N self recursive
 relationship, it is possible to express below hierarchical structures.
@@ -932,11 +932,11 @@ Sale snapshot information.
 belonged [sale](#shopping_sales). The snapshot record is created
 whenever the seller newly creates or updates the sale.
 
-| Sale                                                                      | Cart                                                              | Order                                         |
-| ------------------------------------------------------------------------- | ----------------------------------------------------------------- | --------------------------------------------- |
-| x                                                                         | [shopping_carts](#shopping_carts)                                 | [shopping_orders](#shopping_orders)           |
-| [shopping_sale_snapshots](#shopping_sale_snapshots)                       | [shopping_cart_commodities](#shopping_cart_commodities)           | [shopping_order_goods](#shopping_order_goods) |
-| [shopping_sale_snapshot_unit_stocks](#shopping_sale_snapshot_unit_stocks) | [shopping_cart_commodity_stocks](#shopping_cart_commodity_stocks) | x                                             |
+Sale | Cart | Order
+-----|------|------
+x | [shopping_carts](#shopping_carts) | [shopping_orders](#shopping_orders)
+[shopping_sale_snapshots](#shopping_sale_snapshots) | [shopping_cart_commodities](#shopping_cart_commodities) | [shopping_order_goods](#shopping_order_goods)
+[shopping_sale_snapshot_unit_stocks](#shopping_sale_snapshot_unit_stocks) | [shopping_cart_commodity_stocks](#shopping_cart_commodity_stocks) | x
 
 **Properties**
 
@@ -1368,11 +1368,11 @@ Of course, the reason why they can compose a shopping cart is not for
 [purchasing](#shopping_orders), but for providing a shopping cart template
 to [customers](#shopping_customers).
 
-| Sale                                                                      | Cart                                                              | Order                                         |
-| ------------------------------------------------------------------------- | ----------------------------------------------------------------- | --------------------------------------------- |
-| x                                                                         | [shopping_carts](#shopping_carts)                                 | [shopping_orders](#shopping_orders)           |
-| [shopping_sale_snapshots](#shopping_sale_snapshots)                       | [shopping_cart_commodities](#shopping_cart_commodities)           | [shopping_order_goods](#shopping_order_goods) |
-| [shopping_sale_snapshot_unit_stocks](#shopping_sale_snapshot_unit_stocks) | [shopping_cart_commodity_stocks](#shopping_cart_commodity_stocks) | x                                             |
+Sale | Cart | Order
+-----|------|------
+x | [shopping_carts](#shopping_carts) | [shopping_orders](#shopping_orders)
+[shopping_sale_snapshots](#shopping_sale_snapshots) | [shopping_cart_commodities](#shopping_cart_commodities) | [shopping_order_goods](#shopping_order_goods)
+[shopping_sale_snapshot_unit_stocks](#shopping_sale_snapshot_unit_stocks) | [shopping_cart_commodity_stocks](#shopping_cart_commodity_stocks) | x
 
 **Properties**
 
@@ -1618,11 +1618,11 @@ Of course, not all commodities in the target shopping cart become
 [shopping_order_goods](#shopping_order_goods), but only those selected by the customer
 become the [shopping_order_goods](#shopping_order_goods).
 
-| Sale                                                                      | Cart                                                              | Order                                         |
-| ------------------------------------------------------------------------- | ----------------------------------------------------------------- | --------------------------------------------- |
-| x                                                                         | [shopping_carts](#shopping_carts)                                 | [shopping_orders](#shopping_orders)           |
-| [shopping_sale_snapshots](#shopping_sale_snapshots)                       | [shopping_cart_commodities](#shopping_cart_commodities)           | [shopping_order_goods](#shopping_order_goods) |
-| [shopping_sale_snapshot_unit_stocks](#shopping_sale_snapshot_unit_stocks) | [shopping_cart_commodity_stocks](#shopping_cart_commodity_stocks) | x                                             |
+Sale | Cart | Order
+-----|------|------
+x | [shopping_carts](#shopping_carts) | [shopping_orders](#shopping_orders)
+[shopping_sale_snapshots](#shopping_sale_snapshots) | [shopping_cart_commodities](#shopping_cart_commodities) | [shopping_order_goods](#shopping_order_goods)
+[shopping_sale_snapshot_unit_stocks](#shopping_sale_snapshot_unit_stocks) | [shopping_cart_commodity_stocks](#shopping_cart_commodity_stocks) | x
 
 **Properties**
 
