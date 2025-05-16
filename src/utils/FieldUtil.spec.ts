@@ -1,6 +1,6 @@
 import { DMMF } from "@prisma/generator-helper";
-import { beforeAll, describe, expect, it } from "vitest";
-import { FieldUtil } from "./field-util";
+import { describe, expect, it } from "vitest";
+import { FieldUtil } from "./FieldUtil";
 
 describe("FieldUtil", () => {
   it("format", () => {

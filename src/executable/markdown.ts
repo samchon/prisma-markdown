@@ -3,7 +3,8 @@ import fs from "fs";
 import path from "path";
 
 import { generatorHandler } from "@prisma/generator-helper";
-import { MarkdownWriter } from "../writers/MarkdownWriter";
+import { PrismaMarkdown } from "../PrismaMarkdown";
+import { IPrismaMarkdownConfig } from "../IPrismaMarkdownConfig";
 
 const { version } = require("../../package.json");
 
@@ -15,9 +16,9 @@ generatorHandler({
   }),
 
   onGenerate: async (options) => {
-    const content: string = MarkdownWriter.write(
+    const content: string = PrismaMarkdown.write(
       options.dmmf.datamodel,
-      options.generator.config,
+      options.generator.config as IPrismaMarkdownConfig | undefined,
     );
     const file: string = options.generator.output?.value ?? "./ERD.md";
     try {
