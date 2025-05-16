@@ -1,5 +1,5 @@
 import { DMMF } from "@prisma/generator-helper";
-import { PrismaUtil } from "../utils/PrismaUtil";
+import { PrismaUtil } from "./PrismaUtil";
 
 /**
  * @pattern /[tsdnkr]/g

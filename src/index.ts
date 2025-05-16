@@ -1,3 +1,3 @@
-export * from "./writers/MarkdownWriter";
-export * from "./writers/MermaidWriter";
-export * from "./writers/DescriptionWriter";
+export * from "./IPrismaMarkdownChapter";
+export * from "./IPrismaMarkdownConfig";
+export * from "./PrismaMarkdown";

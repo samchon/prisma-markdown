@@ -1,7 +1,7 @@
-import { DMMF } from "@prisma/client/runtime/library";
+import { DMMF } from "@prisma/generator-helper";
 import { PrismaUtil } from "../utils/PrismaUtil";
 
-export namespace DescriptionWriter {
+export namespace PrismaMarkdownDescriptionWriter {
   export const table = (model: DMMF.Model): string => {
     const description: string = writeDescription(model);
     return [

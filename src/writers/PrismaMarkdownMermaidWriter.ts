@@ -1,8 +1,8 @@
 import { DMMF } from "@prisma/generator-helper";
 import { PrismaUtil } from "../utils/PrismaUtil";
-import { FieldUtil } from "../utils/field-util";
+import { FieldUtil } from "../utils/FieldUtil";
 
-export namespace MermaidWriter {
+export namespace PrismaMarkdownMermaidWriter {
   export const write = (chapter: DMMF.Model[]) =>
     [
       "```mermaid",
