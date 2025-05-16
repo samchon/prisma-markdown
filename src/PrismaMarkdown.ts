@@ -36,8 +36,8 @@ export namespace PrismaMarkdown {
       ...(chapter.diagrams.length
         ? [PrismaMarkdownMermaidWriter.write(chapter.diagrams)]
         : []),
-      ...(chapter.descriptions && chapter.diagrams.length ? [""] : []),
-      ...(chapter.diagrams.length
+      ...(chapter.diagrams.length && chapter.descriptions ? [""] : []),
+      ...(chapter.descriptions.length
         ? [
             chapter.descriptions
               .map((c) => PrismaMarkdownDescriptionWriter.table(c))
