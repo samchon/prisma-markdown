@@ -33,7 +33,7 @@ export namespace PrismaMarkdown {
     [
       `## ${chapter.name}`,
       "",
-      ...(chapter.descriptions.length
+      ...(chapter.diagrams.length
         ? [PrismaMarkdownMermaidWriter.write(chapter.diagrams)]
         : []),
       ...(chapter.descriptions && chapter.diagrams.length ? [""] : []),
