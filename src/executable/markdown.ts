@@ -13,6 +13,7 @@ generatorHandler({
     defaultOutput: "./ERD.md",
     prettyName: "prisma-markdown",
   }),
+
   onGenerate: async (options) => {
     const content: string = MarkdownWriter.write(
       options.dmmf.datamodel,
@@ -22,6 +23,6 @@ generatorHandler({
     try {
       await fs.promises.mkdir(path.dirname(file), { recursive: true });
     } catch {}
-    await fs.writeFileSync(file, content, "utf8");
+    await fs.promises.writeFile(file, content, "utf8");
   },
 });

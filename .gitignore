@@ -2,6 +2,5 @@ assets/
 lib/
 node_modules/
 
-package-lock.json
 *.tgz
 *.pdf
