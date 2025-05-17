@@ -72,7 +72,7 @@ Every attachment files that are managed in this shopping mall system.
 For reference, it is possible to omit one of file name or extension like
 `.gitignore` or `README` case, but not possible to omit both of them,
 
-**Properties**
+Properties as follows:
 
 - `id`:
 - `name`
@@ -108,7 +108,7 @@ the article is designed in this structure.
 
 In other words, to keep evidence, and prevent fraud.
 
-**Properties**
+Properties as follows:
 
 - `id`:
 - `created_at`: Creation time of article.
@@ -127,7 +127,7 @@ the article, as mentioned in [bbs_articles](#bbs_articles), the contents of the
 article are separated from the article record to keep evidence and prevent
 fraud.
 
-**Properties**
+Properties as follows:
 
 - `id`:
 - `bbs_article_id`: Belong article's {@link bbs_articles.id}
@@ -155,7 +155,7 @@ resolve the M: N relationship between [bbs_article_snapshots](#bbs_article_snaps
 files, it has an additional `sequence` attribute, which we will continue to
 see in this documents.
 
-**Properties**
+Properties as follows:
 
 - `id`:
 - `bbs_article_snapshot_id`: Belonged snapshot's {@link bbs_article_snapshots.id}
@@ -178,7 +178,7 @@ the comment is modified.
 Also, `bbs_article_comments` is expressing the relationship of the
 hierarchical reply structure through the `parent_id` attribute.
 
-**Properties**
+Properties as follows:
 
 - `id`:
 - `bbs_article_id`: Belonged article's [bbs_articles.id](#bbs_articles)
@@ -203,7 +203,7 @@ contents of the comment.
 As mentioned in [bbs_article_comments](#bbs_article_comments), designed to keep evidence
 and prevent fraud.
 
-**Properties**
+Properties as follows:
 
 - `id`:
 - `bbs_article_comment_id`: Belonged article's [bbs_article_comments.id](#bbs_article_comments)
@@ -225,7 +225,7 @@ Attachment file of comment snapshot.
 relationship between [bbs_article_comment_snapshots](#bbs_article_comment_snapshots) and
 [attachment_files](#attachment_files) tables.
 
-**Properties**
+Properties as follows:
 
 - `id`:
 - `bbs_article_comment_snapshot_id`: Belonged snapshot's [bbs_article_comment_snapshots.id](#bbs_article_comment_snapshots)

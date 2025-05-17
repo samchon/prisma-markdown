@@ -82,7 +82,7 @@ Every attachment files that are managed in this shopping mall system.
 For reference, it is possible to omit one of file name or extension like
 `.gitignore` or `README` case, but not possible to omit both of them,
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `name`
@@ -119,7 +119,7 @@ the article is designed in this structure.
 
 In other words, to keep evidence, and prevent fraud.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `created_at`: Creation time of article.
@@ -138,7 +138,7 @@ the article, as mentioned in [bbs_articles](#bbs_articles), the contents of the
 article are separated from the article record to keep evidence and prevent
 fraud.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `bbs_article_id`: Belong article's [bbs_articles.id](#bbs_articles)
@@ -166,7 +166,7 @@ resolve the M: N relationship between [bbs_article_snapshots](#bbs_article_snaps
 files, it has an additional `sequence` attribute, which we will continue to
 see in this documents.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `bbs_article_snapshot_id`: Belonged snapshot's [bbs_article_snapshots.id](#bbs_article_snapshots)
@@ -189,7 +189,7 @@ the comment is modified.
 Also, `bbs_article_comments` is expressing the relationship of the
 hierarchical reply structure through the `parent_id` attribute.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `bbs_article_id`: Belonged article's [bbs_articles.id](#bbs_articles)
@@ -214,7 +214,7 @@ contents of the comment.
 As mentioned in [bbs_article_comments](#bbs_article_comments), designed to keep evidence
 and prevent fraud.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `bbs_article_comment_id`: Belonged article's [bbs_article_comments.id](#bbs_article_comments)
@@ -236,7 +236,7 @@ Attachment file of comment snapshot.
 relationship between [bbs_article_comment_snapshots](#bbs_article_comment_snapshots) and
 [attachment_files](#attachment_files) tables.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `bbs_article_comment_snapshot_id`: Belonged snapshot's [bbs_article_comment_snapshots.id](#bbs_article_comment_snapshots)
@@ -323,7 +323,7 @@ system means that it is another site or application.
 By the way, if your shopping mall system requires only one channel, then
 just use only one. This concept is designed to be expandable in the future.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `code`: Identifier code.
@@ -363,7 +363,7 @@ Thus, each channel can set their own category classification as they want.
 Furthermore, `shopping_channel_categories` is designed to merge between
 themselves, so there is no burden to edit the category at any time.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_channel_id`: Belonged channel's [shopping_channels.id](#shopping_channels).
@@ -392,7 +392,7 @@ one section can be classified.
 By the way, if your shopping mall system requires only one section, then
 just use only one. This concept is designed to be expandable in the future.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `code`: Identifier code.
@@ -518,7 +518,7 @@ after being a user of an external service, all related records are changed
 at once. Therefore, identification and tracking of customers can be done
 very systematically.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_channel_id`: Belonged channel's [shopping_channels.id](#shopping_channels)
@@ -566,7 +566,7 @@ violation.
 In addition, additional information received from external services can
 be recorded in the `data` field in JSON format.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_channel_id`: Belonged channel's [shopping_channels.id](#shopping_channels)
@@ -607,7 +607,7 @@ done based on this mobile.
 Of course, real name and mobile phone authentication information are
 encrypted and stored.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_channel_id`
@@ -646,7 +646,7 @@ a [customer](#shopping_customers), sometimes a
 Of course, this is according to system theory, and it is unclear what
 the planning will be like.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_channel_id`: Belonged channel's [shopping_channels.id](#shopping_channels)
@@ -668,7 +668,7 @@ This system allows multiple email addresses to be registered for one
 [member](#shopping_members). If you don't have to plan such multiple
 email addresses, just use only one.
 
-**Properties**
+Properties as follows:
 
 - `id`:
 - `shopping_channel_id`
@@ -693,7 +693,7 @@ participate even without [membership](#shopping_members) joining,
 seller must join membership to operate sales. Also, seller must
 do the [real-name authentication](#shopping_citizens), too.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_member_id`: Belonged member's [shopping_members.id](#shopping_members).
@@ -719,7 +719,7 @@ participate even without [membership](#shopping_members) joining,
 administrator must join membership to operate sales. Also, administrator must
 do the [real-name authentication](#shopping_citizens), too.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_member_id`: Belonged member's [shopping_members.id](#shopping_members).
@@ -738,7 +738,7 @@ do the [real-name authentication](#shopping_citizens), too.
 
 The address information.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `mobile`: Mobile number.
@@ -885,7 +885,7 @@ price of the item. It is also intended to support sellers in so-called
 A/B testing, which involves changing components or prices and measuring
 the performance in each case.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_section_id`: Belonged section's [shopping_sections.id](#shopping_sections)
@@ -938,7 +938,7 @@ x | [shopping_carts](#shopping_carts) | [shopping_orders](#shopping_orders)
 [shopping_sale_snapshots](#shopping_sale_snapshots) | [shopping_cart_commodities](#shopping_cart_commodities) | [shopping_order_goods](#shopping_order_goods)
 [shopping_sale_snapshot_unit_stocks](#shopping_sale_snapshot_unit_stocks) | [shopping_cart_commodity_stocks](#shopping_cart_commodity_stocks) | x
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_sale_id`: Belonged sale's [shopping_sales.id](#shopping_sales)
@@ -979,7 +979,7 @@ For example, even if you buy a Macbook, the
 only after selecting all the
 [options](#shopping_sale_snapshot_unit_options) (CPU / RAM / SSD), etc.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_sale_snapshot_id`: Belonged snapshot's [shopping_sale_snapshots.id](#shopping_sale_snapshots)
@@ -1028,7 +1028,7 @@ value the customer enters and chooses when purchasing it, the option in
 this case does not affect the
 [final stock](#shopping_sale_snapshot_unit_stocks).
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_sale_snapshot_unit_id`: Belonged unit's [shopping_sale_snapshot_units.id](#shopping_sale_snapshot_units)
@@ -1069,7 +1069,7 @@ represents individual candidate values that can be selected from
 By the way, if belonged [option](#shopping_sale_snapshot_unit_options)
 is not "select" type, this entity never being used.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_sale_snapshot_unit_option_id`: Belonged option's [shopping_sale_snapshot_unit_options.id](#shopping_sale_snapshot_unit_options)
@@ -1105,7 +1105,7 @@ of cases is the total number of final stocks in the unit.
 Of course, without a single variable "select" type option, the final
 stocks count in the unit is only 1.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_sale_snapshot_unit_id`: Belonged unit's [shopping_sale_snapshot_units.id](#shopping_sale_snapshot_units)
@@ -1140,7 +1140,7 @@ Of course, if the bound [unit](#shopping_sale_snapshot_units) does not
 have any [options](#shopping_sale_snapshot_unit_options), this entity
 can also be ignored.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_sale_snapshot_unit_stock_id`: Belonged stock's [shopping_sale_snapshot_unit_stocks.id](#shopping_sale_snapshot_unit_stocks)
@@ -1157,7 +1157,7 @@ which [channel](#shopping_channels) a listing
 [snapshot](#shopping_sale_snapshots) is sold, and is designed to
 resolve the M:N relationship between two tables.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_sale_snapshot_id`: Belonged snapshot's [shopping_sale_snapshots.id](#shopping_sale_snapshots).
@@ -1178,7 +1178,7 @@ It is designed to resolve the M:N relationship between
 respectively. Of course, if the target category being referred to is a
 major category, all minor categories belonging to it can also be used.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_sale_snapshot_channel_id`: Belonged assigned channel of sale snapshot's [shopping_sale_snapshot_channels.id](#shopping_sale_snapshot_channels)
@@ -1200,7 +1200,7 @@ this `shopping_sale_snapshot_unit_stock_supplements` is an entity that embodies
 the supplementation of the inventory quantity of the belonged
 [stock](#shopping_sale_snapshot_unit_stocks).
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_sale_snapshot_unit_stock_id`: Belonged stock's [shopping_sale_snapshot_unit_stocks.id](#shopping_sale_snapshot_unit_stocks)
@@ -1218,7 +1218,7 @@ Content information of sale snapshot.
 of [sale snapshot](#shopping_sale_snapshots). Also, it contains
 revert policy of the sale.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_sale_snapshot_id`: Belonged snapshot's [shopping_sale_snapshots.id](#shopping_sale_snapshots)
@@ -1239,7 +1239,7 @@ revert policy of the sale.
 
 Attachment file of sale snapshot content.
 
-**Properties**
+Properties as follows:
 
 - `id`:
 - `shopping_sale_snapshot_content_id`:
@@ -1250,7 +1250,7 @@ Attachment file of sale snapshot content.
 
 Thumbnail of sale snapshot content.
 
-**Properties**
+Properties as follows:
 
 - `id`:
 - `shopping_sale_snapshot_content_id`:
@@ -1261,7 +1261,7 @@ Thumbnail of sale snapshot content.
 
 Search tag of sale snapshot.
 
-**Properties**
+Properties as follows:
 
 - `id`:
 - `shopping_sale_snapshot_id`:
@@ -1374,7 +1374,7 @@ x | [shopping_carts](#shopping_carts) | [shopping_orders](#shopping_orders)
 [shopping_sale_snapshots](#shopping_sale_snapshots) | [shopping_cart_commodities](#shopping_cart_commodities) | [shopping_order_goods](#shopping_order_goods)
 [shopping_sale_snapshot_unit_stocks](#shopping_sale_snapshot_unit_stocks) | [shopping_cart_commodity_stocks](#shopping_cart_commodity_stocks) | x
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_customer_id`: Belonged customer's [shopping_customers.id](#shopping_customers)
@@ -1409,7 +1409,7 @@ target commodity will be purchased. This "volume" is a value that will be
 multiplied by [shopping_cart_commodity_stocks.quantity](#shopping_cart_commodity_stocks), the quantity
 for each component.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_cart_id`: Belonged cart's [shopping_carts.id](#shopping_carts)
@@ -1451,7 +1451,7 @@ how many final stocks would be purchased in total. The final quantity
 actually purchased can be multiplied by the
 [shopping_cart_commodities.volume](#shopping_cart_commodities) value of the parent entity.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_cart_commodity_id`: Belonged commodity's [shopping_cart_commodities.id](#shopping_cart_commodities)
@@ -1480,7 +1480,7 @@ to options. If the `type` of target option is "select", enter the
 candidate value selected by the customer. Otherwise, enter the value
 written by the customer.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_cart_commodity_stock_id`: Belonged cart-commodity-stock's [shopping_cart_commodity_stocks.id](#shopping_cart_commodity_stocks)
@@ -1624,7 +1624,7 @@ x | [shopping_carts](#shopping_carts) | [shopping_orders](#shopping_orders)
 [shopping_sale_snapshots](#shopping_sale_snapshots) | [shopping_cart_commodities](#shopping_cart_commodities) | [shopping_order_goods](#shopping_order_goods)
 [shopping_sale_snapshot_unit_stocks](#shopping_sale_snapshot_unit_stocks) | [shopping_cart_commodity_stocks](#shopping_cart_commodity_stocks) | x
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_customer_id`: Belonged customer's [shopping_customers.id](#shopping_customers)
@@ -1669,7 +1669,7 @@ in the `confirmed_at` attribute. Additionally, `shopping_order_goods` is
 the unit in which customers issue issues or request exchanges or refunds
 for ordered products.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_order_id`: Belonged order's [shopping_orders.id](#shopping_orders)
@@ -1718,7 +1718,7 @@ be sure to check the `paid_at` property.
 In addition, even after payment has been made, there may be cases where
 it is suddenly cancelled, so please be aware of this as well.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_order_id`: Belonged order's [shopping_orders.id](#shopping_orders)
@@ -1765,7 +1765,7 @@ Also, delivery does not end with only one step. It has multiple processes like
 manufacturing, planning, shipping and delivering. Those steps are represented by
 another subsidiary entity [shopping_delivery_journeys](#shopping_delivery_journeys).
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_seller_customer_id`: Belonged seller's [shopping_sellers.id](#shopping_sellers)
@@ -1784,7 +1784,7 @@ For reference, as an order can be delivered in multiple times due to volume or
 weight problem, it is possible to have multiple `shopping_delivery_pieces` records
 for a single stock.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_delivery_id`: Belonged delivery's [shopping_deliveries.id](#shopping_deliveries)
@@ -1801,7 +1801,7 @@ for a single stock.
 
 Shipper information of delivery.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_delivery_id`: Belonged delivery's [shopping_deliveries.id](#shopping_deliveries)
@@ -1819,7 +1819,7 @@ describing each journey of the delivery. For reference, the word journey means
 each step of the delivery process, such as preparing, shipping, and delivering
 [goods](#shopping_order_goods) to the [customer](#shopping_customers).
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_delivery_id`:
@@ -1960,7 +1960,7 @@ or being issued only to customers who came in through a
 For more information, please refer to the properties below and the
 subsidiary entities described later.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_customer_id`: Belonged administrator or seller's [shopping_customers.id](#shopping_customers)
@@ -2097,7 +2097,7 @@ is applicable only to the reference object. Conversely, if the direction
 value is "exclude", it is a coupon that cannot be applied to the reference
 object.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_coupon_id`: Belonged coupon's [shopping_coupons.id](#shopping_coupons)
@@ -2127,7 +2127,7 @@ the coupon can only be used for that section. Conversely, if it is
 are applied on a bundle basis. Coupons may or may not be applicable to
 eligible sections.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_section_id`: Target section's [shopping_coupon_criterias.id](#shopping_coupon_criterias)
@@ -2148,7 +2148,7 @@ multiple `shopping_coupon_channel_criterias` records within one coupon,
 conditions are applied on a bundle basis. Coupons may or may not be
 applicable for target channels and categories.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_channel_id`: Target channel's [shopping_channels.id](#shopping_channels)
@@ -2170,7 +2170,7 @@ And if there are multiple `shopping_coupon_seller_criterias` records within
 one coupon, conditions are applied on a bundle basis. Coupons may or may
 not be applicable to eligible sellers.
 
-**Properties**
+Properties as follows:
 
 - `id`: PK + FK.
 - `shopping_seller_id`: Target seller's [shopping_sellers.id](#shopping_sellers)
@@ -2189,7 +2189,7 @@ it is a coupon that cannot be used.
 
 And if there are multiple shopping_coupon_sale_criterias records within one coupon, conditions are applied on a bundle basis. Coupons that may or may not be applicable to target properties.
 
-**Properties**
+Properties as follows:
 
 - `id`: PK + FK.
 - `shopping_sale_id`: Target sale's [shopping_sales.id](#shopping_sales)
@@ -2208,7 +2208,7 @@ And funnel restrictions are possible in 3 ways: The first is
 [shopping_customers.href](#shopping_customers), which records the customer's access
 address, restrictions can be made in units of specific URLs or variables.
 
-**Properties**
+Properties as follows:
 
 - `id`: PK + FK.
 - `kind`
@@ -2233,7 +2233,7 @@ date, the expiration date is recorded in `expired_at` and is automatically
 discarded after that expiration date. Of course, it doesn't matter if you
 use the discount coupon for your order within the deadline.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_customer_id`: Belonged customer's [shopping_customers.id](#shopping_customers)
@@ -2267,7 +2267,7 @@ Additionally, this record can be deleted by the customer reversing the
 payment of the ticket, but it can also be deleted when the attribution
 order itself is cancelled.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_coupon_ticket_id`: Belonged ticket's [shopping_coupon_tickets.id](#shopping_coupon_tickets)
@@ -2294,7 +2294,7 @@ issuance to the customer is completed. Therefore, if you want to issue
 tickets multiple times using a discount coupon as a secret code, the
 issuing code must also be supported by the corresponding quantity.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_coupon_id`: Belonged coupon's [shopping_coupons.id](#shopping_coupons)
@@ -2409,7 +2409,7 @@ incomes and outcomes of deposit at a shopping mall. In other words,
 refers to the deposit/outcome details of deposits, but is simply
 metadata that specifies specifications for income/outcome scenarios.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `code`: Identifier code.
@@ -2434,7 +2434,7 @@ note that, `value` must have positive number only, even if it is a
 outcome. The minus value must be expressed by multiplying the
 [shopping_deposits.direction](#shopping_deposits) value of the corresponding.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_deposit_id`: Belonged metadata's [shopping_deposits.id](#shopping_deposits)
@@ -2468,7 +2468,7 @@ make a deposit, but it has not yet been confirmed. Only when the customer
 completes the [payment](#shopping_deposit_charge_publishes)
 will the deposit increase be confirmed.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_customer_id`: Belonged metadata's [shopping_deposits.id](#shopping_deposits)
@@ -2495,7 +2495,7 @@ only when payment (`paid_at`) is complete. This is what the
 However, even after payment has been made, there may be cases where it is
 suddenly cancelled, so you must be careful about this as well.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_deposit_charge_id`: Belonged charge appliance's [shopping_deposit_charges.id](#shopping_deposit_charges)
@@ -2527,7 +2527,7 @@ mileage deposit and outcome history, but is simply metadata that
 specifies specifications for scenarios in which mileage is deposited and
 withdrawn.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `code`: Identifier code.
@@ -2548,7 +2548,7 @@ withdrawn.
 
 ### `shopping_mileage_donations`
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_admin_customer_id`: Belonged seller's [shopping_customers.id](#shopping_customers)
@@ -2569,7 +2569,7 @@ note that, `value` must have positive number only, even if it is a
 outcome. The minus value must be expressed by multiplying the
 [shopping_mileages.direction](#shopping_mileages) value of the corresponding.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_mileage_id`: Belonged metadata's [shopping_mileages.id](#shopping_mileages)
@@ -2685,7 +2685,7 @@ However, comments themselves can be made by every customers, even if they
 are not the person who wrote the article. Of course, it cannot be written
 unless the seller is a party.
 
-**Properties**
+Properties as follows:
 
 - `id`: PK + FK.
 - `shopping_sale_snapshot_id`: Belonged snapshot's [shopping_sale_snapshots.id](#shopping_sale_snapshots)
@@ -2716,7 +2716,7 @@ provides a `secret` attribute, allowing you to create a "secret message"
 that can only be viewed by the seller and the customer who wrote the
 question.
 
-**Properties**
+Properties as follows:
 
 - `id`: PK + FK.
 - `secret`
@@ -2743,7 +2743,7 @@ the same product indefinitely. Wouldn't there be restrictions, such as
 if you write a review once, you can write an additional review a month
 later?
 
-**Properties**
+Properties as follows:
 
 - `id`: PK + FK.
 - `shopping_order_good_id`: Belonged good's [shopping_order_goods.id](#shopping_order_goods)
@@ -2759,7 +2759,7 @@ to the content of [review article](#shopping_sale_snapshot_reviews).
 In other words, after writing a review article, customers can edit it
 and change the evaluation `score` at any time.
 
-**Properties**
+Properties as follows:
 
 - `id`: PK + FK.
 - `score`: Estimation score value.
@@ -2784,7 +2784,7 @@ Encourage people to write comments on the inquiry article. This is to
 prevent comments from being scattered in both inquiry and response
 articles.
 
-**Properties**
+Properties as follows:
 
 - `id`: PK + FK
 - `shopping_sale_snapshot_inquiry_id`: Belonged inquiry's [shopping_sale_snapshot_inquiries.id](#shopping_sale_snapshot_inquiries)
@@ -2804,7 +2804,7 @@ For reference, only related parties can write comments for
 In other words, anyone customer can freely write a comment, even if they are
 not the person who wrote the inquiry.
 
-**Properties**
+Properties as follows:
 
 - `id`: PK + FK
 - `shopping_customer_id`: Writer's [shopping_customers.id](#shopping_customers)
@@ -2913,7 +2913,7 @@ has favorited. Also, `shopping_sale_favorites` archives the
 [snapshot](#shopping_sale_snapshots) of the sale at the time when the
 customer favorites it.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_customer_id`: Belonged customer's [shopping_customers.id](#shopping_customers)
@@ -2936,7 +2936,7 @@ the [inquiry](#shopping_sale_snapshot_inquiries) that the
 [snapshot](#shopping_sale_snapshots) of the inquiry at the time when
 the customer favorites it.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_customer_id`: Belonged customer's [shopping_customers.id](#shopping_customers)
@@ -2956,7 +2956,7 @@ Favorite addresses.
 [address](#shopping_addresses) that the
 [customer](#shopping_customers) has favorited.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `shopping_customer_id`: Belonged customer's [shopping_customers.id](#shopping_customers)
