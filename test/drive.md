@@ -152,7 +152,7 @@ name or signs up for our service after being a user of an external service,
 all related records are changed at once. Therefore, identification and tracking
 of customers can be done very systematically.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `drive_member_id`: Belonged member's [drive_members.id](#drive_members)
@@ -199,7 +199,7 @@ violation.
 In addition, additional information received from external services can
 be recorded in the `data` field in JSON format.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `application`
@@ -238,7 +238,7 @@ users is also done based on this mobile.
 Of course, real name and mobile phone authentication information are
 encrypted and stored.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `mobile`: Mobile phone number.
@@ -262,7 +262,7 @@ if you want to create your own repository or participate into some
 [enterprise](#drive_enterprises) as an
 [employee](#drive_enterprise_employees), you must join as a member.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `drive_account_id`: Belonged account's [drive_accounts.id](#drive_accounts)
@@ -284,7 +284,7 @@ This system allows multiple email addresses to be registered for one
 [member](#drive_members). If you don't have to plan such multiple
 email addresses, just use only one.
 
-**Properties**
+Properties as follows:
 
 - `id`:
 - `drive_member_id`: Belonged member's [drive_members.id](#drive_members)
@@ -313,7 +313,7 @@ For example, this may be the case when an account or repository that started
 as an individual becomes successful and is promoted to an enterprise in the
 future.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `code`: Identifer code of the account.
@@ -335,7 +335,7 @@ a team can have its [companions](#drive_enterprise_team_companions)
 collectively have the same [access rights](#drive_repository_accesses) to
 enterprise [repositories](#drive_repositories).
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `drive_account_id`: Belonged account's [drive_accounts.id](#drive_accounts)
@@ -360,7 +360,7 @@ of this drive system can be
 is possible for one person to belong to multiple enterprises as an employee at
 the same time.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `drive_enterprise_id`: Belonged enterprise's [drive_enterprises.id](#drive_enterprises)
@@ -383,7 +383,7 @@ Therefore, this entity record is created once when a enterprise appoints
 an employee, and is accumulated each time the employee changes his or her
 position thereafter.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `drive_enterprise_employee_id`: Belonged employee's [drive_enterprise_employees.id](#drive_enterprise_employees)
@@ -402,7 +402,7 @@ Team information within the enterprise.
 by receiving [permission](#drive_repository_accesses) from the enterprise's
 [repository](#drive_repositories).
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `drive_enterprise_id`: Belonged enterprise's [drive_enterprises.id](#drive_enterprises)
@@ -427,7 +427,7 @@ same time. This is similar to how it was possible for one member to be
 [appointed](#drive_enterprise_employee_appointments) as an employee at
 multiple enterprises at the same time.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `drive_enterprise_team_id`: Belonged team's [drive_enterprise_teams.id](#drive_enterprise_teams)
@@ -450,7 +450,7 @@ Therefore, this entity record is first created when the team appoints a
 companion, and is accumulated each time the companion changes roles
 thereafter.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `drive_enterprise_team_companion_id`: Belonged team companion's [drive_enterprise_team_companions.id](#drive_enterprise_team_companions)
@@ -537,7 +537,7 @@ addition, the account owner who created the repository can use the repository
 with fellow members or [team](#drive_enterprise_teams) companion through
 controlling [access rights](#drive_repository_accesses) to the repository.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `drive_account_id`: Belonged account's [drive_accounts.id](#drive_accounts)
@@ -558,7 +558,7 @@ entities of [folders](#drive_repository_folders),
 [shortcut icons](#drive_repository_shortcuts), respectively. In other
 / words, it is a table that stores common information about files and folders.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `drive_repository_id`: Belonged repository's [drive_repositories.id](#drive_repositories)
@@ -584,7 +584,7 @@ Folder (directory).
 `drive_repository_folders` is an entity that represents a folder in the
 [repository](#drive_repositories).
 
-**Properties**
+Properties as follows:
 
 - `id`: PK + FK.
 
@@ -598,7 +598,7 @@ File.
 And the location where the file is physically stored is recorded in the
 attribute url.
 
-**Properties**
+Properties as follows:
 
 - `id`: PK + FK.
 - `extension`: Extension of file.
@@ -615,7 +615,7 @@ other [buckets](#drive_repository_buckets) in the repository.
 A concept that is exactly the same as a shortcut icon in Windows and
 a symbolic link in Linux.
 
-**Properties**
+Properties as follows:
 
 - `id`: PK + FK.
 - `drive_repository_bucket_id`
@@ -637,7 +637,7 @@ For reference, the account owner who created the repository is also recorded
 in access permission control. In other words, as soon as the account owner
 creates the repository, one table record is created and started.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `drive_repository_id`: Belonged repository's [drive_repositories.id](#drive_repositories)
@@ -653,7 +653,7 @@ creates the repository, one table record is created and started.
 
 Search tag of repository.
 
-**Properties**
+Properties as follows:
 
 - `id`: Primary Key.
 - `drive_repository_id`: Belonged repository's [drive_repositories.id](#drive_repositories)

@@ -8,7 +8,7 @@ export namespace PrismaMarkdownDescriptionWriter {
       `### \`${model.dbName ?? model.name}\``,
       ...(description.length ? ["", description] : []),
       "",
-      "**Properties**",
+      "Properties as follows:",
       "",
       ...model.fields.filter((f) => f.kind !== "object").map(writeField),
     ].join("\n");
