@@ -33,18 +33,18 @@
   },
   "homepage": "https://github.com/samchon/prisma-markdown",
   "devDependencies": {
-    "@prisma/client": "^7.0.0",
+    "@prisma/client": "^7.0.1",
     "@types/node": "^22.13.10",
     "@vitest/coverage-v8": "^3.0.8",
     "prettier": "^3.5.3",
-    "prisma": "^7.0.0",
+    "prisma": "^7.0.1",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2",
     "vitest": "^3.0.8"
   },
   "dependencies": {
-    "@prisma/generator-helper": "^7.0.0"
+    "@prisma/generator-helper": "^7.0.1"
   },
   "peerDependencies": {
     "@prisma/client": ">= 7.0.0",
