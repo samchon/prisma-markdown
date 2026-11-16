@@ -3465,7 +3465,7 @@ model shopping_deposit_histories {
   /// @format uuid
   shopping_citizen_id String @db.Uuid
 
-  /// The source record occured deposit/outcome.
+  /// The source record occurred deposit/outcome.
   ///
   /// @format uuid
   source_id String @db.Uuid
@@ -3738,7 +3738,7 @@ model shopping_mileage_histories {
   /// @format uuid
   shopping_citizen_id String @db.Uuid
 
-  /// The source record occured income/outcome.
+  /// The source record occurred income/outcome.
   ///
   /// @format uuid
   source_id String @db.Uuid

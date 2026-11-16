@@ -21,6 +21,8 @@ const main = (): void => {
   for (const file of directory) {
     process.chdir(`${__dirname}/${file}`);
     execute();
+    const verifier: string = `${__dirname}/${file}/index.ts`;
+    if (fs.existsSync(verifier)) require(verifier).default();
   }
 };
 main();

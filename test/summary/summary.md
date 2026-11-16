@@ -130,7 +130,7 @@ fraud.
 Properties as follows:
 
 - `id`:
-- `bbs_article_id`: Belong article's {@link bbs_articles.id}
+- `bbs_article_id`: Belong article's [bbs_articles.id](#bbs_articles)
 - `format`
   > Format of body.
   >
@@ -158,8 +158,8 @@ see in this documents.
 Properties as follows:
 
 - `id`:
-- `bbs_article_snapshot_id`: Belonged snapshot's {@link bbs_article_snapshots.id}
-- `attachment_file_id`: Belonged file's {@link attachment_files.id}
+- `bbs_article_snapshot_id`: Belonged snapshot's [bbs_article_snapshots.id](#bbs_article_snapshots)
+- `attachment_file_id`: Belonged file's [attachment_files.id](#attachment_files)
 - `sequence`: Sequence of attachment file in the snapshot.
 
 ### `bbs_article_comments`

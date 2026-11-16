@@ -1,0 +1,56 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator markdown {
+  provider = "node ../../lib/executable/markdown"
+  title    = "Link References"
+  output   = "./links.md"
+}
+
+/// Owns many {@link Post posts}; see also {@link UserProfile}.
+/// Legacy {@link users}; identifier {@link User.id user identifier}.
+///
+/// @namespace Accounts
+model User {
+  id      String       @id
+  posts   Post[]
+  profile UserProfile?
+
+  @@map("users")
+}
+
+/// Profile of {@link User}.
+///
+/// @namespace Profiles
+model UserProfile {
+  id     String @id
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@map("user_profiles")
+}
+
+/// Tagged with {@link Tag tags} through {@link _PostToTag}.
+///
+/// @summary Posts by {@link User users}.
+/// @namespace Articles
+model Post {
+  id       Int    @id
+  /// Author {@link User.id}.
+  ///
+  /// @summary Identifier of {@link User}.
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+  tags     Tag[]
+}
+
+/// Tags for {@link Post}.
+///
+/// @namespace Articles
+model Tag {
+  id    Int    @id
+  posts Post[]
+
+  @@map("PostTags")
+}
