@@ -1427,7 +1427,7 @@ Properties as follows:
   >
   > Until purchase the commodity, the commodity can be reused to create new
   > cart commodity. This variable can be computed by referencing
-  > [order](#Orders) related tables, but just denormalized for the
+  > [order](#orders) related tables, but just denormalized for the
   > performance reason.
 
 ### `shopping_cart_commodity_stocks`
