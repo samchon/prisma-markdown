@@ -1,6 +1,6 @@
 {
   "name": "prisma-markdown",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Prisma Markdown documents generator including ERD diagrams and comment descriptions",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -11,6 +11,8 @@
     "build": "rimraf lib && tsc",
     "dev": "rimraf lib && tsc --watch",
     "test": "ts-node test/index.ts",
+    "test:peers": "pwsh -NoProfile -File test/peers.ps1",
+    "release": "pwsh -NoProfile -File scripts/release.ps1",
     "vitest:cov": "vitest run --coverage"
   },
   "repository": {
@@ -33,26 +35,21 @@
   },
   "homepage": "https://github.com/samchon/prisma-markdown",
   "devDependencies": {
-    "@prisma/client": "^7.0.0",
-    "@types/node": "^22.13.10",
-    "@vitest/coverage-v8": "^4.1.8",
-    "prettier": "^3.5.3",
-    "prisma": "^7.0.0",
-    "rimraf": "^6.0.1",
+    "@prisma/client": "^7.10.1",
+    "@types/node": "^22.20.5",
+    "@vitest/coverage-v8": "^4.1.12",
+    "prettier": "^3.10.1",
+    "prisma": "^7.10.1",
+    "rimraf": "^6.1.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.2",
-    "vitest": "^4.1.8"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.12"
   },
   "dependencies": {
-    "@prisma/generator-helper": "^7.0.0"
+    "@prisma/generator-helper": "^7.10.1"
   },
   "peerDependencies": {
-    "@prisma/client": ">= 7.0.0",
-    "prisma": ">= 7.0.0"
+    "prisma": "^7.0.0"
   },
-  "files": [
-    "lib",
-    "src",
-    "README.md"
-  ]
+  "files": ["lib", "src", "README.md"]
 }

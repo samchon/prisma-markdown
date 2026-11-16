@@ -28,6 +28,14 @@ At first, install NPM package.
 npm i -D prisma-markdown
 ```
 
+Prisma 7.x is supported. `@prisma/client` is not required to generate Markdown;
+install it separately if your application also needs Prisma Client. Compatibility
+tests cover Prisma 7.0.0 and the version locked for development.
+
+Maintainers can run `pnpm release` from a clean, synchronized `master` after
+merging a version update. It creates the version's GitHub Release, which triggers
+the npm publishing workflow with provenance.
+
 At next, add the generator to the schema file.
 
 ```prisma
