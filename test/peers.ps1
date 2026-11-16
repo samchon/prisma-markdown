@@ -68,7 +68,12 @@ try {
         -not ([System.IO.Path]::GetFileName($taskResolvedRoot).StartsWith('prisma-markdown-peers-'))) {
         throw 'Unexpected peer-test cleanup target'
     }
-    Remove-Item -LiteralPath $taskResolvedRoot -Recurse
+    if ($IsWindows) {
+        Remove-Item -LiteralPath $taskResolvedRoot -Recurse
+    } else {
+        # Unix npm trees contain dotfiles that PowerShell treats as hidden.
+        Remove-Item -LiteralPath $taskResolvedRoot -Recurse -Force
+    }
 }
 
 if ($taskFailures.Count -gt 0) { throw ($taskFailures -join "`n") }

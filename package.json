@@ -12,6 +12,7 @@
     "dev": "rimraf lib && tsc --watch",
     "test": "ts-node test/index.ts",
     "test:peers": "pwsh -NoProfile -File test/peers.ps1",
+    "release": "pwsh -NoProfile -File scripts/release.ps1",
     "vitest:cov": "vitest run --coverage"
   },
   "repository": {
