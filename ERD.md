@@ -1427,7 +1427,7 @@ Properties as follows:
   >
   > Until purchase the commodity, the commodity can be reused to create new
   > cart commodity. This variable can be computed by referencing
-  > [order](#Orders) related tables, but just denormalized for the
+  > [order](#orders) related tables, but just denormalized for the
   > performance reason.
 
 ### `shopping_cart_commodity_stocks`
@@ -2439,7 +2439,7 @@ Properties as follows:
 - `id`: Primary Key.
 - `shopping_deposit_id`: Belonged metadata's [shopping_deposits.id](#shopping_deposits)
 - `shopping_citizen_id`: Belonged citizen's [shopping_citizens.id](#shopping_citizens)
-- `source_id`: The source record occured deposit/outcome.
+- `source_id`: The source record occurred deposit/outcome.
 - `value`
   > Income/outcome amount of deposit.
   >
@@ -2574,7 +2574,7 @@ Properties as follows:
 - `id`: Primary Key.
 - `shopping_mileage_id`: Belonged metadata's [shopping_mileages.id](#shopping_mileages)
 - `shopping_citizen_id`: Belonged citizen's [shopping_citizens.id](#shopping_citizens)
-- `source_id`: The source record occured income/outcome.
+- `source_id`: The source record occurred income/outcome.
 - `value`
   > Income/outcome amount of mileage.
   >

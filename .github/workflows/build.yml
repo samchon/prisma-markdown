@@ -1,6 +1,10 @@
 name: build
 on: [pull_request]
 
+defaults:
+  run:
+    shell: pwsh
+
 jobs:
   Ubuntu:
     runs-on: ubuntu-latest
@@ -20,6 +24,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - run: npm install
+      - run: npm ci
       - run: npm run build
       - run: npm run test
+      - run: npm run vitest:cov
+      - run: npm run test:peers

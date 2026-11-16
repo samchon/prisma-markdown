@@ -1,21 +1,32 @@
 import { DMMF } from "@prisma/generator-helper";
 import { PrismaUtil } from "../utils/PrismaUtil";
+import { PrismaMarkdownLinker } from "../utils/PrismaMarkdownLinker";
 
 export namespace PrismaMarkdownDescriptionWriter {
-  export const table = (model: DMMF.Model): string => {
-    const description: string = writeDescription(model);
+  export const table = (
+    model: DMMF.Model,
+    resolveLink: (reference: string) => string = PrismaMarkdownLinker.create([
+      model,
+    ]),
+  ): string => {
+    const description: string = writeDescription(model, resolveLink);
     return [
       `### \`${model.dbName ?? model.name}\``,
       ...(description.length ? ["", description] : []),
       "",
       "Properties as follows:",
       "",
-      ...model.fields.filter((f) => f.kind !== "object").map(writeField),
+      ...model.fields
+        .filter((f) => f.kind !== "object")
+        .map((field) => writeField(field, resolveLink)),
     ].join("\n");
   };
 
-  const writeField = (field: DMMF.Field): string => {
-    const description: string = writeDescription(field);
+  const writeField = (
+    field: DMMF.Field,
+    resolveLink: (reference: string) => string,
+  ): string => {
+    const description: string = writeDescription(field, resolveLink);
     const lines: string[] = description.split("\n");
     const head = `- \`${field.dbName ?? field.name}\``;
 
@@ -24,7 +35,10 @@ export namespace PrismaMarkdownDescriptionWriter {
     return [head, ...lines.map((line) => `  > ${line}`.trimEnd())].join("\n");
   };
 
-  const writeDescription = (target: DMMF.Model | DMMF.Field): string => {
+  const writeDescription = (
+    target: DMMF.Model | DMMF.Field,
+    resolveLink: (reference: string) => string,
+  ): string => {
     const content: string[] = (target.documentation ?? "")
       .split("\r\n")
       .join("\n")
@@ -37,8 +51,12 @@ export namespace PrismaMarkdownDescriptionWriter {
     while (first < content.length && empty(content[first])) ++first;
     while (last >= 0 && empty(content[last])) --last;
 
-    const summary: string[] = PrismaUtil.tagValues("summary")(target);
-    const body: string[] = content.slice(first, last + 1).map(replaceLinks);
+    const summary: string[] = PrismaUtil.tagValues("summary")(target).map(
+      (line) => replaceLinks(line, resolveLink),
+    );
+    const body: string[] = content
+      .slice(first, last + 1)
+      .map((line) => replaceLinks(line, resolveLink));
 
     return summary.length
       ? body.length
@@ -47,7 +65,10 @@ export namespace PrismaMarkdownDescriptionWriter {
       : body.join("\n");
   };
 
-  const replaceLinks = (content: string): string => {
+  const replaceLinks = (
+    content: string,
+    resolveLink: (reference: string) => string,
+  ): string => {
     const rejoined: string[] = [];
     let i: number = 0;
 
@@ -59,13 +80,13 @@ export namespace PrismaMarkdownDescriptionWriter {
       if (last === -1) break;
 
       const part: string = content.slice(first + 7, last).trim();
-      const space: number = part.indexOf(" ");
+      const space: number = part.search(/\s/);
       rejoined.push(content.slice(i, first));
 
-      if (space === -1) rejoined.push(`[${part}](#${part.split(".")[0]})`);
+      if (space === -1) rejoined.push(`[${part}](#${resolveLink(part)})`);
       else
         rejoined.push(
-          `[${part.slice(space + 1)}](#${part.slice(0, space).split(".")[0]})`,
+          `[${part.slice(space + 1).trimStart()}](#${resolveLink(part.slice(0, space))})`,
         );
       i = last + 1;
     }

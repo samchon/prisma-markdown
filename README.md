@@ -28,6 +28,10 @@ At first, install NPM package.
 npm i -D prisma-markdown
 ```
 
+Prisma 7.x is supported. `@prisma/client` is not required to generate Markdown;
+install it separately if your application also needs Prisma Client. Compatibility
+tests cover Prisma 7.0.0 and the version locked for development.
+
 At next, add the generator to the schema file.
 
 ```prisma
@@ -57,6 +61,17 @@ Also, if you use `@erd <name>` instead of `@namespace <name>`, target model woul
 - `@describe <name>`: Only markdown content
 - `@hidden`: Neither ERD nor markdown content
 - `@minItems 1`: Mandatory relationship when 1: **N** (`||---|{`)
+
+Use `{@link Model}`, `{@link Model.field}`, or `{@link Model label}` in model
+and field comments, including `@summary`, to link to a model's description.
+Links use the target model's `@@map` table name when present and the heading's
+normalized anchor. Existing links written with database table names also work;
+Prisma model names take precedence if the names conflict.
+
+When using the library API, `PrismaMarkdown.write(schema)` resolves references
+across all chapters. `writeChapter(chapter)` uses the models in that chapter,
+and `writeDescription(model)` resolves the model's own references. Use `write`
+with the complete schema when references need other models' mapped table names.
 
 ```prisma
 /// Both description and ERD on Actors chatper.
